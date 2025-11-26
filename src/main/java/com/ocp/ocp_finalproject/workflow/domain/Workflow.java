@@ -1,0 +1,56 @@
+package com.ocp.ocp_finalproject.workflow.domain;
+
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.catalina.User;
+import org.hibernate.engine.internal.Cascade;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "workflow")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Workflow extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "workflow_id")
+    private Long workflowId;
+
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Work> works = new ArrayList<>();
+
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecurrenceRule> recurrenceRules = new ArrayList<>();
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "site_url_id")
+//    private SiteUrlInfo siteUrlInfo;
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_blog_id")
+//    private UserBlog userBlog;
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "trend_keyword_id")
+//    private TrendKeyword trendKeyword;
+
+    @Column(name = "is_test")
+    private Boolean isTest = false;
+
+    private String status;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+}
