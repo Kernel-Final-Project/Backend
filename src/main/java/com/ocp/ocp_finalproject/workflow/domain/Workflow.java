@@ -1,12 +1,12 @@
 package com.ocp.ocp_finalproject.workflow.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
-import org.hibernate.engine.internal.Cascade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Workflow extends BaseEntity {
 
     @Id
@@ -43,14 +44,18 @@ public class Workflow extends BaseEntity {
 
 //    @OneToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "trend_keyword_id")
-//    private TrendKeyword trendKeyword;
+//    private SetTrendKeyword setTrendKeyword;
+
+//    @OneToMany(mappedBy = "dailyStatistics", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<DailyStatistics> dailyStatistics = new ArrayList<>();
 
     @Column(name = "is_test")
     private Boolean isTest = false;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private WorkflowStatus status;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
 }
