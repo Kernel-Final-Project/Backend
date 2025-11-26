@@ -37,9 +37,3 @@ body:
       label: "🧪 로그 / 스크린샷"
       description: "가능하다면 관련 로그나 화면을 추가해주세요."
       placeholder: "error log, request/response 등"
-
-  - type: textarea
-    id: reference
-    attributes:
-      label: "🙋🏻 참고 자료"
-      description: "관련 링크나 참고할 자료가 있다면 적어주세요."
