@@ -1,0 +1,38 @@
+name: "♻️ Refactor"
+description: "리팩토링 작업 요청"
+labels: ["refactor"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "📄 설명"
+      description: "리팩토링 이유와 목적을 설명해주세요."
+      placeholder: "예: 서비스 A의 코드 복잡도 개선"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 작업할 내용"
+      description: "리팩토링 작업 항목을 체크박스 형태로 작성해주세요."
+      placeholder: |
+        - [ ] 불필요한 코드 정리
+        - [ ] 모듈 구조 개선
+        - [ ] 테스트 코드 보강
+    validations:
+      required: true
+
+  - type: textarea
+    id: risk
+    attributes:
+      label: "⚠️ 영향 범위"
+      description: "리팩토링으로 인해 영향 받는 기능이 있다면 작성해주세요."
+      placeholder: "예: 회원가입 API 영향 가능성"
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: "🙋🏻 참고 자료"
+      description: "참고할 자료가 있다면 자유롭게 남겨주세요."
