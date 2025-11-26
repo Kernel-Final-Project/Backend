@@ -30,9 +30,3 @@ body:
       label: "⚠️ 영향 범위"
       description: "리팩토링으로 인해 영향 받는 기능이 있다면 작성해주세요."
       placeholder: "예: 회원가입 API 영향 가능성"
-
-  - type: textarea
-    id: reference
-    attributes:
-      label: "🙋🏻 참고 자료"
-      description: "참고할 자료가 있다면 자유롭게 남겨주세요."
