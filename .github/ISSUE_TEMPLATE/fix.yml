@@ -1,0 +1,32 @@
+name: "🛠️ Fix"
+description: "버그는 아니지만 수정이 필요한 작업"
+labels: ["fix"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "📄 수정할 내용"
+      description: "수정이 필요한 내용이나 문제 상황을 설명해주세요."
+      placeholder: "예: 문구 오타 수정, API 응답 필드명 변경 등"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "🤔 수정 이유"
+      description: "왜 수정이 필요한지 이유를 설명해주세요."
+      placeholder: "예: 사용자가 혼동할 가능성 있음"
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 작업할 내용"
+      description: "수정해야 할 항목들을 체크박스 형태로 작성해주세요."
+      placeholder: |
+        - [ ] 수정할 부분 1
+        - [ ] 수정할 부분 2
+        - [ ] 테스트 필요 시 작성하기
+    validations:
+      required: true
