@@ -1,0 +1,45 @@
+name: "🐞 Bug Report"
+description: "버그 또는 오류 제보"
+labels: ["bug"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "📄 문제 설명"
+      description: "발생한 문제를 명확히 설명해 주세요."
+      placeholder: "예: 게시글 목록 API 호출 시 500 에러 발생"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: "🔁 재현 절차"
+      description: "에러가 발생하는 과정을 단계별로 작성해주세요."
+      placeholder: |
+        1. /api/posts 호출
+        2. 특정 header 값을 포함
+        3. 500 에러 출력
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "✨ 기대 동작"
+      description: "정상 작동 시 어떻게 되어야 하는지 작성해주세요."
+      placeholder: "예: 정상적으로 게시글 목록이 반환되어야 함"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "🧪 로그 / 스크린샷"
+      description: "가능하다면 관련 로그나 화면을 추가해주세요."
+      placeholder: "error log, request/response 등"
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: "🙋🏻 참고 자료"
+      description: "관련 링크나 참고할 자료가 있다면 적어주세요."
