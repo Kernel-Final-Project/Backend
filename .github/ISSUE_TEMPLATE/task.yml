@@ -1,0 +1,31 @@
+name: "📝 Task"
+description: "일반 작업 요청"
+labels: ["task"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "📄 설명"
+      description: "작업해야 하는 내용을 설명해 주세요."
+      placeholder: "예: A 서비스의 API 응답 포맷 수정"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "✅ 작업할 내용"
+      description: "구체적인 작업 항목을 체크박스 형태로 작성해주세요."
+      placeholder: |
+        - [ ] 상세 작업 1
+        - [ ] 상세 작업 2
+        - [ ] 테스트 필요 시 작성하기
+    validations:
+      required: true
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: "🙋🏻 참고 자료"
+      description: "참고할 자료가 있다면 링크나 내용을 작성해주세요."
