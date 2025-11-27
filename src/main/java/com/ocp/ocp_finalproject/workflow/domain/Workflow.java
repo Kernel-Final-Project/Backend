@@ -20,7 +20,7 @@ public class Workflow extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "workflow_id")
-    private Long workflowId;
+    private Long id;
 
     @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Work> works = new ArrayList<>();

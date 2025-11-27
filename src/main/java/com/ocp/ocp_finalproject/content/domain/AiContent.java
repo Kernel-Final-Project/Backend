@@ -4,10 +4,7 @@ import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.content.enums.ContentStatus;
 import com.ocp.ocp_finalproject.workflow.domain.Work;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +17,7 @@ public class AiContent extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ai_content_id")
-    private Long aiContentId;
+    private Long id;
 
     @Column(nullable = false)
     private String title;
@@ -43,6 +40,8 @@ public class AiContent extends BaseEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    // 편의 메서드
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id", nullable = false)
     private Work work;
@@ -70,8 +69,4 @@ public class AiContent extends BaseEntity {
         return aiContent;
     }
 
-    // 편의 메서드
-    public void setWork(Work work) {
-        this.work = work;
-    }
 }

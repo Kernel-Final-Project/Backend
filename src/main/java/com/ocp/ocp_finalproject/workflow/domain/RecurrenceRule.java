@@ -19,7 +19,7 @@ public class RecurrenceRule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recurrence_rule_id")
-    private Long recurrenceRuleId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflow_id")
@@ -29,7 +29,7 @@ public class RecurrenceRule extends BaseEntity {
     @Column(name = "repeat_type", length = 50)
     private RepeatType repeatType;
 
-    @Column(name = "repeat_interval", columnDefinition = "JSON")
+    @Column(name = "repeat_interval")
     private Integer repeatInterval;
 
     @Column(name = "days_of_week", length = 500, columnDefinition = "JSON")

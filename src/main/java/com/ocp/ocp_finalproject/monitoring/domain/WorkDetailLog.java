@@ -1,9 +1,10 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.monitoring.enums.StepStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import com.ocp.ocp_finalproject.monitoring.enums.LogLevel;
 
 /**
  * 작업 상세 로그 엔티티
@@ -21,7 +22,7 @@ public class WorkDetailLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id", nullable = false)
-    private Long logId;
+    private Long id;
 
     /**
      * 작업 ID (Foreign Key)
@@ -51,16 +52,18 @@ public class WorkDetailLog extends BaseEntity {
      * 상태
      */
     @Column(name = "status", length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StepStatus status;
 
     /**
      * 로그 레벨
      */
     @Column(name = "log_level", length = 100)
-    private String logLevel;
+    @Enumerated(EnumType.STRING)
+    private LogLevel logLevel;
 
     @Builder(builderMethodName = "createBuilder")
-    public static WorkDetailLog create(Long workId, Integer stepNumber, String stepName, String logData, String status, String logLevel) {
+    public static WorkDetailLog create(Long workId, Integer stepNumber, String stepName, String logData, StepStatus status, LogLevel logLevel) {
         WorkDetailLog workDetailLog = new WorkDetailLog();
         workDetailLog.workId = workId;
         workDetailLog.stepNumber = stepNumber;

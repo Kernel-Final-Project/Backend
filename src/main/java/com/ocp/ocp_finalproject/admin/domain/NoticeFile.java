@@ -16,7 +16,7 @@ public class NoticeFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
-    private Long fileId;
+    private Long id;
 
     @Column(name = "file_name")
     private String fileName;

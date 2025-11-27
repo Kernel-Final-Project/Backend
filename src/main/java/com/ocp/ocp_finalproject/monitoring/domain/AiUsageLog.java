@@ -22,7 +22,7 @@ public class AiUsageLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usage_log_id", nullable = false)
-    private Long usageLogId;
+    private Long id;
 
     /**
      * 기능 타입

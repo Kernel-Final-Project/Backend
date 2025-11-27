@@ -18,7 +18,7 @@ public class BlogPost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blog_post_id")
-    private Long blogPostId;
+    private Long id;
 
     @Column(name = "blog_post_url", nullable = false)
     private String blogPostUrl;

@@ -20,7 +20,7 @@ public class PostDailyStats extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_stat_id")
-    private Long postStatId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_post_id", nullable = false)

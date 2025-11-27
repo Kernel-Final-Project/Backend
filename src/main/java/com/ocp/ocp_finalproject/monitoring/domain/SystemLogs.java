@@ -3,7 +3,7 @@ package com.ocp.ocp_finalproject.monitoring.domain;
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import com.ocp.ocp_finalproject.monitoring.enums.LogLevel;
 
 /**
  * 시스템 로그 엔티티
@@ -21,13 +21,14 @@ public class SystemLogs extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id", nullable = false)
-    private Long logId;
+    private Long id;
 
     /**
      * 로그 레벨 (INFO, WARN, ERROR 등)
      */
     @Column(name = "log_level", length = 10)
-    private String logLevel;
+    @Enumerated(EnumType.STRING)
+    private LogLevel logLevel;
 
     /**
      * 로그 메시지
@@ -66,7 +67,7 @@ public class SystemLogs extends BaseEntity {
     private String requestData;
 
     @Builder(builderMethodName = "createBuilder")
-    public static SystemLogs create(String logLevel, String message, String errorType, String taskType,
+    public static SystemLogs create(LogLevel logLevel, String message, String errorType, String taskType,
                                     String ipAddress, String stackTrace, String requestData) {
         SystemLogs systemLogs = new SystemLogs();
         systemLogs.logLevel = logLevel;

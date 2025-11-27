@@ -23,7 +23,7 @@ public class DailyStatistics extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stat_id", nullable = false)
-    private Long statId;
+    private Long id;
 
     /**
      * 통계 날짜

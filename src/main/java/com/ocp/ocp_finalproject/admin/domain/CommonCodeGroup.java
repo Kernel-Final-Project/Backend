@@ -18,7 +18,7 @@ public class CommonCodeGroup extends BaseEntity {
 
     @Id
     @Column(name = "group_id", length = 50)
-    private String groupId;
+    private String id;
 
     @Column(name = "group_name", length = 100)
     private String groupName;
@@ -43,7 +43,7 @@ public class CommonCodeGroup extends BaseEntity {
             List<CommonCode> codes
     ) {
         CommonCodeGroup group = new CommonCodeGroup();
-        group.groupId = groupId;
+        group.id = groupId;
         group.groupName = groupName;
         group.description = description;
         if (codes != null && !codes.isEmpty()) {

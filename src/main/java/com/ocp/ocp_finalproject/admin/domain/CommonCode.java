@@ -15,7 +15,7 @@ public class CommonCode extends BaseEntity {
 
     @Id
     @Column(name = "code_id", length = 50)
-    private String codeId;
+    private String id;
 
     @Column(name = "code_name", length = 100, nullable = false)
     private String codeName;
@@ -44,7 +44,7 @@ public class CommonCode extends BaseEntity {
             Boolean isActive
     ) {
         CommonCode code = new CommonCode();
-        code.codeId = codeId;
+        code.id = codeId;
         code.codeName = codeName;
         code.description = description;
         code.sortOrder = sortOrder;
