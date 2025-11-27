@@ -22,22 +22,25 @@ public class UserBlog extends BaseEntity {
     @JoinColumn(name = "blog_type_id")
     private BlogType blogType;
 
-    @Column(name = "account_id")
+
+    @Column(name = "account_id", length = 100)
     private String accountId;
 
-    @Column(name = "account_pw")
+    @Column(name = "account_pw", length = 255)
     private String accountPassword;
 
-    @Column(name = "blog_url")
+    @Column(name = "blog_url", length = 500)
     private String blogUrl;
 
-    @Builder
-    private UserBlog(Long id, BlogType blogType, String accountId, String accountPassword, String blogUrl) {
-        this.id = id;
-        this.blogType = blogType;
-        this.accountId = accountId;
-        this.accountPassword = accountPassword;
-        this.blogUrl = blogUrl;
+    @Builder(builderMethodName = "createBuilder")
+    public static UserBlog create(BlogType blogType, String accountId, String accountPassword, String blogUrl) {
+        UserBlog userBlog = new UserBlog();
+        userBlog.blogType = blogType;
+        userBlog.accountId = accountId;
+        userBlog.accountPassword = accountPassword;
+        userBlog.blogUrl = blogUrl;
+        return userBlog;
+
     }
 
     public void updateCredentials(String accountId, String accountPassword) {

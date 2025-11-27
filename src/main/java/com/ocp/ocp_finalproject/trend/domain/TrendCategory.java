@@ -30,17 +30,23 @@ public class TrendCategory extends BaseEntity {
     @JoinColumn(name = "parent_category_id")
     private TrendCategory parentCategory;
 
-    @Column(name = "trend_category_name")
+
+    @Column(name = "trend_category_name", length = 100)
+
     private String name;
 
     @Column(name = "depth")
     private Integer depth;
 
-    @Builder
-    private TrendCategory(TrendCategory parentCategory, String name, Integer depth) {
-        this.parentCategory = parentCategory;
-        this.name = name;
-        this.depth = depth;
+
+    @Builder(builderMethodName = "createBuilder")
+    public static TrendCategory create(TrendCategory parentCategory, String name, Integer depth) {
+        TrendCategory trendCategory = new TrendCategory();
+        trendCategory.parentCategory = parentCategory;
+        trendCategory.name = name;
+        trendCategory.depth = depth;
+        return trendCategory;
+
     }
 
     public void updateInfo(String name, Integer depth, TrendCategory parentCategory) {

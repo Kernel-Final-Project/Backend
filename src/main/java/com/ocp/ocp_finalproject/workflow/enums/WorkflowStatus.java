@@ -1,0 +1,67 @@
+package com.ocp.ocp_finalproject.workflow.enums;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 워크플로우 상태
+ */
+@Getter
+@RequiredArgsConstructor
+public enum WorkflowStatus {
+
+    PENDING("대기", "워크플로우 생성 후 첫 실행 대기 중"),
+    ACTIVE("활성", "워크플로우가 활성화되어 자동 실행 중"),
+    INACTIVE("비활성", "워크플로우가 비활성화되어 실행 중지"),
+    COMPLETED("완료", "워크플로우 완전 종료");
+
+    private final String displayName;
+    private final String description;
+
+    /**
+     * 활성 상태 여부
+     */
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
+
+    /**
+     * 실행 가능 여부
+     */
+    public boolean canExecute() {
+        return this == ACTIVE;
+    }
+
+    /**
+     * 종료 상태 여부
+     */
+    public boolean isTerminated() {
+        return this == COMPLETED;
+    }
+
+    /**
+     * 활성화 가능 여부
+     */
+    public boolean canActivate() {
+        return this == PENDING || this == INACTIVE;
+    }
+
+    /**
+     * 비활성화 가능 여부
+     */
+    public boolean canDeactivate() {
+        return this == ACTIVE;
+    }
+
+    /**
+     * 상태 전이 가능 여부 체크
+     */
+    public boolean canTransitionTo(WorkflowStatus newStatus) {
+        return switch (this) {
+            case PENDING -> newStatus == ACTIVE || newStatus == INACTIVE;
+            case ACTIVE -> newStatus == INACTIVE || newStatus == COMPLETED;
+            case INACTIVE -> newStatus == ACTIVE || newStatus == COMPLETED;
+            case COMPLETED -> false;
+        };
+    }
+}
