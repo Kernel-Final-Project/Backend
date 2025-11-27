@@ -1,22 +1,16 @@
 package com.ocp.ocp_finalproject.user.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.user.enums.UserRole;
 import com.ocp.ocp_finalproject.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "user")
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id", nullable = false)
@@ -25,25 +19,30 @@ public class User {
     @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "birth")
+    @Column(name = "birth", length = 10)
     private String birth;
 
-    @Column(name = "email")
+    @Column(name = "email", length = 100)
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 50)
     private UserStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 50)
     private UserRole role;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Builder(builderMethodName = "createBuilder")
+    public static User create(String name, String birth, String email, UserStatus status, UserRole role) {
+        User user = new User();
+        user.name = name;
+        user.birth = birth;
+        user.email = email;
+        user.status = status;
+        user.role = role;
+        return user;
+    }
 
     // ================ 비즈니스 매서드 ================
     /**

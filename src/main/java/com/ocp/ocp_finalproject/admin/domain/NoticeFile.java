@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.admin.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "notice_file")
-public class NoticeFile {
+public class NoticeFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

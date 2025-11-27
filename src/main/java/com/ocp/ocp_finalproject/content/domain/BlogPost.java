@@ -2,6 +2,7 @@ package com.ocp.ocp_finalproject.content.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.content.enums.PostStatus;
+import com.ocp.ocp_finalproject.workflow.domain.Work;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class BlogPost extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id", nullable = false)
     private Work work;
 
@@ -45,8 +46,5 @@ public class BlogPost extends BaseEntity {
     // 편의 메서드
     public void setWork(Work work) {
         this.work = work;
-        if (work.getBlogPost() != this) {
-            work.setBlogPost(this);
-        }
     }
 }

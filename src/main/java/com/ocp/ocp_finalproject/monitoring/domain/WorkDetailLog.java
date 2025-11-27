@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -12,9 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "work_detail_log")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class WorkDetailLog {
+public class WorkDetailLog extends BaseEntity {
 
     /**
      * 로그 ID (Primary Key)
@@ -60,9 +59,15 @@ public class WorkDetailLog {
     @Column(name = "log_level", length = 100)
     private String logLevel;
 
-    /**
-     * 생성 일시
-     */
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Builder(builderMethodName = "createBuilder")
+    public static WorkDetailLog create(Long workId, Integer stepNumber, String stepName, String logData, String status, String logLevel) {
+        WorkDetailLog workDetailLog = new WorkDetailLog();
+        workDetailLog.workId = workId;
+        workDetailLog.stepNumber = stepNumber;
+        workDetailLog.stepName = stepName;
+        workDetailLog.logData = logData;
+        workDetailLog.status = status;
+        workDetailLog.logLevel = logLevel;
+        return workDetailLog;
+    }
 }

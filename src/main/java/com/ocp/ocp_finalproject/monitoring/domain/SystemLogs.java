@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -12,9 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "system_logs")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class SystemLogs {
+public class SystemLogs extends BaseEntity {
 
     /**
      * 로그 ID (Primary Key)
@@ -66,9 +65,17 @@ public class SystemLogs {
     @Column(name = "request_data", columnDefinition = "JSON")
     private String requestData;
 
-    /**
-     * 생성 일시
-     */
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Builder(builderMethodName = "createBuilder")
+    public static SystemLogs create(String logLevel, String message, String errorType, String taskType,
+                                    String ipAddress, String stackTrace, String requestData) {
+        SystemLogs systemLogs = new SystemLogs();
+        systemLogs.logLevel = logLevel;
+        systemLogs.message = message;
+        systemLogs.errorType = errorType;
+        systemLogs.taskType = taskType;
+        systemLogs.ipAddress = ipAddress;
+        systemLogs.stackTrace = stackTrace;
+        systemLogs.requestData = requestData;
+        return systemLogs;
+    }
 }

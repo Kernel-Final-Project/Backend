@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -13,9 +14,7 @@ import java.time.LocalDate;
 @Table(name = "system_daily_statistics")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class SystemDailyStatistics {
+public class SystemDailyStatistics extends BaseEntity {
 
     /**
      * 통계 ID (Primary Key)
@@ -90,4 +89,24 @@ public class SystemDailyStatistics {
      */
     @Column(name = "active_user_growth_rate", precision = 5, scale = 2)
     private BigDecimal activeUserGrowthRate;
+
+    @Builder(builderMethodName = "createBuilder")
+    public static SystemDailyStatistics create(LocalDate statDate, Integer totalUsers, BigDecimal userGrowthRate,
+                                              Integer totalWorkflows, Integer workflowGrowthRate, BigDecimal postGrowthRate,
+                                              Integer totalAiRequests, BigDecimal totalAiCost, BigDecimal aiCostGrowthRate,
+                                              Integer activeUsersToday, BigDecimal activeUserGrowthRate) {
+        SystemDailyStatistics systemDailyStatistics = new SystemDailyStatistics();
+        systemDailyStatistics.statDate = statDate;
+        systemDailyStatistics.totalUsers = totalUsers;
+        systemDailyStatistics.userGrowthRate = userGrowthRate;
+        systemDailyStatistics.totalWorkflows = totalWorkflows;
+        systemDailyStatistics.workflowGrowthRate = workflowGrowthRate;
+        systemDailyStatistics.postGrowthRate = postGrowthRate;
+        systemDailyStatistics.totalAiRequests = totalAiRequests;
+        systemDailyStatistics.totalAiCost = totalAiCost;
+        systemDailyStatistics.aiCostGrowthRate = aiCostGrowthRate;
+        systemDailyStatistics.activeUsersToday = activeUsersToday;
+        systemDailyStatistics.activeUserGrowthRate = activeUserGrowthRate;
+        return systemDailyStatistics;
+    }
 }

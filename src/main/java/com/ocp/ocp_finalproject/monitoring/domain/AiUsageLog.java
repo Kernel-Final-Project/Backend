@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -13,9 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "ai_usage_log")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class AiUsageLog {
+public class AiUsageLog extends BaseEntity {
 
     /**
      * 사용 로그 ID (Primary Key)
@@ -62,12 +61,6 @@ public class AiUsageLog {
     private BigDecimal estimatedCost;
 
     /**
-     * 생성 일시
-     */
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    /**
      * 작업 ID (Foreign Key)
      */
     @Column(name = "work_id", nullable = false)
@@ -78,4 +71,19 @@ public class AiUsageLog {
      */
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @Builder(builderMethodName = "createBuilder")
+    public static AiUsageLog create(String featureType, String model, Integer promptTokens, Integer completionTokens,
+                                    Integer totalTokens, BigDecimal estimatedCost, Long workId, Long userId) {
+        AiUsageLog aiUsageLog = new AiUsageLog();
+        aiUsageLog.featureType = featureType;
+        aiUsageLog.model = model;
+        aiUsageLog.promptTokens = promptTokens;
+        aiUsageLog.completionTokens = completionTokens;
+        aiUsageLog.totalTokens = totalTokens;
+        aiUsageLog.estimatedCost = estimatedCost;
+        aiUsageLog.workId = workId;
+        aiUsageLog.userId = userId;
+        return aiUsageLog;
+    }
 }

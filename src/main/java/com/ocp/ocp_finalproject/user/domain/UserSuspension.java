@@ -1,23 +1,19 @@
 package com.ocp.ocp_finalproject.user.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "user_suspension")
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class UserSuspension {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserSuspension extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "suspension_id", nullable = false)
@@ -40,14 +36,18 @@ public class UserSuspension {
     @Column(name = "unsuspended_at")
     private LocalDateTime unsuspendedAt;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Builder(builderMethodName = "createBuilder")
+    public static UserSuspension create(User user, User suspendedUser, String reason, LocalDateTime suspendedAt, LocalDateTime unsuspendedAt, Boolean isActive) {
+        UserSuspension userSuspension = new UserSuspension();
+        userSuspension.user = user;
+        userSuspension.suspendedUser = suspendedUser;
+        userSuspension.reason = reason;
+        userSuspension.suspendedAt = suspendedAt;
+        userSuspension.unsuspendedAt = unsuspendedAt;
+        userSuspension.isActive = (isActive != null) ? isActive : true;
+        return userSuspension;
+    }
 }

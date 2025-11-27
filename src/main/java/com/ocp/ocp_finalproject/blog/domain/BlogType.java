@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.blog.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,23 +16,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "blog_type")
-public class BlogType {
+public class BlogType extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blog_type_id")
     private Long id;
 
-    @Column(name = "blog_type_name")
+    @Column(name = "blog_type_name", length = 100)
     private String name;
 
-    @Column(name = "blog_base_url")
+    @Column(name = "blog_base_url", length = 255)
     private String baseUrl;
 
-    @Builder
-    private BlogType(Long id, String name, String baseUrl) {
-        this.id = id;
-        this.name = name;
-        this.baseUrl = baseUrl;
+    @Builder(builderMethodName = "createBuilder")
+    public static BlogType create(String name, String baseUrl) {
+        BlogType blogType = new BlogType();
+        blogType.name = name;
+        blogType.baseUrl = baseUrl;
+        return blogType;
     }
 }
