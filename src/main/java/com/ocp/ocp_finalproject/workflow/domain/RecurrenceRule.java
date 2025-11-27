@@ -30,13 +30,13 @@ public class RecurrenceRule extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RepeatType repeatType;
 
-    @Column(name = "interval")
-    private int interval;
+    @Column(name = "repeat_interval", columnDefinition = "JSON")
+    private Integer repeatInterval;
 
-    @Column(name = "days_of_week")
+    @Column(name = "days_of_week", columnDefinition = "JSON")
     private String daysOfWeek;
 
-    @Column(name = "days_of_month")
+    @Column(name = "days_of_month", columnDefinition = "JSON")
     private String daysOfMonth;
 
     @Column(name = "times_of_day")
