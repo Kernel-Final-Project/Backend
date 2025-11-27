@@ -28,7 +28,10 @@ public class RecurrenceRule extends BaseEntity {
 
     @Column(name = "repeat_type")
     @Enumerated(EnumType.STRING)
-    private RepeatType interval;
+    private RepeatType repeatType;
+
+    @Column(name = "interval")
+    private int interval;
 
     @Column(name = "days_of_week")
     private String daysOfWeek;
