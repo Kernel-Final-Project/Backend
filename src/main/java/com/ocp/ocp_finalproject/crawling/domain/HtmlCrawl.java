@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.crawling.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.common.enums.ExecutionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -22,6 +23,9 @@ public class HtmlCrawl extends BaseEntity {
     @Lob
     @Column(name = "html_content", columnDefinition = "TEXT")
     private String htmlContent;
+
+    @Enumerated(EnumType.STRING)
+    private ExecutionStatus status;
 
     @Column(name = "started_at")
     private LocalDateTime startedAt;
