@@ -2,6 +2,7 @@ package com.ocp.ocp_finalproject.content.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.content.enums.ContentStatus;
+import com.ocp.ocp_finalproject.workflow.domain.Work;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,7 +43,7 @@ public class AiContent extends BaseEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id", nullable = false)
     private Work work;
 
@@ -69,11 +70,8 @@ public class AiContent extends BaseEntity {
         return aiContent;
     }
 
-    // 편의 메서드 (양방향일 경우 필요)
+    // 편의 메서드
     public void setWork(Work work) {
         this.work = work;
-        if (work.getAiContent() != this) {
-            work.setAiContent(this);
-        }
     }
 }

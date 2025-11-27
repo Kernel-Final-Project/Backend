@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -14,9 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "daily_statistics")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class DailyStatistics {
+public class DailyStatistics extends BaseEntity {
 
     /**
      * 통계 ID (Primary Key)
@@ -93,14 +92,29 @@ public class DailyStatistics {
     private BigDecimal todayGrowthRate;
 
     /**
-     * 생성 일시
-     */
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    /**
      * 워크플로우 ID (Foreign Key)
      */
     @Column(name = "workflow_id", nullable = false)
     private Long workflowId;
+
+    @Builder(builderMethodName = "createBuilder")
+    public static DailyStatistics create(LocalDate statDate, Integer totalUsers, BigDecimal userGrowthRate,
+                                        Integer totalPosts, Integer successfulPosts, BigDecimal postGrowthRate,
+                                        Integer aiRequests, BigDecimal aiCost, BigDecimal aiGrowthRate,
+                                        Integer todayValue, BigDecimal todayGrowthRate, Long workflowId) {
+        DailyStatistics dailyStatistics = new DailyStatistics();
+        dailyStatistics.statDate = statDate;
+        dailyStatistics.totalUsers = totalUsers;
+        dailyStatistics.userGrowthRate = userGrowthRate;
+        dailyStatistics.totalPosts = totalPosts;
+        dailyStatistics.successfulPosts = successfulPosts;
+        dailyStatistics.postGrowthRate = postGrowthRate;
+        dailyStatistics.aiRequests = aiRequests;
+        dailyStatistics.aiCost = aiCost;
+        dailyStatistics.aiGrowthRate = aiGrowthRate;
+        dailyStatistics.todayValue = todayValue;
+        dailyStatistics.todayGrowthRate = todayGrowthRate;
+        dailyStatistics.workflowId = workflowId;
+        return dailyStatistics;
+    }
 }

@@ -1,15 +1,18 @@
 package com.ocp.ocp_finalproject.crawling.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "html_crawl")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HtmlCrawl {
+public class HtmlCrawl extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "html_crawl_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -17,17 +20,19 @@ public class HtmlCrawl {
     private SiteUrlInfo siteUrlInfo;
 
     @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "html_content", columnDefinition = "TEXT")
     private String htmlContent;
 
-    @Column
+    @Column(name = "started_at")
     private LocalDateTime startedAt;
 
-    @Column
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    public static HtmlCrawl of(String htmlContent, LocalDateTime startedAt, LocalDateTime completedAt) {
+    @Builder(builderMethodName = "createBuilder")
+    public static HtmlCrawl create(SiteUrlInfo siteUrlInfo, String htmlContent, LocalDateTime startedAt, LocalDateTime completedAt) {
         HtmlCrawl htmlCrawl = new HtmlCrawl();
+        htmlCrawl.siteUrlInfo = siteUrlInfo;
         htmlCrawl.htmlContent = htmlContent;
         htmlCrawl.startedAt = startedAt;
         htmlCrawl.completedAt = completedAt;

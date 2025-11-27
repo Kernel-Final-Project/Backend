@@ -28,12 +28,14 @@ public class SetTrendCategory extends BaseEntity {
     @Column(name = "depth3category")
     private Integer depth3Category;
 
-    @Builder
-    private SetTrendCategory(Long trendKeywordId, Integer depth1Category, Integer depth2Category, Integer depth3Category) {
-        this.trendKeywordId = trendKeywordId;
-        this.depth1Category = depth1Category;
-        this.depth2Category = depth2Category;
-        this.depth3Category = depth3Category;
+    @Builder(builderMethodName = "createBuilder")
+    public static SetTrendCategory create(Long trendKeywordId, Integer depth1Category, Integer depth2Category, Integer depth3Category) {
+        SetTrendCategory setTrendCategory = new SetTrendCategory();
+        setTrendCategory.trendKeywordId = trendKeywordId;
+        setTrendCategory.depth1Category = depth1Category;
+        setTrendCategory.depth2Category = depth2Category;
+        setTrendCategory.depth3Category = depth3Category;
+        return setTrendCategory;
     }
 
     public void updateDepths(Integer depth1Category, Integer depth2Category, Integer depth3Category) {

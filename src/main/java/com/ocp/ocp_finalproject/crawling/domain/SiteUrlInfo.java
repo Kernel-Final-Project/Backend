@@ -1,27 +1,30 @@
 package com.ocp.ocp_finalproject.crawling.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static lombok.AccessLevel.PROTECTED;
-
 @Entity
+@Table(name = "site_url_info")
 @Getter
-@NoArgsConstructor(access = PROTECTED)
-public class SiteUrlInfo {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class SiteUrlInfo extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "site_url_info_id")
     private Long id;
 
-    @Column(length = 1000, nullable = false)
+    @Column(name = "site_url", length = 1000, nullable = false)
     private String siteUrl;
 
-    @Column(nullable = false)
+    @Column(name = "site_name", length = 200, nullable = false)
     private String siteName;
 
-    // 생성 메서드(생성 규칙을 검증할 때 있으면 좋음)
-    public static SiteUrlInfo of(String siteUrl, String siteName) {
+    @Builder(builderMethodName = "createBuilder")
+    public static SiteUrlInfo create(String siteUrl, String siteName) {
         SiteUrlInfo info = new SiteUrlInfo();
         info.siteUrl = siteUrl;
         info.siteName = siteName;

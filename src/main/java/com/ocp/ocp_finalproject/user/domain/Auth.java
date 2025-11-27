@@ -1,24 +1,20 @@
 package com.ocp.ocp_finalproject.user.domain;
 
+import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.user.enums.AuthProvider;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "auth")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Auth {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Auth extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auth_id", nullable = false)
@@ -44,13 +40,16 @@ public class Auth {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Builder(builderMethodName = "createBuilder")
+    public static Auth create(User user, AuthProvider provider, String providerUserId, String refreshToken, String accessToken) {
+        Auth auth = new Auth();
+        auth.user = user;
+        auth.provider = provider;
+        auth.providerUserId = providerUserId;
+        auth.refreshToken = refreshToken;
+        auth.accessToken = accessToken;
+        return auth;
+    }
 
     // === 비즈니스 메서드 ===
     /**
