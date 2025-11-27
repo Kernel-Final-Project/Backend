@@ -23,7 +23,10 @@ public class BlogType extends BaseEntity {
     @Column(name = "blog_type_id")
     private Long id;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0ed1e72 (chore: sync blog/trend entities with dev)
     @Column(name = "blog_type_name", length = 100)
     private String name;
 

@@ -30,15 +30,22 @@ public class TrendCategory extends BaseEntity {
     @JoinColumn(name = "parent_category_id")
     private TrendCategory parentCategory;
 
+<<<<<<< HEAD
 
     @Column(name = "trend_category_name", length = 100)
 
+=======
+    @Column(name = "trend_category_name", length = 100)
+>>>>>>> 0ed1e72 (chore: sync blog/trend entities with dev)
     private String name;
 
     @Column(name = "depth")
     private Integer depth;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0ed1e72 (chore: sync blog/trend entities with dev)
     @Builder(builderMethodName = "createBuilder")
     public static TrendCategory create(TrendCategory parentCategory, String name, Integer depth) {
         TrendCategory trendCategory = new TrendCategory();
@@ -46,7 +53,10 @@ public class TrendCategory extends BaseEntity {
         trendCategory.name = name;
         trendCategory.depth = depth;
         return trendCategory;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0ed1e72 (chore: sync blog/trend entities with dev)
     }
 
     public void updateInfo(String name, Integer depth, TrendCategory parentCategory) {
