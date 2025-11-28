@@ -17,13 +17,13 @@ public class ApiResponse<T> {
     private T data;
 
     //성공 응답 (데이터 O)
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, "success", data);
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>(true, message, data);
     }
 
-    //성공 응답 (데이터 O)
-    public static <T> ApiResponse<T> success(String meesage) {
-        return new ApiResponse<>(true, "success", null);
+    //성공 응답 (데이터 x)
+    public static <T> ApiResponse<T> success(String message) {
+        return new ApiResponse<>(true, message, null);
     }
 
     public static <T> ApiResponse<T> error(String message) {
