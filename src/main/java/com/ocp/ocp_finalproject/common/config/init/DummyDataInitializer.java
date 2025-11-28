@@ -42,7 +42,6 @@ public class DummyDataInitializer implements ApplicationRunner {
             log.info("[Init] SQL 실행 완료");
 
             // 데이터 확인
-            // 데이터 확인
             try (Connection c = dataSource.getConnection();
                  Statement st = c.createStatement()) {
 
