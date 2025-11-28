@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "recurrence_rule")
@@ -20,10 +22,6 @@ public class RecurrenceRule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recurrence_rule_id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_id")
-    private Workflow workflow;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "repeat_type", length = 50)
@@ -41,6 +39,9 @@ public class RecurrenceRule extends BaseEntity {
     @Column(name = "times_of_day", length = 500)
     private String timesOfDay;
 
+    @Column(name = "readable_rule", length = 100)
+    private String readableRule;
+
     @Column(name = "start_at", nullable = false)
     private LocalDateTime startAt;
 
@@ -49,7 +50,6 @@ public class RecurrenceRule extends BaseEntity {
 
     @Builder(builderMethodName = "createBuilder")
     public static RecurrenceRule create(
-            Workflow workflow,
             RepeatType repeatType,
             Integer repeatInterval,
             String daysOfWeek,
@@ -59,7 +59,6 @@ public class RecurrenceRule extends BaseEntity {
             LocalDateTime endAt
     ) {
         RecurrenceRule recurrenceRule = new RecurrenceRule();
-        recurrenceRule.workflow = workflow;
         recurrenceRule.repeatType = repeatType;
         recurrenceRule.repeatInterval = repeatInterval;
         recurrenceRule.daysOfWeek = daysOfWeek;
