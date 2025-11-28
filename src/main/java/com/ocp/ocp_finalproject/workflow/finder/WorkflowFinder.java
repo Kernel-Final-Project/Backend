@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.USER_NOT_FOUND;
+import static com.ocp.ocp_finalproject.common.exception.ErrorCode.WORKFLOW_NOT_FOUND;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +27,13 @@ public class WorkflowFinder {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        return workflowRepository.findByUserId(userId);
+        List<WorkflowResponse> workflowList = workflowRepository.findByUserId(userId);
+
+        if (workflowList.isEmpty()) {
+            throw new CustomException(WORKFLOW_NOT_FOUND);
+        }
+
+        return workflowList;
     }
 
 }
