@@ -62,6 +62,7 @@ public class Workflow extends BaseEntity {
     public static Workflow create(
             User user,
             UserBlog userBlog,
+            TrendCategory trendCategory,
             RecurrenceRule recurrenceRule,
             WorkflowStatus status,
             String siteUrl,
@@ -71,6 +72,7 @@ public class Workflow extends BaseEntity {
         Workflow workflow = new Workflow();
         workflow.user = user;
         workflow.userBlog = userBlog;
+        workflow.trendCategory = trendCategory;
         workflow.recurrenceRule = recurrenceRule;
         workflow.status = status;
         workflow.siteUrl = siteUrl;

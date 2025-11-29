@@ -80,6 +80,14 @@ VALUES (1, 1, 'COMPLETED', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTE
 -- ============================================
 -- 12. 상품 크롤링 (product_crawl) - REMOVED
 -- ============================================
+INSERT INTO `product_crawl` (`product_crawl_id`, `workflow_id`, `product_name`, `product_code`,
+                             `product_detail_url`,
+                             `product_price`, `started_at`, `completed_at`, `created_at`, `updated_at`)
+VALUES (1, 1, '여름 원피스', 'PROD001', 'https://www.coupang.com/products/12345', 29900, NOW(), NOW(), NOW(), NOW()),
+       (2, 1, '갤럭시 S24', 'PROD002', 'https://www.coupang.com/products/67890', 999000, NOW(), NOW(), NOW(), NOW()),
+       (3, 2, '봄 원피스', 'PROD003', 'https://www.11st.co.kr/products/11111', 35000, NOW(), NOW(), NOW(), NOW()),
+       (4, 2, '아이폰 15', 'PROD004', 'https://www.11st.co.kr/products/22222', 1200000, NOW(), NOW(), NOW(), NOW());
+
 
 -- ============================================
 -- 13. AI 콘텐츠 (ai_content)
