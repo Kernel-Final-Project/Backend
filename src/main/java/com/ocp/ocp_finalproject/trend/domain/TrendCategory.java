@@ -31,22 +31,22 @@ public class TrendCategory extends BaseEntity {
     private TrendCategory parentCategory;
 
     @Column(name = "trend_category_name", length = 100)
-    private String name;
+    private String trendCategoryName;
 
     @Column(name = "depth")
     private Integer depth;
 
     @Builder(builderMethodName = "createBuilder")
-    public static TrendCategory create(TrendCategory parentCategory, String name, Integer depth) {
+    public static TrendCategory create(TrendCategory parentCategory, String trendCategoryName, Integer depth) {
         TrendCategory trendCategory = new TrendCategory();
         trendCategory.parentCategory = parentCategory;
-        trendCategory.name = name;
+        trendCategory.trendCategoryName = trendCategoryName;
         trendCategory.depth = depth;
         return trendCategory;
     }
 
-    public void updateInfo(String name, Integer depth, TrendCategory parentCategory) {
-        this.name = name;
+    public void updateInfo(String trendCategoryName, Integer depth, TrendCategory parentCategory) {
+        this.trendCategoryName = trendCategoryName;
         this.depth = depth;
         this.parentCategory = parentCategory;
     }
