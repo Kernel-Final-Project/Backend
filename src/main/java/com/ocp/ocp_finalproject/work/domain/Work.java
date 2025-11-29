@@ -49,9 +49,9 @@ public class Work extends BaseEntity {
         return work;
     }
 
-    public void setPostingUrl(String postingUrl, boolean success) {
+    public void setPostingUrl(String postingUrl, boolean isSuccess) {
         this.postingUrl = postingUrl;
-        if(success){
+        if(isSuccess){
             this.status=WorkExecutionStatus.COMPLETED;
         }else {
             this.status=WorkExecutionStatus.FAILED;

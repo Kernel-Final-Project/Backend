@@ -28,3 +28,6 @@ app:
     queue:
       content-request: content-request-queue
       blog-upload: blog-upload-queue
+
+blog-upload:
+  webhook-secret: ${BLOG_UPLOAD_WEBHOOK_SECRET:local-dev-secret}
