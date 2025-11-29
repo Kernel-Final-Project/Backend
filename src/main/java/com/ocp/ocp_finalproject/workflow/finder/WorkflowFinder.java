@@ -2,8 +2,8 @@ package com.ocp.ocp_finalproject.workflow.finder;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
-import com.ocp.ocp_finalproject.workflow.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
