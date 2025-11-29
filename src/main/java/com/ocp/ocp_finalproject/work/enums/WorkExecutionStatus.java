@@ -1,23 +1,25 @@
-package com.ocp.ocp_finalproject.common.enums;
+package com.ocp.ocp_finalproject.work.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 실행 상태 (공통)
+ * work 실행 상태 (공통)
  *
  * 사용 대상:
- * - HtmlCrawl (HTML 추출 작업)
- * - ProductCrawl (상품 크롤링 작업)
+ * - Work (작업 실행)
  */
 @Getter
 @RequiredArgsConstructor
-public enum ExecutionStatus {
+public enum WorkExecutionStatus {
 
     PENDING("대기", "실행 대기 중"),
-    RUNNING("실행중", "실행 중"),
-    COMPLETED("완료", "실행 완료"),
-    FAILED("실패", "실행 실패");
+    TREND_KEYWORD_DONE("키워드 추출 성공", "트렌드 키워드 추출 완료"),
+    PRODUCT_SELECTED("상품 선택 완료", "상품 선택 완료"),
+    CONTENT_GENERATED("콘텐츠 생성 완료", "콘텐츠 생성 완료"),
+    BLOG_UPLOAD_PENDING("블로그 업로드 준비", "블로그 업로드 큐 발송 대기"),
+    COMPLETED("완료", "전체 파이프라인 완료"),
+    FAILED("실패", "작업 실패");
 
     private final String displayName;
     private final String description;
@@ -26,7 +28,11 @@ public enum ExecutionStatus {
      * 진행 중 여부
      */
     public boolean isInProgress() {
-        return this == PENDING || this == RUNNING;
+        return this == PENDING
+                || this == TREND_KEYWORD_DONE
+                || this == PRODUCT_SELECTED
+                || this == CONTENT_GENERATED
+                || this == BLOG_UPLOAD_PENDING;
     }
 
     /**

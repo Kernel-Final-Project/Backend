@@ -15,5 +15,19 @@ services:
       - mysql-data:/var/lib/mysql
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ocp-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # 관리 UI (http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
+    restart: unless-stopped
+
 volumes:
   mysql-data:
+  rabbitmq-data:

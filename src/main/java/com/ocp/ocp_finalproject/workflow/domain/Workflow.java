@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

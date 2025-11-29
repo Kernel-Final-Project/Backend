@@ -1,7 +1,8 @@
-package com.ocp.ocp_finalproject.workflow.domain;
+package com.ocp.ocp_finalproject.work.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
-import com.ocp.ocp_finalproject.common.enums.ExecutionStatus;
+import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
+import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,7 +28,10 @@ public class Work extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 50)
-    private ExecutionStatus status;
+    private WorkExecutionStatus status;
+
+    @Column(name="posting_url")
+    private String postingUrl;
 
     @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;
@@ -36,13 +40,22 @@ public class Work extends BaseEntity {
     private LocalDateTime completedAt;
 
     @Builder(builderMethodName = "createBuilder")
-    public static Work create(Workflow workflow, ExecutionStatus status, LocalDateTime startedAt, LocalDateTime completedAt) {
+    public static Work create(Workflow workflow, WorkExecutionStatus status, LocalDateTime startedAt, LocalDateTime completedAt) {
         Work work = new Work();
         work.workflow = workflow;
         work.status = status;
         work.startedAt = startedAt;
         work.completedAt = completedAt;
         return work;
+    }
+
+    public void setPostingUrl(String postingUrl, boolean success) {
+        this.postingUrl = postingUrl;
+        if(success){
+            this.status=WorkExecutionStatus.COMPLETED;
+        }else {
+            this.status=WorkExecutionStatus.FAILED;
+        }
     }
 
 }

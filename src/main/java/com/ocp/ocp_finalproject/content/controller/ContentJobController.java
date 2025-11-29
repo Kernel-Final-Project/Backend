@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/contents")
 @RequiredArgsConstructor
 public class ContentJobController {
-
+    /*
     private final ContentJobService contentJobService;
     private final ContentTaskProducer contentTaskProducer;
 
@@ -38,4 +38,6 @@ public class ContentJobController {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "Job not found: " + jobId));
         return ApiResponse.success(new ContentJobResponse(job));
     }
+
+     */
 }
