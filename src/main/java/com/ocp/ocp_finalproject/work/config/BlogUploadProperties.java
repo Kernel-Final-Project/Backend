@@ -15,4 +15,9 @@ public class BlogUploadProperties {
      * 워커가 웹훅을 호출할 때 Authorization 헤더로 사용할 시크릿 값.
      */
     private String webhookSecret;
+
+    /**
+     * 워커가 결과를 전송할 기본 웹훅 URL.
+     */
+    private String webhookUrl;
 }

@@ -17,7 +17,7 @@ public enum WorkExecutionStatus {
     TREND_KEYWORD_DONE("키워드 추출 성공", "트렌드 키워드 추출 완료"),
     PRODUCT_SELECTED("상품 선택 완료", "상품 선택 완료"),
     CONTENT_GENERATED("콘텐츠 생성 완료", "콘텐츠 생성 완료"),
-    BLOG_UPLOAD_PENDING("블로그 업로드 준비", "블로그 업로드 큐 발송 대기"),
+    BLOG_UPLOAD_PENDING("블로그 업로드 준비", "블로그 업로드 큐 대기"),
     COMPLETED("완료", "전체 파이프라인 완료"),
     FAILED("실패", "작업 실패");
 
