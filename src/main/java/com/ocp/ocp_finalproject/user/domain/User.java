@@ -33,14 +33,14 @@ public class User extends BaseEntity {
     @Column(name = "role", length = 50)
     private UserRole role;
 
+    // OAuth2 로그인으로 신규 사용자 생성
     @Builder(builderMethodName = "createBuilder")
-    public static User create(String name, String birth, String email, UserStatus status, UserRole role) {
+    public static User create(String name, String email) {
         User user = new User();
         user.name = name;
-        user.birth = birth;
         user.email = email;
-        user.status = status;
-        user.role = role;
+        user.status = UserStatus.ACTIVE;
+        user.role = UserRole.USER;
         return user;
     }
 
