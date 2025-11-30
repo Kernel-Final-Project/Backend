@@ -14,11 +14,9 @@ public class WorkflowListResponse {
 
     private final String siteUrl;
 
-    private final String blogType;
-
     private final String blogUrl;
 
-    private final String trendCategoryName;
+    private final String trendCategory;
 
     private final String blogAccountId;
 

@@ -17,7 +17,6 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
                 wf.id,
                 u.id,
                 wf.siteUrl,
-                bt.blogTypeName,
                 ub.blogUrl,
                 tc.trendCategoryName,
                 ub.accountId,
@@ -29,7 +28,6 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             JOIN wf.trendCategory tc
             LEFT JOIN wf.recurrenceRule rr
             JOIN wf.userBlog ub
-            LEFT JOIN ub.blogType bt
             WHERE u.id = :userId
     """)
     List<WorkflowListResponse> findByUserId(@Param("userId") Long userId);

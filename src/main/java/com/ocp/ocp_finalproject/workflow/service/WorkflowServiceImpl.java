@@ -3,20 +3,22 @@ package com.ocp.ocp_finalproject.workflow.service;
 import com.ocp.ocp_finalproject.blog.domain.BlogType;
 import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.blog.repository.BlogTypeRepository;
+import com.ocp.ocp_finalproject.blog.repository.UserBlogRepository;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.trend.repository.TrendCategoryRepository;
 import com.ocp.ocp_finalproject.user.domain.User;
-import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.domain.RecurrenceRule;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.*;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.finder.WorkflowFinder;
+import com.ocp.ocp_finalproject.workflow.repository.RecurrenceRuleRepository;
+import com.ocp.ocp_finalproject.workflow.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.util.RecurrenceRuleFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +34,11 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private final WorkflowFinder workflowFinder;
     private final UserRepository userRepository;
+    private final UserBlogRepository userBlogRepository;
     private final WorkflowRepository workflowRepository;
     private final TrendCategoryRepository trendCategoryRepository;
     private final BlogTypeRepository blogTypeRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final RecurrenceRuleRepository recurrenceRuleRepository;
 
     @Override
     public List<WorkflowListResponse> findWorkflows(Long userId) {
@@ -74,12 +77,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private UserBlog createUserBlog(WorkflowRequest workflowRequest, BlogType blogType) {
-
-        String encryptedPassword = passwordEncoder.encode(workflowRequest.getBlogAccountPwd());
         return UserBlog.createBuilder()
                 .blogType(blogType)
                 .accountId(workflowRequest.getBlogAccountId())
-                .accountPassword(encryptedPassword)
+                .accountPassword(workflowRequest.getBlogAccountPwd())
                 .blogUrl(workflowRequest.getBlogUrl())
                 .build();
     }
