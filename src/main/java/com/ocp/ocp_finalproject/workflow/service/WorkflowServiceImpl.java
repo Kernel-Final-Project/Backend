@@ -34,11 +34,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private final WorkflowFinder workflowFinder;
     private final UserRepository userRepository;
-    private final UserBlogRepository userBlogRepository;
     private final WorkflowRepository workflowRepository;
     private final TrendCategoryRepository trendCategoryRepository;
     private final BlogTypeRepository blogTypeRepository;
-    private final RecurrenceRuleRepository recurrenceRuleRepository;
 
     @Override
     public List<WorkflowListResponse> findWorkflows(Long userId) {
