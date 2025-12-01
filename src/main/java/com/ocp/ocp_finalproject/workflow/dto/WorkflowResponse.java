@@ -19,8 +19,6 @@ public class WorkflowResponse {
 
     private String blogUrl;
 
-    private String trendCategory;
-
     private SetTrendCategoryDto setTrendCategory;
 
     private String blogAccountId;
