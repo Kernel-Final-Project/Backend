@@ -30,10 +30,10 @@ public class RecurrenceRule extends BaseEntity {
     @Column(name = "repeat_interval")
     private Integer repeatInterval;
 
-    @Column(name = "days_of_week", length = 500, columnDefinition = "JSON")
+    @Column(name = "days_of_week", length = 500)
     private String daysOfWeek;
 
-    @Column(name = "days_of_month", columnDefinition = "JSON")
+    @Column(name = "days_of_month")
     private String daysOfMonth;
 
     @Column(name = "times_of_day", length = 500)
@@ -55,6 +55,7 @@ public class RecurrenceRule extends BaseEntity {
             String daysOfWeek,
             String daysOfMonth,
             String timesOfDay,
+            String readableRule,
             LocalDateTime startAt,
             LocalDateTime endAt
     ) {
@@ -64,6 +65,7 @@ public class RecurrenceRule extends BaseEntity {
         recurrenceRule.daysOfWeek = daysOfWeek;
         recurrenceRule.daysOfMonth = daysOfMonth;
         recurrenceRule.timesOfDay = timesOfDay;
+        recurrenceRule.readableRule = readableRule;
         recurrenceRule.startAt = startAt;
         recurrenceRule.endAt = endAt;
         return recurrenceRule;

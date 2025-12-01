@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.workflow.finder;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.user.domain.User;
-import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +22,11 @@ public class WorkflowFinder {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<WorkflowResponse> findWorkflows(Long userId) {
+    public List<WorkflowListResponse> findWorkflows(Long userId) {
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        List<WorkflowResponse> workflowList = workflowRepository.findByUserId(userId);
-
-        if (workflowList.isEmpty()) {
-            throw new CustomException(WORKFLOW_NOT_FOUND);
-        }
-
-        return workflowList;
+        return workflowRepository.findByUserId(userId);
     }
 }

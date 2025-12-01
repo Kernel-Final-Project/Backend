@@ -2,19 +2,21 @@ package com.ocp.ocp_finalproject.workflow.api;
 
 
 import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowRequest;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/workflow")
 @RequiredArgsConstructor
+@Slf4j
 public class WorkflowController {
 
     private final WorkflowService workflowService;
@@ -23,11 +25,23 @@ public class WorkflowController {
      * 워크플로우 목록 조회
      */
     @GetMapping("/{userId}")
-    public ApiResponse<List<WorkflowResponse>> findWorkflows(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<WorkflowListResponse>>> findWorkflows(@PathVariable Long userId) {
 
-        List<WorkflowResponse> workflowList = workflowService.findWorkflows(userId);
+        List<WorkflowListResponse> workflowList = workflowService.findWorkflows(userId);
 
-        return ApiResponse.success("워크플로우 목록 조회 성공", workflowList);
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 목록 조회 성공", workflowList));
+    }
+
+    /**
+     * 워크플로우 등록
+     */
+    @PostMapping("/{userId}")
+    public ResponseEntity<ApiResponse<WorkflowResponse>> createWorkflow(@PathVariable Long userId,
+                                                                        @RequestBody WorkflowRequest workflowRequest) {
+
+        WorkflowResponse workflow = workflowService.createWorkflow(userId, workflowRequest);
+
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 생성 성공", workflow));
     }
 
 }

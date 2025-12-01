@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
@@ -30,7 +31,7 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_blog_id")
     private UserBlog userBlog;
 
@@ -38,11 +39,12 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "trend_category_id")
     private TrendCategory trendCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "recurrence_rule_id")
     private RecurrenceRule recurrenceRule;
 
     @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Work> works = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -55,7 +57,6 @@ public class Workflow extends BaseEntity {
     @Column(name = "is_test", nullable = false)
     private Boolean isTest = false;
 
-
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
@@ -65,7 +66,6 @@ public class Workflow extends BaseEntity {
             UserBlog userBlog,
             TrendCategory trendCategory,
             RecurrenceRule recurrenceRule,
-            WorkflowStatus status,
             String siteUrl,
             Boolean isTest,
             Boolean isActive
@@ -75,7 +75,7 @@ public class Workflow extends BaseEntity {
         workflow.userBlog = userBlog;
         workflow.trendCategory = trendCategory;
         workflow.recurrenceRule = recurrenceRule;
-        workflow.status = status;
+        workflow.status = WorkflowStatus.PENDING;
         workflow.siteUrl = siteUrl;
         workflow.isTest = isTest != null ? isTest : false;
         workflow.isActive = isActive != null ? isActive : true;

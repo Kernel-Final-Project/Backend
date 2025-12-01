@@ -15,6 +15,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -49,5 +52,17 @@ public class TrendCategory extends BaseEntity {
         this.trendCategoryName = trendCategoryName;
         this.depth = depth;
         this.parentCategory = parentCategory;
+    }
+
+    public List<TrendCategory> getFullPath(TrendCategory category) {
+        List<TrendCategory> path = new ArrayList<>();
+        TrendCategory current = this;
+
+        while (current != null) {
+            path.add(0, current);
+            current = current.getParentCategory();
+        }
+
+        return path;
     }
 }
