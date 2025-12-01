@@ -3,6 +3,7 @@ package com.ocp.ocp_finalproject.user.handler;
 import com.ocp.ocp_finalproject.common.config.oauth.OAuth2Properties;
 import com.ocp.ocp_finalproject.user.domain.Auth;
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.user.enums.AuthProvider;
 import com.ocp.ocp_finalproject.user.repository.AuthRepository;
 import com.ocp.ocp_finalproject.user.service.oauth2.OAuth2UserInfo;
@@ -15,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -36,21 +36,21 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         try{
             // 1. OAuth2User에서 정보 추출
             OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-            OAuth2User oAuth2User = oauthToken.getPrincipal();
+            UserPrincipal userPrincipal = (UserPrincipal) oauthToken.getPrincipal();
+
+            User user = userPrincipal.getUser();
             String registrationId = oauthToken.getAuthorizedClientRegistrationId();
             AuthProvider provider = AuthProvider.valueOf(registrationId.toUpperCase());
 
-            // 2. OAuth2UserInfoFactory 사용
-            OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, oAuth2User.getAttributes());
-            String providerUserId = userInfo.getProviderId();
+            log.info("Provider: {}, UserId: {}", provider, user.getId());
 
-            log.info("Provider: {}, ProviderUserId: {}", provider, providerUserId);
+            // 2. OAuth2UserInfoFactory 사용
+            OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, userPrincipal.getAttributes());
+            String providerUserId = userInfo.getProviderId();
 
             // 3. DB에서 사용자 조회
             Auth auth = authRepository.findByProviderAndProviderUserId(provider, providerUserId)
                     .orElseThrow(()->new IllegalStateException("인증 정보를 찾을 수 없음"));
-
-            User user = auth.getUser();
 
             // 4. 신규 가입 여부 확인
             boolean isNewUser = auth.isNewUser();

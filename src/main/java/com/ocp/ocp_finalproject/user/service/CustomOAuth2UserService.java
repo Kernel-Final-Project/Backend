@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.user.service;
 
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.user.enums.AuthProvider;
 import com.ocp.ocp_finalproject.user.service.oauth2.OAuth2UserInfo;
 import com.ocp.ocp_finalproject.user.service.oauth2.OAuth2UserInfoFactory;
@@ -40,11 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = userOAuth2Service.processOAuth2User(provider,userInfo);
 
         // 5. Spring Security에서 사용할 Principal 객체 변환
-        return new DefaultOAuth2User(
-                oAuth2User.getAuthorities(),
-                oAuth2User.getAttributes(),
-                OAuth2UserInfoFactory.getUserNameAttribute(provider)
-        );
+        String nameAttributeKey = OAuth2UserInfoFactory.getUserNameAttribute(provider);
+        return new UserPrincipal(user, oAuth2User.getAttributes(), nameAttributeKey);
     }
-
 }

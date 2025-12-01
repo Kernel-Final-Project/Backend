@@ -21,7 +21,7 @@ public class Auth extends BaseEntity {
     @Column(name = "auth_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
@@ -31,12 +31,6 @@ public class Auth extends BaseEntity {
 
     @Column(name = "provider_user_id", length = 100)
     private String providerUserId;
-
-    @Column(name = "refresh_token", length = 500)
-    private String refreshToken;
-
-    @Column(name = "access_token", length = 500)
-    private String accessToken;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
@@ -53,43 +47,13 @@ public class Auth extends BaseEntity {
 
     // === 비즈니스 메서드 ===
     /**
-     * 토큰 갱신
-     */
-    public void updateTokens(String accessToken, String refreshToken) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-    }
-
-    /**
      * 로그인 시간 기록
      */
     public void recordLogin() {
         this.lastLoginAt = LocalDateTime.now();
     }
 
-    /**
-     * 토큰 초기화 (로그아웃)
-     */
-    public void clearTokens() {
-        this.accessToken = null;
-        this.refreshToken = null;
-    }
-
     // === 조회 메서드 ===
-    /**
-     * 토큰 존재 여부
-     */
-    public boolean hasTokens() {
-        return accessToken != null && refreshToken != null;
-    }
-
-    /**
-     * 리프레시 토큰 존재 여부
-     */
-    public boolean hasRefreshToken() {
-        return refreshToken != null;
-    }
-
     /**
      * 신규 가입 여부 확인
      * 로그인 시간과 생성 시간이 1분 이내면 신규 가입으로 판단

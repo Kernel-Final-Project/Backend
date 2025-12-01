@@ -41,42 +41,4 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다. email: " + email));
     }
-
-    /**
-     * 현재 로그인한 사용자 조회
-     * - OAuth2UserInfoFactory 재사용!
-     *
-     * @param authentication Spring Security Authentication 객체
-     * @return User 엔티티
-     */
-    public User getCurrentUser(Authentication authentication) {
-        if (authentication == null || !(authentication instanceof OAuth2AuthenticationToken)) {
-            throw new IllegalArgumentException("OAuth2 로그인 정보가 없습니다");
-        }
-
-        // 1. OAuth2AuthenticationToken으로 캐스팅
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        OAuth2User oAuth2User = oauthToken.getPrincipal();
-
-        // 2. Provider 정보 추출
-        String registrationId = oauthToken.getAuthorizedClientRegistrationId();
-        AuthProvider provider = AuthProvider.valueOf(registrationId.toUpperCase());
-
-        // 3. OAuth2UserInfoFactory 사용 (기존 로직 재사용!)
-        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
-                provider,
-                oAuth2User.getAttributes()
-        );
-
-        // 4. 이메일 추출 (Factory가 알아서 처리)
-        String providerUserId = userInfo.getProviderId();
-
-        log.info("현재 사용자 조회 - provider: {}, email: {}", provider, providerUserId);
-
-        // 5. DB 조회 (트랜잭션 시작)
-        Auth auth = authRepository.findByProviderAndProviderUserId(provider, providerUserId)
-                .orElseThrow(()-> new IllegalArgumentException("정보를 찾을 수 없습니다."));
-
-        return auth.getUser();
-    }
 }
