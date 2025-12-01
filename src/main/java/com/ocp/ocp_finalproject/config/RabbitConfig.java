@@ -11,12 +11,26 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${app.rabbit.queue.request}")
-    private String contentRequestQueueName;
 
+
+    public static final String CONTENT_GENERATE_QUEUE="content-generate-queue";
+
+
+
+    public static final String BLOG_UPLOAD_QUEUE = "blog-upload-queue";
+
+
+    // 콘텐츠 생성 큐
     @Bean
     public Queue contentRequestQueue() {
-        return new Queue(contentRequestQueueName, true); // durable queue
+        return new Queue(CONTENT_GENERATE_QUEUE, true); // durable queue
+    }
+
+
+    // 블로그 업로드 큐
+    @Bean
+    public Queue blogUploadQueue() {
+        return new Queue(BLOG_UPLOAD_QUEUE, true); // durable queue\\
     }
 
     @Bean

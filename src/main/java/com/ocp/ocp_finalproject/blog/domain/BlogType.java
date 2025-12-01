@@ -24,15 +24,15 @@ public class BlogType extends BaseEntity {
     private Long id;
 
     @Column(name = "blog_type_name", length = 100)
-    private String name;
+    private String blogTypeName;
 
     @Column(name = "blog_base_url", length = 255)
     private String baseUrl;
 
     @Builder(builderMethodName = "createBuilder")
-    public static BlogType create(String name, String baseUrl) {
+    public static BlogType create(String blogTypeName, String baseUrl) {
         BlogType blogType = new BlogType();
-        blogType.name = name;
+        blogType.blogTypeName = blogTypeName;
         blogType.baseUrl = baseUrl;
         return blogType;
     }

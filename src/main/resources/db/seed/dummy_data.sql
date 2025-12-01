@@ -29,11 +29,8 @@ VALUES (1, 1, 'user123', 'password123', 'https://blog.naver.com/user123', NOW(),
        (2, 2, 'admin_blog', 'admin_pw123', 'https://admin.tistory.com', NOW(), NOW());
 
 -- ============================================
--- 5. 사이트 URL 정보 (site_url_info)
+-- 5. 사이트 URL 정보 (site_url_info) - REMOVED
 -- ============================================
-INSERT INTO `site_url_info` (`site_url_info_id`, `site_url`, `site_name`, `created_at`, `updated_at`)
-VALUES (1, 'https://www.coupang.com', '쿠팡', NOW(), NOW()),
-       (2, 'https://www.11st.co.kr', '11번가', NOW(), NOW());
 
 -- ============================================
 -- 6. 트렌드 카테고리 (trend_category)
@@ -47,13 +44,6 @@ VALUES (1, NULL, '패션/뷰티', 1, NOW(), NOW()),
        (5, 3, '원피스', 3, NOW(), NOW()),
        (6, 4, '갤럭시', 3, NOW(), NOW());
 
--- ============================================
--- 7. 설정 트렌드 카테고리 (set_trend_category)
--- ============================================
-INSERT INTO `set_trend_category` (`set_trend_category_id`, `depth1_category_id`, `depth2_category_id`,
-                                  `depth3_category_id`, `created_at`, `updated_at`)
-VALUES (1, 1, 3, 5, NOW(), NOW()),
-       (2, 2, 4, 6, NOW(), NOW());
 
 -- ============================================
 -- 8. 반복 규칙 (recurrence_rule)
@@ -69,10 +59,10 @@ VALUES (1, 'DAILY', 1, NULL, NULL, '["09:00", "18:00"]', "매일 09:00, 18:00에
 -- ============================================
 -- 9. 워크플로우 (workflow)
 -- ============================================
-INSERT INTO `workflow` (`workflow_id`, `user_id`, `user_blog_id`, `site_url_info_id`, `set_trend_category_id`,
-                        `recurrence_rule_id`, `is_test`, `status`, `is_active`, `created_at`, `updated_at`)
-VALUES (1, 1, 1, 1, 1, 1, FALSE, 'ACTIVE', TRUE, NOW(), NOW()),
-       (2, 2, 2, 2, 2, 2, FALSE, 'ACTIVE', TRUE, NOW(), NOW());
+INSERT INTO `workflow` (`workflow_id`, `user_id`, `user_blog_id`, `trend_category_id`, `recurrence_rule_id`,
+                        `site_url`, `is_test`, `status`, `is_active`, `created_at`, `updated_at`)
+VALUES (1, 1, 1, 5, 1, 'https://www.coupang.com', FALSE, 'ACTIVE', TRUE, NOW(), NOW()),
+       (2, 2, 2, 6, 2, 'https://www.11st.co.kr', FALSE, 'ACTIVE', TRUE, NOW(), NOW());
 
 -- ============================================
 -- 10. 작업 (work)
@@ -84,23 +74,20 @@ VALUES (1, 1, 'COMPLETED', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTE
        (4, 2, 'PENDING', NOW(), NULL, NOW(), NOW());
 
 -- ============================================
--- 11. HTML 크롤링 (html_crawl)
+-- 11. HTML 크롤링 (html_crawl) - REMOVED
 -- ============================================
-INSERT INTO `html_crawl` (`html_crawl_id`, `site_url_info_id`, `html_content`, `status`, `started_at`, `completed_at`,
-                          `created_at`, `updated_at`)
-VALUES (1, 1, '<html><body><h1>쿠팡 샘플 HTML</h1></body></html>', 'COMPLETED', NOW(), NOW(), NOW(), NOW()),
-       (2, 2, '<html><body><h1>11번가 샘플 HTML</h1></body></html>', 'COMPLETED', NOW(), NOW(), NOW(), NOW());
 
 -- ============================================
--- 12. 상품 크롤링 (product_crawl)
+-- 12. 상품 크롤링 (product_crawl) - REMOVED
 -- ============================================
-INSERT INTO `product_crawl` (`product_crawl_id`, `site_url_info_id`, `product_name`, `product_code`,
+INSERT INTO `product_crawl` (`product_crawl_id`, `workflow_id`, `product_name`, `product_code`,
                              `product_detail_url`,
                              `product_price`, `started_at`, `completed_at`, `created_at`, `updated_at`)
 VALUES (1, 1, '여름 원피스', 'PROD001', 'https://www.coupang.com/products/12345', 29900, NOW(), NOW(), NOW(), NOW()),
        (2, 1, '갤럭시 S24', 'PROD002', 'https://www.coupang.com/products/67890', 999000, NOW(), NOW(), NOW(), NOW()),
        (3, 2, '봄 원피스', 'PROD003', 'https://www.11st.co.kr/products/11111', 35000, NOW(), NOW(), NOW(), NOW()),
        (4, 2, '아이폰 15', 'PROD004', 'https://www.11st.co.kr/products/22222', 1200000, NOW(), NOW(), NOW(), NOW());
+
 
 -- ============================================
 -- 13. AI 콘텐츠 (ai_content)
@@ -280,7 +267,7 @@ VALUES (1, CURDATE(), 2, 0.00, 2, 0, 0.00, 2, 0.03, 0.00, 2, 0.00, NOW(), NOW())
 -- ============================================
 -- 26. 포스트 일별 통계 (post_daily_stats)
 -- ============================================
-INSERT INTO `post_daily_stats` (`post_stat_id`, `blog_post_id`, `user_id`, `stat_date`, `view_count`, `created_at`,
+INSERT INTO `post_daily_stats` (`post_stat_id`, `work_id`, `user_id`, `stat_date`, `view_count`, `created_at`,
                                 `updated_at`)
 VALUES (1, 1, 1, CURDATE(), 0, NOW(), NOW()),
        (2, 3, 2, CURDATE(), 0, NOW(), NOW());

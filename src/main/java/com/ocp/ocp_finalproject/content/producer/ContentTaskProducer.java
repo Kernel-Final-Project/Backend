@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.content.producer;
 
+import com.ocp.ocp_finalproject.config.RabbitConfig;
 import com.ocp.ocp_finalproject.content.dto.ContentRequestDto;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +17,6 @@ public class ContentTaskProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    @Value("${app.rabbit.queue.request}")
-    private String contentRequestQueueName;
-
     public void sendTask(String jobId, ContentRequestDto requestDto) {
         Map<String, Object> message = new HashMap<>();
         message.put("jobId", jobId);
@@ -26,7 +24,7 @@ public class ContentTaskProducer {
         message.put("title", requestDto.getTitle());
         message.put("content", requestDto.getContent());
 
-        log.info("Sending content task to queue {}: jobId={}, taskType={}", contentRequestQueueName, jobId, requestDto.getTaskType());
-        rabbitTemplate.convertAndSend(contentRequestQueueName, message);
+        log.info("Sending content task to queue {}: jobId={}, taskType={}", RabbitConfig.CONTENT_GENERATE_QUEUE, jobId, requestDto.getTaskType());
+        rabbitTemplate.convertAndSend(RabbitConfig.CONTENT_GENERATE_QUEUE, message);
     }
 }

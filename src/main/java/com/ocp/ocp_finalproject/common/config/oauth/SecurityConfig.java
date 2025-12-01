@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -34,10 +36,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 // ========== CSRF 설정 ==========
-                // 개발 단계: disable (프론트엔드 분리 시)
-                // 운영 단계: CookieCsrfTokenRepository 사용 권장
                 .csrf(AbstractHttpConfigurer::disable)
 
                 // ========== CORS 설정 ==========
@@ -45,54 +46,34 @@ public class SecurityConfig {
 
                 // ========== 세션 관리 ==========
                 .sessionManagement(session -> session
-                        // IF_REQUIRED: 필요 시 세션 생성 (OAuth2 로그인 시 자동 생성)
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-
-                        // 동시 로그인 세션 제한 (같은 계정으로 1개만 로그인 가능)
                         .maximumSessions(1)
-
-                        // 새로운 로그인 시 기존 세션 만료
                         .maxSessionsPreventsLogin(false)
-
-                        // 세션 만료 시 리다이렉트 URL
                         .expiredUrl("/login?expired")
                 )
-
-                // 세션 고정 공격 방지 (로그인 시 새 세션 ID 발급)
                 .sessionManagement(session -> session
                         .sessionFixation().changeSessionId()
                 )
 
                 // ========== 인증/인가 설정 ==========
                 .authorizeHttpRequests(auth -> auth
-                        // OAuth2 로그인 관련 경로: 모두 허용
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**"
                         ).permitAll()
 
-                        // 인증이 필요한 API
                         .requestMatchers(
                                 "/api/v1/auth/me",
                                 "/api/v1/auth/logout"
                         ).authenticated()
 
-                        // 나머지는 모두 허용 (개발 단계)
-                        // 운영 단계에서는 .authenticated()로 변경 권장
                         .anyRequest().permitAll()
                 )
 
-                // ========== OAuth2 로그인 설정 ==========
+                // ========== OAuth2 ==========
                 .oauth2Login(oauth2 -> oauth2
-                        // 로그인 페이지 없음 (자동으로 /oauth2/authorization/{provider}로 리다이렉트)
-
-                        // 성공 핸들러 (프론트엔드로 리다이렉트)
                         .successHandler(oAuth2SuccessHandler)
-
-                        // 실패 핸들러 (에러 페이지로 리다이렉트)
                         .failureHandler(oAuth2FailureHandler)
-
-                        // 사용자 정보 처리 서비스
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
@@ -100,17 +81,14 @@ public class SecurityConfig {
 
                 // ========== 예외 처리 ==========
                 .exceptionHandling(exception -> exception
-                        // 인증 실패 시 (401)
-                        .authenticationEntryPoint((request, response, authException) -> {
+                        .authenticationEntryPoint((request, response, ex) -> {
                             response.setStatus(401);
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write(
                                     "{\"success\":false,\"message\":\"인증이 필요합니다\"}"
                             );
                         })
-
-                        // 권한 없음 시 (403)
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        .accessDeniedHandler((request, response, ex) -> {
                             response.setStatus(403);
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write(
@@ -162,4 +140,10 @@ public class SecurityConfig {
 
         return source;
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();  // BCrypt 알고리즘
+    }
+
 }

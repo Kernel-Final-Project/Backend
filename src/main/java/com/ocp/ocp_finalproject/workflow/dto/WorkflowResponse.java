@@ -1,27 +1,28 @@
 package com.ocp.ocp_finalproject.workflow.dto;
 
-import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 public class WorkflowResponse {
 
-    private final Long workflowId;
+    private Long workflowId;
 
-    private final Long userId;
+    private Long userId;
 
-    private final String siteUrl;
+    private String siteUrl;
 
-    private final String blogUrl;
+    private String blogType;
 
-    private final SetTrendCategoryDto setTrendCategory;
+    private String blogUrl;
 
-    private final String blogAccountId;
+    private SetTrendCategoryDto setTrendCategory;
 
-    private final String readableRule;
+    private String blogAccountId;
 
-    private final WorkflowStatus status;
+    private String readableRule;
 
 }

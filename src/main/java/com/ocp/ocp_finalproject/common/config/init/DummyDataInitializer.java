@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+/*
 @Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -65,10 +65,6 @@ public class DummyDataInitializer implements ApplicationRunner {
                     log.info("[Init] work 개수: {}", rs4.getInt(1));
                 }
 
-                ResultSet rs5 = st.executeQuery("SELECT COUNT(*) FROM html_crawl");
-                if (rs5.next()) {
-                    log.info("[Init] html_crawl 개수: {}", rs5.getInt(1));
-                }
 
                 ResultSet rs6 = st.executeQuery("SELECT COUNT(*) FROM product_crawl");
                 if (rs6.next()) {
@@ -83,11 +79,6 @@ public class DummyDataInitializer implements ApplicationRunner {
                 ResultSet rs8 = st.executeQuery("SELECT COUNT(*) FROM ai_content");
                 if (rs8.next()) {
                     log.info("[Init] ai_content 개수: {}", rs8.getInt(1));
-                }
-
-                ResultSet rs9 = st.executeQuery("SELECT COUNT(*) FROM blog_post");
-                if (rs9.next()) {
-                    log.info("[Init] blog_post 개수: {}", rs9.getInt(1));
                 }
 
                 ResultSet rs10 = st.executeQuery("SELECT COUNT(*) FROM ai_usage_log");
@@ -115,19 +106,9 @@ public class DummyDataInitializer implements ApplicationRunner {
                     log.info("[Init] blog_type 개수: {}", rs14.getInt(1));
                 }
 
-                ResultSet rs15 = st.executeQuery("SELECT COUNT(*) FROM site_url_info");
-                if (rs15.next()) {
-                    log.info("[Init] site_url_info 개수: {}", rs15.getInt(1));
-                }
-
                 ResultSet rs16 = st.executeQuery("SELECT COUNT(*) FROM trend_category");
                 if (rs16.next()) {
                     log.info("[Init] trend_category 개수: {}", rs16.getInt(1));
-                }
-
-                ResultSet rs17 = st.executeQuery("SELECT COUNT(*) FROM set_trend_category");
-                if (rs17.next()) {
-                    log.info("[Init] set_trend_category 개수: {}", rs17.getInt(1));
                 }
 
                 ResultSet rs18 = st.executeQuery("SELECT COUNT(*) FROM common_code_group");
@@ -161,3 +142,5 @@ public class DummyDataInitializer implements ApplicationRunner {
         log.info("========================================");
     }
 }
+
+ */

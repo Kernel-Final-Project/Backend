@@ -1,8 +1,8 @@
 package com.ocp.ocp_finalproject.monitoring.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
-import com.ocp.ocp_finalproject.content.domain.BlogPost;
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.work.domain.Work;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,8 +23,8 @@ public class PostDailyStats extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_post_id", nullable = false)
-    private BlogPost blogPost;
+    @JoinColumn(name = "work_id", nullable = false)
+    private Work work;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -37,15 +37,13 @@ public class PostDailyStats extends BaseEntity {
     private LocalDate statDate;
 
     @Builder(builderMethodName = "createBuilder")
-    public static PostDailyStats create(BlogPost blogPost,
-                                        User user,
+    public static PostDailyStats create(User user,
+                                        Work work,
                                         Integer viewCount,
                                         LocalDate statDate) {
-
         PostDailyStats stats = new PostDailyStats();
-
-        stats.blogPost = blogPost;
         stats.user = user;
+        stats.work = work;
         stats.viewCount = (viewCount != null ? viewCount : 0);         // 기본값 적용
         stats.statDate = (statDate != null ? statDate : LocalDate.now());
 

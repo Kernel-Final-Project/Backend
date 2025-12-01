@@ -57,6 +57,8 @@ public enum ErrorCode {
     WORK_EXECUTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_003", "작업 실행에 실패했습니다"),
     WORK_LOG_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_004", "작업 로그를 찾을 수 없습니다"),
     WORK_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_005", "작업 생성에 실패했습니다"),
+    WORK_WEBHOOK_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "WORK_006", "유효하지 않은 블로그 웹훅 토큰입니다"),
+    WORK_WEBHOOK_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_007", "블로그 웹훅 URL이 설정되지 않았습니다"),
 
     // ===== 블로그 관련 (BLOG) =====
     BLOG_NOT_FOUND(HttpStatus.NOT_FOUND, "BLOG_001", "블로그를 찾을 수 없습니다"),

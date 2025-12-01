@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
  * 실행 상태 (공통)
  *
  * 사용 대상:
- * - Work (작업 실행)
  * - HtmlCrawl (HTML 추출 작업)
  * - ProductCrawl (상품 크롤링 작업)
  */
