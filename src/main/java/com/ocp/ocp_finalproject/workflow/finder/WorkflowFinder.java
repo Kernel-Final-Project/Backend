@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,13 +28,7 @@ public class WorkflowFinder {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        List<WorkflowListResponse> workflowList = workflowRepository.findByUserId(userId);
-
-        if (workflowList.isEmpty()) {
-            throw new CustomException(WORKFLOW_NOT_FOUND);
-        }
-
-        return workflowList;
+        return workflowRepository.findByUserId(user.getId());
     }
 
 }
