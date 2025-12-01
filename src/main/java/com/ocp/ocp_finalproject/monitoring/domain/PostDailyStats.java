@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.monitoring.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.user.domain.User;
-import com.ocp.ocp_finalproject.workflow.domain.Work;
+import com.ocp.ocp_finalproject.work.domain.Work;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
