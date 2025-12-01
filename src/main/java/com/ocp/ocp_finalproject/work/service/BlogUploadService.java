@@ -11,7 +11,7 @@ import com.ocp.ocp_finalproject.message.blog.dto.BlogUploadRequest;
 import com.ocp.ocp_finalproject.work.config.BlogUploadProperties;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
-import com.ocp.ocp_finalproject.work.repository.AiContentRepository;
+import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.workflow.domain.RecurrenceRule;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;

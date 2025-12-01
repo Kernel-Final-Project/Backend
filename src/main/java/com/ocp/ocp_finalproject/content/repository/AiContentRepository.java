@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.work.repository;
+package com.ocp.ocp_finalproject.content.repository;
 
 import com.ocp.ocp_finalproject.content.domain.AiContent;
 import java.util.Optional;
