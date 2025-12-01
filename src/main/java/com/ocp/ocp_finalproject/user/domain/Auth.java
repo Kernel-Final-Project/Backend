@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -41,13 +42,12 @@ public class Auth extends BaseEntity {
     private LocalDateTime lastLoginAt;
 
     @Builder(builderMethodName = "createBuilder")
-    public static Auth create(User user, AuthProvider provider, String providerUserId, String refreshToken, String accessToken) {
+    public static Auth create(User user, AuthProvider provider, String providerUserId) {
         Auth auth = new Auth();
         auth.user = user;
         auth.provider = provider;
         auth.providerUserId = providerUserId;
-        auth.refreshToken = refreshToken;
-        auth.accessToken = accessToken;
+        auth.recordLogin(); // 생성시 자동 로그인 기록
         return auth;
     }
 
@@ -88,5 +88,19 @@ public class Auth extends BaseEntity {
      */
     public boolean hasRefreshToken() {
         return refreshToken != null;
+    }
+
+    /**
+     * 신규 가입 여부 확인
+     * 로그인 시간과 생성 시간이 1분 이내면 신규 가입으로 판단
+     */
+    public boolean isNewUser(){
+        if(lastLoginAt == null || getCreatedAt() == null) {
+            return false;
+        }
+
+        long diffSeconds = Duration.between(getCreatedAt(), lastLoginAt).getSeconds();
+
+        return diffSeconds < 60;
     }
 }
