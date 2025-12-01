@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.work.dto.request;
+package com.ocp.ocp_finalproject.message.blog.dto;
 
 import lombok.Data;
 

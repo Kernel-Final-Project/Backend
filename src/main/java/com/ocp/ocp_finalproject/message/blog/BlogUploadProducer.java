@@ -1,14 +1,15 @@
-package com.ocp.ocp_finalproject.work.producer;
+package com.ocp.ocp_finalproject.message.blog;
 
 import com.ocp.ocp_finalproject.config.RabbitConfig;
-import com.ocp.ocp_finalproject.work.dto.request.BlogUploadRequest;
+import com.ocp.ocp_finalproject.message.blog.dto.BlogUploadRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class BlogUploadProducer {
+
     private final RabbitTemplate rabbitTemplate;
 
     public void send(BlogUploadRequest request) {
