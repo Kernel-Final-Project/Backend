@@ -4,16 +4,14 @@ import com.ocp.ocp_finalproject.common.response.ApiResponse;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.user.dto.response.UserResponse;
+import com.ocp.ocp_finalproject.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 세션기반 인증
@@ -24,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
+    private final UserService userService;
+
     /**
      * 현재 로그인한 사용자 정보 조회
      * GET /api/v1/auth/me
@@ -45,18 +46,57 @@ public class AuthController {
 
     /**
      * 로그 아웃
-     * POST /api/vi/auth/logout
+     * POST /api/v1/auth/logout
      */
     @PostMapping("/logout")
-    public ResponseEntity <ApiResponse<Void>> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
+    public ResponseEntity <ApiResponse<Void>> logout(@AuthenticationPrincipal UserPrincipal principal ,HttpServletRequest request) {
+        log.info("로그아웃 요청 - userId: {}",principal.getUser().getId());
 
-        if(session != null) {
-            session.invalidate();
+        try{
+            // 1. 사용자 상태를 INACTIVE로 변경
+            User user = principal.getUser();
+            userService.deactivateUser(user.getId());
+
+            // 2. 세션 무효화
+            HttpSession session = request.getSession(false);
+            if(session != null) {
+                session.invalidate();
+            }
+
+            return ResponseEntity.ok(
+                    ApiResponse.success("로그아웃 성공")
+            );
+        }catch (Exception e){
+            log.error("로그아웃 처리 중 에러 발생",e);
+            return ResponseEntity.status(500).body(
+                    ApiResponse.error("로그아웃 처리 중 오류가 발생했습니다.")
+            );
         }
+    }
 
-        return ResponseEntity.ok(
-            ApiResponse.success("로그아웃 성공")
-        );
+    /**
+     * 회원 탈퇴
+     * DELETE /api/v1/auth/withdraw
+     */
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(@AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request) {
+        User user = principal.getUser();
+        log.info("회원 작ㄹ퇴 요청 - userId: {}",user.getId());
+
+        try{
+            userService.withdrawUser(user.getId());
+            HttpSession session = request.getSession(false);
+
+            if(session != null) {
+                session.invalidate();
+            }
+
+            return  ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다."));
+        }catch (Exception e){
+            log.error("회원 탈퇴 처리 중 에러 발생 - userId: {}",user.getId(),e.getMessage());
+            return ResponseEntity.status(500).body(
+                    ApiResponse.error("회원 탈퇴 처리 중 오류가 발생했습니다.")
+            );
+        }
     }
 }

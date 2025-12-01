@@ -3,6 +3,7 @@ package com.ocp.ocp_finalproject.user.service;
 import com.ocp.ocp_finalproject.user.domain.Auth;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.enums.AuthProvider;
+import com.ocp.ocp_finalproject.user.enums.UserStatus;
 import com.ocp.ocp_finalproject.user.repository.AuthRepository;
 import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.user.service.oauth2.OAuth2UserInfo;
@@ -43,8 +44,13 @@ public class UserOAuth2Service {
      */
     private User updateExistingUser(Auth auth){
         auth.recordLogin();
+        User user = auth.getUser();
+        if(user.getStatus() != UserStatus.ACTIVE){
+            user.updateStatus(UserStatus.ACTIVE);
+        }
+
         log.info("기존 사용자 로그인 -UserId: {}",auth.getUser().getId());
-        return auth.getUser();
+        return user;
     }
 
     /**
