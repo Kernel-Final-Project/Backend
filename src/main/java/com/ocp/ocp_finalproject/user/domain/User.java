@@ -19,9 +19,6 @@ public class User extends BaseEntity {
     @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "birth", length = 10)
-    private String birth;
-
     @Column(name = "email", length = 100)
     private String email;
 
