@@ -21,7 +21,7 @@ public class Auth extends BaseEntity {
     @Column(name = "auth_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
