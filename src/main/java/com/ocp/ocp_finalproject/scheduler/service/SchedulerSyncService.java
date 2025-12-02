@@ -13,6 +13,12 @@ public class SchedulerSyncService {
 
     private final Scheduler scheduler;
 
+    public void startSchedulerIfNeeded() throws SchedulerException {
+        if (!scheduler.isStarted()) {
+            scheduler.start();  // 스케줄러 시작
+        }
+    }
+
     public void registerWorkflowJobs(Workflow workflow) throws SchedulerException {
 
         /*
