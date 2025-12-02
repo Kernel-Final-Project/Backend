@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.scheduler.service;
 
-import com.ocp.ocp_finalproject.scheduler.converter.RecurrenceRuleCronConverter;
+import com.ocp.ocp_finalproject.workflow.util.RecurrenceRuleCronConverter;
 import com.ocp.ocp_finalproject.scheduler.job.BlogUploadJob;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import lombok.RequiredArgsConstructor;

@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.blog.domain.BlogType;
 import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.blog.repository.BlogTypeRepository;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
+import com.ocp.ocp_finalproject.scheduler.service.SchedulerSyncService;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.trend.repository.TrendCategoryRepository;
 import com.ocp.ocp_finalproject.user.domain.User;
@@ -16,6 +17,7 @@ import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.util.RecurrenceRuleFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final TrendCategoryRepository trendCategoryRepository;
     private final BlogTypeRepository blogTypeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SchedulerSyncService schedulerSyncService;
 
     @Override
     @Transactional(readOnly = true)
@@ -78,7 +81,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional
-    public WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) {
+    public WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) throws SchedulerException {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -102,9 +105,28 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .build();
 
         workflowRepository.save(workflow);
+        
+        // 스케줄러에 workflow 등록
+        schedulerSyncService.registerWorkflowJobs(workflow);
 
         return buildResponse(workflow, user, blogType, category, userBlog, rule);
     }
+
+
+    /**
+     *  워크플로우 수정 api 개발 시 해당 로직을 삽입해주세요.
+     * public Workflow updateWorkflow(Long id, UpdateDto dto) {
+     *     workflow.update(entity);
+     *     schedulerSyncService.updateWorkflowJobs(workflow); <--- 이 부분 추가
+     *     return workflow;
+     * }
+     *
+     * 워크플로우 삭제 api 개발 시 해당 로직을 삽입해주세요.
+     * public void deleteWorkflow(Long id) {
+     *     schedulerSyncService.removeWorkflowJobs(id); <--- 이 부분 추가
+     *     workflowRepository.deleteById(id);
+     * }
+     */
 
     private UserBlog createUserBlog(WorkflowRequest workflowRequest, BlogType blogType) {
 
