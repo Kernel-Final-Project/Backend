@@ -54,6 +54,9 @@ public class SchedulerSyncService {
                 ))
                 .build();
 
+        if (scheduler.checkExists(uploadJob.getKey())) {
+            scheduler.deleteJob(uploadJob.getKey());
+        }
         scheduler.scheduleJob(uploadJob, uploadTrigger);
     }
 
