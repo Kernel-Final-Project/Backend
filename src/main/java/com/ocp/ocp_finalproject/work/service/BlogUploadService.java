@@ -46,7 +46,7 @@ public class BlogUploadService {
 
         // 1. 특정 워크플로우의 CONTENT_GENERATED 상태인 Work만 조회
         List<Work> works = workRepository
-                .findByWorkflowIdAndStatus(workflowId, WorkExecutionStatus.CONTENT_GENERATED);
+                .findWorksWithBlog(workflowId, WorkExecutionStatus.CONTENT_GENERATED);
 
         if (works.isEmpty()) {
             return Collections.emptyList();

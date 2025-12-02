@@ -21,7 +21,7 @@ public class QuartzInitializer implements ApplicationListener<ApplicationReadyEv
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        //List<Workflow> workflows = workflowRepository.findAllActive();
-        //workflows.forEach(schedulerSyncService::registerWorkflowJobs);
+        List<Workflow> workflows = workflowRepository.findAllActive();
+        workflows.forEach(schedulerSyncService::registerWorkflowJobs);
     }
 }
