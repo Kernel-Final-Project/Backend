@@ -33,7 +33,7 @@ public class Work extends BaseEntity {
     @Column(name="posting_url")
     private String postingUrl;
 
-    @Column(name = "started_at", nullable = false)
+    @Column(name = "started_at")
     private LocalDateTime startedAt;
 
     @Column(name = "completed_at")
