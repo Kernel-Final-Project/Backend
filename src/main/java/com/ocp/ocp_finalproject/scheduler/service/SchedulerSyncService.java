@@ -7,6 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class SchedulerSyncService {
@@ -47,17 +52,27 @@ public class SchedulerSyncService {
                 .storeDurably()
                 .build();
 
-        Trigger uploadTrigger = TriggerBuilder.newTrigger()
-                .withIdentity("blog-upload-trigger-" + workflow.getId())
-                .withSchedule(CronScheduleBuilder.cronSchedule(
-                        RecurrenceRuleCronConverter.toCron(workflow.getRecurrenceRule())
-                ))
-                .build();
+        List<String> cronExpressions = RecurrenceRuleCronConverter.toCronExpressions(workflow.getRecurrenceRule());
+        if (cronExpressions.isEmpty()) {
+            throw new IllegalStateException("Blog upload Cron 표현식을 하나 이상 생성해야 합니다.");
+        }
+        List<Trigger> uploadTriggers = new ArrayList<>();
+        String baseTriggerIdentity = "blog-upload-trigger-" + workflow.getId();
+        for (int i = 0; i < cronExpressions.size(); i++) {
+            String triggerId = cronExpressions.size() == 1 ? baseTriggerIdentity : baseTriggerIdentity + "-" + (i + 1);
+            Trigger uploadTrigger = TriggerBuilder.newTrigger()
+                    .withIdentity(triggerId)
+                    .forJob(uploadJob)
+                    .withSchedule(CronScheduleBuilder.cronSchedule(cronExpressions.get(i)))
+                    .build();
+            uploadTriggers.add(uploadTrigger);
+        }
 
         if (scheduler.checkExists(uploadJob.getKey())) {
             scheduler.deleteJob(uploadJob.getKey());
         }
-        scheduler.scheduleJob(uploadJob, uploadTrigger);
+        Set<Trigger> triggerSet = new HashSet<>(uploadTriggers);
+        scheduler.scheduleJob(uploadJob, triggerSet, true);
     }
 
     public void updateWorkflowJobs(Workflow workflow) throws SchedulerException {
