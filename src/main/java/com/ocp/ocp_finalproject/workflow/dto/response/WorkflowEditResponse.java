@@ -1,5 +1,7 @@
-package com.ocp.ocp_finalproject.workflow.dto;
+package com.ocp.ocp_finalproject.workflow.dto.response;
 
+import com.ocp.ocp_finalproject.workflow.dto.RecurrenceRuleDto;
+import com.ocp.ocp_finalproject.workflow.dto.SetTrendCategoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class WorkflowResponse {
+public class WorkflowEditResponse {
 
     private Long workflowId;
 
@@ -15,7 +17,7 @@ public class WorkflowResponse {
 
     private String siteUrl;
 
-    private String blogType;
+    private Long blogTypeId;
 
     private String blogUrl;
 
@@ -23,6 +25,5 @@ public class WorkflowResponse {
 
     private String blogAccountId;
 
-    private String readableRule;
-
+    private RecurrenceRuleDto recurrenceRule;
 }
