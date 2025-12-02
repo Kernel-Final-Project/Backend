@@ -2,6 +2,8 @@ package com.ocp.ocp_finalproject.workflow.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.workflow.enums.RepeatType;
+import com.ocp.ocp_finalproject.workflow.util.IntegerListConverter;
+import com.ocp.ocp_finalproject.workflow.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,14 +32,17 @@ public class RecurrenceRule extends BaseEntity {
     @Column(name = "repeat_interval")
     private Integer repeatInterval;
 
-    @Column(name = "days_of_week", length = 500)
-    private String daysOfWeek;
+    @Convert(converter = IntegerListConverter.class)
+    @Column(name = "days_of_week", columnDefinition = "JSON")
+    private List<Integer> daysOfWeek;
 
-    @Column(name = "days_of_month")
-    private String daysOfMonth;
+    @Convert(converter = IntegerListConverter.class)
+    @Column(name = "days_of_month", columnDefinition = "JSON")
+    private List<Integer> daysOfMonth;
 
-    @Column(name = "times_of_day", length = 500)
-    private String timesOfDay;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "times_of_day", columnDefinition = "JSON")
+    private List<String> timesOfDay;
 
     @Column(name = "readable_rule", length = 100)
     private String readableRule;
@@ -52,9 +57,9 @@ public class RecurrenceRule extends BaseEntity {
     public static RecurrenceRule create(
             RepeatType repeatType,
             Integer repeatInterval,
-            String daysOfWeek,
-            String daysOfMonth,
-            String timesOfDay,
+            List<Integer> daysOfWeek,
+            List<Integer> daysOfMonth,
+            List<String> timesOfDay,
             String readableRule,
             LocalDateTime startAt,
             LocalDateTime endAt
