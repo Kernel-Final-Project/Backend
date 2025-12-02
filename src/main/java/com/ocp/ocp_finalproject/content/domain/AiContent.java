@@ -19,17 +19,17 @@ public class AiContent extends BaseEntity {
     @Column(name = "ai_content_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column
     private String content;
 
-    @Column(name = "choice_product", nullable = false)
+    @Column(name = "choice_product")
     private String choiceProduct;
 
-    @Column(name = "choice_trend_keyword", nullable = false)
+    @Column(name = "choice_trend_keyword")
     private String choiceTrendKeyword;
 
     @Enumerated(EnumType.STRING)     // ★ 필수
