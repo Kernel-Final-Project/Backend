@@ -9,14 +9,21 @@ import org.springframework.data.repository.query.Param;
 
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
+    /**
+     * BlogUploadService에서 work 조회 시 사용되는 메서드
+     *
+     */
     @Query("""
-            SELECT w
-            FROM Work w
-            JOIN FETCH w.workflow wf
-            LEFT JOIN FETCH wf.userBlog ub
-            LEFT JOIN FETCH ub.blogType bt
-            LEFT JOIN FETCH wf.recurrenceRule rr
-            WHERE w.status = :status
-            """)
-    List<Work> findByStatusWithWorkflow(@Param("status") WorkExecutionStatus status);
+        SELECT w
+        FROM Work w
+        JOIN FETCH w.workflow wf
+        JOIN FETCH wf.userBlog ub
+        LEFT JOIN FETCH ub.blogType bt
+        WHERE wf.id = :workflowId
+          AND w.status = :status
+    """)
+    List<Work> findWorksWithBlog(
+            @Param("workflowId") Long workflowId,
+            @Param("status") WorkExecutionStatus status
+    );
 }
