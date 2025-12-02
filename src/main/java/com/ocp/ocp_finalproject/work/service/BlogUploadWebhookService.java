@@ -5,6 +5,8 @@ import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,11 @@ public class BlogUploadWebhookService {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORK_NOT_FOUND, "워크를 찾을 수 없습니다. workId=" + workId));
 
-        log.info("웹훅 결과 수신 workId={} success={} postingUrl={}", workId, request.isSuccess(), request.getPostingUrl());
-        work.setPostingUrl(request.getPostingUrl(), request.isSuccess());
+        LocalDateTime completedAt = request.getCompletedAt() != null
+                ? request.getCompletedAt().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime()
+                : LocalDateTime.now(ZoneOffset.UTC);
+
+        log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, request.isSuccess(), request.getPostingUrl(), completedAt);
+        work.updateCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
     }
 }

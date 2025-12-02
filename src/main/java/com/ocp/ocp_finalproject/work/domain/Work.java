@@ -49,12 +49,13 @@ public class Work extends BaseEntity {
         return work;
     }
 
-    public void setPostingUrl(String postingUrl, boolean isSuccess) {
+    public void updateCompletion(String postingUrl, boolean isSuccess, LocalDateTime completedAt) {
         this.postingUrl = postingUrl;
-        if(isSuccess){
-            this.status=WorkExecutionStatus.COMPLETED;
-        }else {
-            this.status=WorkExecutionStatus.FAILED;
+        this.completedAt = completedAt;
+        if (isSuccess) {
+            this.status = WorkExecutionStatus.COMPLETED;
+        } else {
+            this.status = WorkExecutionStatus.FAILED;
         }
     }
 
