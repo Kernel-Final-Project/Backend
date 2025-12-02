@@ -42,44 +42,47 @@ public class BlogUploadService {
     private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
-    public List<BlogUploadRequest> collectPendingBlogUploads() {
-        List<Work> candidates = workRepository.findByStatusWithWorkflow(WorkExecutionStatus.CONTENT_GENERATED);
-        if (candidates.isEmpty()) {
+    public List<BlogUploadRequest> collectPendingBlogUploadsForWorkflow(Long workflowId) {
+
+        // 1. 특정 워크플로우의 CONTENT_GENERATED 상태인 Work만 조회
+        List<Work> works = workRepository
+                .findByWorkflowIdAndStatus(workflowId, WorkExecutionStatus.CONTENT_GENERATED);
+
+        if (works.isEmpty()) {
             return Collections.emptyList();
         }
 
-        LocalDateTime now = LocalDateTime.now();
         List<BlogUploadRequest> requests = new ArrayList<>();
 
-        for (Work work : candidates) {
-            Workflow workflow = work.getWorkflow();
-            if (!isWorkflowActive(workflow, now)) {
-                continue;
-            }
+        for (Work work : works) {
 
+            // 2. AI 콘텐츠 조회
             Optional<AiContent> aiContentOpt = aiContentRepository.findTopByWorkId(work.getId());
             if (aiContentOpt.isEmpty()) {
-                log.warn("워크 {} 에 대한 AI 콘텐츠를 찾을 수 없어 업로드를 건너뜁니다.", work.getId());
+                log.warn("워크 {} : AI 콘텐츠가 없어 업로드 스킵", work.getId());
                 continue;
             }
-
-            UserBlog userBlog = workflow.getUserBlog();
-            if (userBlog == null) {
-                log.warn("워크 {} 의 워크플로우에 블로그 정보가 없어 업로드를 건너뜁니다.", work.getId());
-                continue;
-            }
-
             AiContent aiContent = aiContentOpt.get();
-            BlogUploadRequest request = new BlogUploadRequest();
-            request.setWorkId(work.getId());
-            request.setTitle(aiContent.getTitle());
-            request.setContent(aiContent.getContent());
-            request.setBlogType(resolveBlogType(userBlog.getBlogType()));
-            request.setBlogId(userBlog.getAccountId());
-            request.setBlogPassword(userBlog.getAccountPassword());
-            request.setBlogUrl(userBlog.getBlogUrl());
 
-            requests.add(request);
+            // 3. 블로그 정보 조회
+            Workflow workflow = work.getWorkflow();
+            UserBlog blog = workflow.getUserBlog();
+            if (blog == null) {
+                log.warn("워크 {} : 블로그 정보 없음 -> 업로드 스킵", work.getId());
+                continue;
+            }
+
+            // 4. 업로드 요청 생성
+            BlogUploadRequest req = new BlogUploadRequest();
+            req.setWorkId(work.getId());
+            req.setTitle(aiContent.getTitle());
+            req.setContent(aiContent.getContent());
+            req.setBlogType(resolveBlogType(blog.getBlogType()));
+            req.setBlogId(blog.getAccountId());
+            req.setBlogPassword(blog.getAccountPassword());
+            req.setBlogUrl(blog.getBlogUrl());
+
+            requests.add(req);
         }
 
         return requests;
@@ -89,102 +92,6 @@ public class BlogUploadService {
         applyDefaultWebhookUrlIfNeeded(request);
         applyWebhookToken(request);
         return request;
-    }
-
-    private boolean isWorkflowActive(Workflow workflow, LocalDateTime now) {
-        if (workflow == null) {
-            return false;
-        }
-        if (Boolean.FALSE.equals(workflow.getIsActive())) {
-            return false;
-        }
-        RecurrenceRule rule = workflow.getRecurrenceRule();
-        if (rule == null) {
-            return true;
-        }
-
-        if (rule.getStartAt() != null && now.isBefore(rule.getStartAt())) {
-            return false;
-        }
-        if (rule.getEndAt() != null && now.isAfter(rule.getEndAt())) {
-            return false;
-        }
-
-        if (!matchesDaysOfWeek(rule.getDaysOfWeek(), now.getDayOfWeek())) {
-            return false;
-        }
-        if (!matchesDaysOfMonth(rule.getDaysOfMonth(), now.toLocalDate())) {
-            return false;
-        }
-        return matchesTimesOfDay(rule.getTimesOfDay(), now.toLocalTime());
-    }
-
-    private boolean matchesDaysOfWeek(String daysOfWeekJson, DayOfWeek currentDay) {
-        List<String> dayTokens = parseStringArray(daysOfWeekJson);
-        if (dayTokens.isEmpty()) {
-            return true;
-        }
-        for (String token : dayTokens) {
-            try {
-                if (DayOfWeek.valueOf(token.toUpperCase()) == currentDay) {
-                    return true;
-                }
-            } catch (IllegalArgumentException ignored) {
-                // 무시하고 다음 토큰 검사
-            }
-        }
-        return false;
-    }
-
-    private boolean matchesDaysOfMonth(String daysOfMonthJson, LocalDate date) {
-        List<Integer> days = parseIntegerArray(daysOfMonthJson);
-        if (days.isEmpty()) {
-            return true;
-        }
-        return days.contains(date.getDayOfMonth());
-    }
-
-    private boolean matchesTimesOfDay(String timesOfDayJson, LocalTime currentTime) {
-        List<String> times = parseStringArray(timesOfDayJson);
-        if (times.isEmpty()) {
-            return true;
-        }
-        LocalTime current = currentTime.withSecond(0).withNano(0);
-        for (String timeValue : times) {
-            try {
-                LocalTime scheduled = LocalTime.parse(timeValue, TIME_FORMATTER);
-                if (scheduled.equals(current)) {
-                    return true;
-                }
-            } catch (Exception e) {
-                log.warn("잘못된 timesOfDay 값({}) 으로 인해 비교를 건너뜁니다.", timeValue);
-            }
-        }
-        return false;
-    }
-
-    private List<String> parseStringArray(String jsonArray) {
-        if (jsonArray == null || jsonArray.isBlank()) {
-            return Collections.emptyList();
-        }
-        try {
-            return objectMapper.readValue(jsonArray, new TypeReference<List<String>>() {});
-        } catch (Exception e) {
-            log.warn("문자열 배열 파싱 실패: {}", jsonArray, e);
-            return Collections.emptyList();
-        }
-    }
-
-    private List<Integer> parseIntegerArray(String jsonArray) {
-        if (jsonArray == null || jsonArray.isBlank()) {
-            return Collections.emptyList();
-        }
-        try {
-            return objectMapper.readValue(jsonArray, new TypeReference<List<Integer>>() {});
-        } catch (Exception e) {
-            log.warn("정수 배열 파싱 실패: {}", jsonArray, e);
-            return Collections.emptyList();
-        }
     }
 
     private String resolveBlogType(BlogType blogType) {
