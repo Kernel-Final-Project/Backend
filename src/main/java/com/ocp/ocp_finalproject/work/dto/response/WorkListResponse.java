@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class WorkListResponse {
-    Long workId;
-    String status;
-    String postingUrl;
-    LocalDateTime completedAt;
-    String choiceProduct;
+    private Long workId;
+    private String status;
+    private String postingUrl;
+    private LocalDateTime completedAt;
+    private String choiceProduct;
 }
