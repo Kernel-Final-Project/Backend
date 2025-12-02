@@ -30,7 +30,6 @@ import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class WorkflowServiceImpl implements WorkflowService {
 
-    private final WorkflowFinder workflowFinder;
     private final UserRepository userRepository;
     private final WorkflowRepository workflowRepository;
     private final TrendCategoryRepository trendCategoryRepository;
@@ -38,9 +37,43 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public List<WorkflowListResponse> findWorkflows(Long userId) {
 
-        return workflowFinder.findWorkflows(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        return workflowRepository.findWorkflows(user.getId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WorkflowEditResponse findWorkflow(Long workflowId, Long userId) {
+
+        Workflow workflow = workflowRepository.findWorkflow(workflowId, userId);
+
+        User user = workflow.getUser();
+
+        UserBlog userBlog = workflow.getUserBlog();
+
+        BlogType blogType = userBlog.getBlogType();
+
+        TrendCategory category = workflow.getTrendCategory();
+
+        RecurrenceRule rule = workflow.getRecurrenceRule();
+
+        List<TrendCategory> path = category.getFullPath();
+
+        return WorkflowEditResponse.builder()
+                .workflowId(workflow.getId())
+                .userId(user.getId())
+                .siteUrl(workflow.getSiteUrl())
+                .blogTypeId(blogType.getId())
+                .blogUrl(userBlog.getBlogUrl())
+                .setTrendCategory(SetTrendCategoryDto.from(path))
+                .blogAccountId(userBlog.getAccountId())
+                .recurrenceRule(RecurrenceRuleDto.from(rule))
+                .build();
     }
 
     @Override
@@ -76,6 +109,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private UserBlog createUserBlog(WorkflowRequest workflowRequest, BlogType blogType) {
 
         String encryptedPassword = passwordEncoder.encode(workflowRequest.getBlogAccountPwd());
+
         return UserBlog.createBuilder()
                 .blogType(blogType)
                 .accountId(workflowRequest.getBlogAccountId())
@@ -92,9 +126,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         return RecurrenceRule.createBuilder()
                 .repeatType(ruleDto.getRepeatType())
                 .repeatInterval(ruleDto.getRepeatInterval())
-                .daysOfWeek(ruleDto.getDaysOfWeekAsString())
-                .daysOfMonth(ruleDto.getDaysOfMonthAsString())
-                .timesOfDay(ruleDto.getTimesOfDayAsString())
+                .daysOfWeek(ruleDto.getDaysOfWeek())
+                .daysOfMonth(ruleDto.getDaysOfMonth())
+                .timesOfDay(ruleDto.getTimesOfDay())
                 .readableRule(readableRule)
                 .startAt(ruleDto.getStartAt())
                 .endAt(ruleDto.getEndAt())
@@ -110,7 +144,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             RecurrenceRule rule
     ) {
 
-        List<TrendCategory> path = category.getFullPath(category);
+        List<TrendCategory> path = category.getFullPath();
 
         return WorkflowResponse.builder()
                 .workflowId(workflow.getId())

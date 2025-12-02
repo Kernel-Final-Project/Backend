@@ -54,7 +54,7 @@ public class TrendCategory extends BaseEntity {
         this.parentCategory = parentCategory;
     }
 
-    public List<TrendCategory> getFullPath(TrendCategory category) {
+    public List<TrendCategory> getFullPath() {
         List<TrendCategory> path = new ArrayList<>();
         TrendCategory current = this;
 

@@ -1,14 +1,19 @@
 package com.ocp.ocp_finalproject.workflow.dto;
 
+import com.ocp.ocp_finalproject.workflow.domain.RecurrenceRule;
 import com.ocp.ocp_finalproject.workflow.enums.RepeatType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class RecurrenceRuleDto {
     private RepeatType repeatType;
@@ -25,29 +30,16 @@ public class RecurrenceRuleDto {
 
     private LocalDateTime endAt;
 
-    public String getDaysOfWeekAsString() {
-        if (daysOfWeek == null || daysOfWeek.isEmpty()) {
-            return null;
-        }
-        return daysOfWeek.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-    }
-
-    public String getDaysOfMonthAsString() {
-        if (daysOfMonth == null || daysOfMonth.isEmpty()) {
-            return null;
-        }
-        return daysOfMonth.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-    }
-
-    public String getTimesOfDayAsString() {
-        if (timesOfDay == null || timesOfDay.isEmpty()) {
-            return null;
-        }
-        return String.join(",", timesOfDay);
+    public static RecurrenceRuleDto from(RecurrenceRule rule) {
+        return RecurrenceRuleDto.builder()
+                .repeatType(rule.getRepeatType())
+                .repeatInterval(rule.getRepeatInterval())
+                .daysOfWeek(rule.getDaysOfWeek())
+                .daysOfMonth(rule.getDaysOfMonth())
+                .timesOfDay(rule.getTimesOfDay())
+                .startAt(rule.getStartAt())
+                .endAt(rule.getEndAt())
+                .build();
     }
 
 }

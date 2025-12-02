@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-/*
+
 @Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -142,5 +142,3 @@ public class DummyDataInitializer implements ApplicationRunner {
         log.info("========================================");
     }
 }
-
- */

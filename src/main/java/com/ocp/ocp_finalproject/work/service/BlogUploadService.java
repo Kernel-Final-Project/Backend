@@ -110,13 +110,13 @@ public class BlogUploadService {
             return false;
         }
 
-        if (!matchesDaysOfWeek(rule.getDaysOfWeek(), now.getDayOfWeek())) {
+        if (!matchesDaysOfWeek(rule.getDaysOfWeek().toString(), now.getDayOfWeek())) {
             return false;
         }
-        if (!matchesDaysOfMonth(rule.getDaysOfMonth(), now.toLocalDate())) {
+        if (!matchesDaysOfMonth(rule.getDaysOfMonth().toString(), now.toLocalDate())) {
             return false;
         }
-        return matchesTimesOfDay(rule.getTimesOfDay(), now.toLocalTime());
+        return matchesTimesOfDay(String.valueOf(rule.getTimesOfDay()), now.toLocalTime());
     }
 
     private boolean matchesDaysOfWeek(String daysOfWeekJson, DayOfWeek currentDay) {

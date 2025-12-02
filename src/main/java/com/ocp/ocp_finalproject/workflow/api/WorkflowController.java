@@ -2,6 +2,7 @@ package com.ocp.ocp_finalproject.workflow.api;
 
 
 import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowEditResponse;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowRequest;
 import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
@@ -30,6 +31,17 @@ public class WorkflowController {
         List<WorkflowListResponse> workflowList = workflowService.findWorkflows(userId);
 
         return ResponseEntity.ok(ApiResponse.success("워크플로우 목록 조회 성공", workflowList));
+    }
+
+    /**
+     * 워크플로우 상세 조회
+     */
+    @GetMapping("/{userId}/{workflowId}")
+    public ResponseEntity<ApiResponse<WorkflowEditResponse>> getWorkflowEdit(@PathVariable Long userId, @PathVariable Long workflowId) {
+
+        WorkflowEditResponse workflow = workflowService.findWorkflow(workflowId, userId);
+
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 상세 조회 성공", workflow));
     }
 
     /**
