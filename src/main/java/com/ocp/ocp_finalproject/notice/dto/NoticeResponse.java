@@ -19,8 +19,9 @@ public class NoticeResponse {
     private Integer viewCount;
     private String attachmentUrl;
 
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
     private List<NoticeFileResponse> noticeFiles;
 
@@ -34,8 +35,8 @@ public class NoticeResponse {
                 .authorId(notice.getAuthorId())
                 .viewCount(notice.getViewCount())
                 .attachmentUrl(notice.getAttachmentUrl())
-                .createAt(notice.getCreatedAt())
-                .updateAt(notice.getUpdatedAt())
+                .createdAt(notice.getCreatedAt())
+                .updatedAt(notice.getUpdatedAt())
                 .noticeFiles(
                         notice.getNoticeFiles().stream()
                                 .map(NoticeFileResponse::from)
