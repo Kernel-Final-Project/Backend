@@ -60,4 +60,11 @@ public class CommonCodeGroup extends BaseEntity {
         }
         code.setCommonCodeGroup(this);
     }
+
+    // 비즈니스 메서드 작성
+    // 그룹 정보 수정
+    public void updateInfo(String groupName, String description) {
+        this.groupName = groupName;
+        this.description = description;
+    }
 }
