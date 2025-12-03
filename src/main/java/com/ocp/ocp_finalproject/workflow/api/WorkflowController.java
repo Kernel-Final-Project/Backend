@@ -62,7 +62,7 @@ public class WorkflowController {
     @PutMapping("/{userId}/{workflowId}")
     public ResponseEntity<ApiResponse<WorkflowResponse>> updateWorkflow(@PathVariable Long userId,
                                                                         @PathVariable Long workflowId,
-                                                                        @RequestBody WorkflowRequest workflowRequest) {
+                                                                        @RequestBody WorkflowRequest workflowRequest) throws SchedulerException {
         WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowId, workflowRequest);
 
         return ResponseEntity.ok(ApiResponse.success("워크플로우 수정 성공", workflow));
