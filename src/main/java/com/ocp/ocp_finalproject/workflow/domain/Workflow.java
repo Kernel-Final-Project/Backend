@@ -60,12 +60,15 @@ public class Workflow extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Builder(builderMethodName = "createBuilder")
     public static Workflow create(
             User user,
             UserBlog userBlog,
             TrendCategory trendCategory,
             RecurrenceRule recurrenceRule,
-            String siteUrl
+            String siteUrl,
+            Boolean isTest,
+            Boolean isActive
     ) {
         Workflow workflow = new Workflow();
         workflow.user = user;
@@ -74,20 +77,10 @@ public class Workflow extends BaseEntity {
         workflow.recurrenceRule = recurrenceRule;
         workflow.status = WorkflowStatus.PENDING;
         workflow.siteUrl = siteUrl;
-        workflow.isTest = false;
-        workflow.isActive = true;
+        workflow.isTest = isTest != null ? isTest : false;
+        workflow.isActive = isActive != null ? isActive : true;
 
         return workflow;
-    }
-
-    public void update(UserBlog userBlog,
-                       TrendCategory trendCategory,
-                       RecurrenceRule recurrenceRule,
-                       String siteUrl) {
-        this.userBlog = userBlog;
-        this.trendCategory = trendCategory;
-        this.recurrenceRule = recurrenceRule;
-        this.siteUrl = siteUrl;
     }
 
 }

@@ -1,7 +1,8 @@
 package com.ocp.ocp_finalproject.workflow.repository;
 
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
-import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ import java.util.Optional;
 public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
 
     @Query("""
-            SELECT new com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse(
+            SELECT new com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse(
                 wf.id,
                 u.id,
                 wf.siteUrl,
@@ -45,7 +46,8 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN FETCH ub.blogType bt
             WHERE wf.id = :workflowId and u.id = :userId
     """)
-    Optional<Workflow> findWorkflow(@Param("workflowId") Long workflowId, @Param("userId") Long userId);
+    Workflow findWorkflow(@Param("workflowId") Long workflowId,@Param("userId") Long userId);
+
 
     /**
      *

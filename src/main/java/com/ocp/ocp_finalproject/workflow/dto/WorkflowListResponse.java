@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.workflow.dto.response;
+package com.ocp.ocp_finalproject.workflow.dto;
 
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import lombok.Getter;

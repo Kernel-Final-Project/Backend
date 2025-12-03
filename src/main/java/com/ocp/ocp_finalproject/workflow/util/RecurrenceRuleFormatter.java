@@ -9,51 +9,34 @@ import java.util.stream.Collectors;
 public class RecurrenceRuleFormatter {
 
     public static String toReadableString(RecurrenceRuleDto dto) {
-        return toReadableString(
-                dto.getRepeatType(),
-                dto.getRepeatInterval(),
-                dto.getDaysOfWeek(),
-                dto.getDaysOfMonth(),
-                dto.getTimesOfDay()
-        );
-    }
-
-    public static String toReadableString(
-            RepeatType repeatType,
-            Integer repeatInterval,
-            List<Integer> daysOfWeek,
-            List<Integer> daysOfMonth,
-            List<String> timesOfDay
-    ) {
         StringBuilder sb = new StringBuilder();
 
-        switch (repeatType) {
+        switch (dto.getRepeatType()) {
             case ONCE:
                 return "1회만 실행";
             case DAILY:
                 sb.append("매일");
                 break;
             case WEEKLY:
-                sb.append("매주 ").append(formatDaysOfWeek(daysOfWeek));
+                sb.append("매주 ").append(formatDaysOfWeek(dto.getDaysOfWeek()));
                 break;
             case MONTHLY:
-                sb.append("매달 ").append(formatDaysOfMonth(daysOfMonth));
+                sb.append("매달 ").append(formatDaysOfMonth(dto.getDaysOfMonth()));
                 break;
             case CUSTOM:
                 sb.append("사용자 정의");
                 break;
         }
 
-        if (repeatInterval != null && repeatInterval > 1) {
-            sb.append(" (").append(repeatInterval).append("번째마다)");
+        if (dto.getRepeatInterval() != null && dto.getRepeatInterval() > 1) {
+            sb.append(" (").append(dto.getRepeatInterval()).append("번째마다)");
         }
 
-        if (timesOfDay != null && !timesOfDay.isEmpty()) {
-            sb.append(" ").append(formatTimesOfDay(timesOfDay)).append("에 실행");
+        if (dto.getTimesOfDay() != null && !dto.getTimesOfDay().isEmpty()) {
+            sb.append(" ").append(formatTimesOfDay(dto.getTimesOfDay())).append("에 실행");
         }
 
         return sb.toString();
-
     }
 
     private static String formatDaysOfWeek(List<Integer> daysOfWeek) {
