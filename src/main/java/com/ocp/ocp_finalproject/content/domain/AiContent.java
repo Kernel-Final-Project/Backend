@@ -3,6 +3,7 @@ package com.ocp.ocp_finalproject.content.domain;
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import com.ocp.ocp_finalproject.content.enums.ContentStatus;
 import com.ocp.ocp_finalproject.work.domain.Work;
+import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -70,4 +71,14 @@ public class AiContent extends BaseEntity {
         return aiContent;
     }
 
+    public void updateKeywordCompletion(boolean isSuccess, String keyword, LocalDateTime startedAt, LocalDateTime completedAt) {
+        if(isSuccess) {
+            this.choiceTrendKeyword=keyword;
+            this.status = ContentStatus.GENERATING;
+        } else{
+            this.status = ContentStatus.FAILED;
+        }
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+    }
 }

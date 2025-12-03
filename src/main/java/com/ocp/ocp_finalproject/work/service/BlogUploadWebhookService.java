@@ -34,6 +34,6 @@ public class BlogUploadWebhookService {
                 : LocalDateTime.now(ZoneOffset.UTC);
 
         log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, request.isSuccess(), request.getPostingUrl(), completedAt);
-        work.updateCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
+        work.updateUrlCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
     }
 }

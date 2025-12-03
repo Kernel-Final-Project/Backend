@@ -11,4 +11,6 @@ public interface AiContentRepository extends JpaRepository<AiContent, Long> {
     Optional<AiContent> findTopByWorkId(Long workId);
 
     List<AiContent> findByWorkIdIn(Collection<Long> workIds);
+
+    Optional<AiContent> findByWorkId(Long workId);
 }
