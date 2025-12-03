@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.common.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,13 +8,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ApiResponse<T> {
 
-    //성공 여부(true/false)
+    @Schema(description = "성공 여부", example = "true")
     private boolean success;
 
-    //message: 응답 메시지 (예: "조회 성공", "등록 완료")
+    @Schema(description = "응답 메시지", example = "요청이 성공적으로 처리되었습니다")
     private String message;
 
-    //조회 결과, 생성된 객체 등 다양한 타입의 데이터를 담을 수 있음
+    @Schema(description = "응답 데이터")
     private T data;
 
     //성공 응답 (데이터 O)
