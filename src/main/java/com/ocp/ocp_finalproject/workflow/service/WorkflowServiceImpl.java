@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -97,24 +96,21 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         String encryptedPassword = passwordEncoder.encode(workflowRequest.getBlogAccountPwd());
 
-        UserBlog userBlog = UserBlog.createBuilder()
-                .blogType(blogType)
-                .accountId(workflowRequest.getBlogAccountId())
-                .accountPassword(encryptedPassword)
-                .blogUrl(workflowRequest.getBlogUrl())
-                .build();
+        UserBlog userBlog = UserBlog.create(blogType,
+                workflowRequest.getBlogAccountId(),
+                encryptedPassword, workflowRequest.getBlogUrl());
 
         RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
 
         validator.validate(ruleDto);
 
         RecurrenceRule rule = RecurrenceRule.create(ruleDto.getRepeatType(),
-                        ruleDto.getRepeatInterval(),
-                        ruleDto.getDaysOfWeek(),
-                        ruleDto.getDaysOfMonth(),
-                        ruleDto.getTimesOfDay(),
-                        ruleDto.getStartAt(),
-                        ruleDto.getEndAt());
+                ruleDto.getRepeatInterval(),
+                ruleDto.getDaysOfWeek(),
+                ruleDto.getDaysOfMonth(),
+                ruleDto.getTimesOfDay(),
+                ruleDto.getStartAt(),
+                ruleDto.getEndAt());
 
         Workflow workflow = Workflow.create(user, userBlog, category, rule, workflowRequest.getSiteUrl());
 
@@ -125,39 +121,49 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional
-    public WorkflowResponse updateWorkflow(Long userId, WorkflowEditRequest workflowEditRequest) throws SchedulerException {
+    public WorkflowResponse updateWorkflow(Long userId,
+                                           Long workflowId,
+                                           WorkflowRequest workflowRequest) throws SchedulerException {
 
-        Workflow workflow = workflowRepository.findWorkflow(workflowEditRequest.getWorkflowId(), userId)
+        Workflow workflow = workflowRepository.findWorkflow(workflowId, userId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
-        BlogType blogType = blogTypeRepository.findById(workflowEditRequest.getBlogTypeId())
+        BlogType blogType = blogTypeRepository.findById(workflowRequest.getBlogTypeId())
                 .orElseThrow(() -> new CustomException(BLOG_TYPE_NOT_FOUND));
 
-        UserBlog userBlog = userBlogRepository.findByBlogTypeAndAccountId(blogType, workflowEditRequest.getBlogAccountId());
+        UserBlog userBlog = userBlogRepository.findByBlogTypeAndAccountId(blogType, workflowRequest.getBlogAccountId());
 
         if (userBlog == null) {
             userBlog = UserBlog.create(blogType,
-                    workflowEditRequest.getBlogAccountId(),
-                    passwordEncoder.encode(workflowEditRequest.getBlogAccountPwd()),
-                    workflowEditRequest.getBlogUrl());
+                    workflowRequest.getBlogAccountId(),
+                    passwordEncoder.encode(workflowRequest.getBlogAccountPwd()),
+                    workflowRequest.getBlogUrl());
 
             userBlogRepository.save(userBlog);
+        } else {
+            userBlog.updateBlogUrl(workflowRequest.getBlogUrl());
+
+            if (workflowRequest.getBlogAccountPwd() != null
+                    && !workflowRequest.getBlogAccountPwd().isBlank()) {
+                userBlog.updateCredentials(workflowRequest.getBlogAccountId(),
+                        passwordEncoder.encode(workflowRequest.getBlogAccountPwd()));
+            }
         }
 
-        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowEditRequest.getCategoryId())
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
                 .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
 
         RecurrenceRule rule = workflow.getRecurrenceRule();
 
         if (rule != null) {
-            RecurrenceRuleDto ruleDto = workflowEditRequest.getRecurrenceRule();
+            RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
 
             validator.validate(ruleDto);
 
             rule.update(ruleDto);
         }
 
-        workflow.update(userBlog, category, rule, workflowEditRequest.getSiteUrl());
+        workflow.update(userBlog, category, rule, workflowRequest.getSiteUrl());
         schedulerSyncService.updateWorkflowJobs(workflow);
 
         return buildResponse(workflow, category);
@@ -166,8 +172,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     /**
      * 워크플로우 삭제 api 개발 시 해당 로직을 삽입해주세요.
      * public void deleteWorkflow(Long id) {
-     *     schedulerSyncService.removeWorkflowJobs(id); <--- 이 부분 추가
-     *     workflowRepository.deleteById(id);
+     * schedulerSyncService.removeWorkflowJobs(id); <--- 이 부분 추가
+     * workflowRepository.deleteById(id);
      * }
      */
 

@@ -35,7 +35,8 @@ public class WorkflowController {
      * 워크플로우 상세 조회
      */
     @GetMapping("/{userId}/{workflowId}")
-    public ResponseEntity<ApiResponse<WorkflowEditResponse>> getWorkflowEdit(@PathVariable Long userId, @PathVariable Long workflowId) {
+    public ResponseEntity<ApiResponse<WorkflowEditResponse>> getWorkflowEdit(@PathVariable Long userId,
+                                                                             @PathVariable Long workflowId) {
 
         WorkflowEditResponse workflow = workflowService.findWorkflow(workflowId, userId);
 
@@ -58,10 +59,11 @@ public class WorkflowController {
      * 워크플로우 수정
      * url, 트렌드 키워드, 블로그, 예약 시간, 블로그 계정 모두 수정 가능
      */
-    @PutMapping("/{userId}")
+    @PutMapping("/{userId}/{workflowId}")
     public ResponseEntity<ApiResponse<WorkflowResponse>> updateWorkflow(@PathVariable Long userId,
-                                                                        @RequestBody WorkflowEditRequest workflowEditRequest) {
-        WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowEditRequest);
+                                                                        @PathVariable Long workflowId,
+                                                                        @RequestBody WorkflowRequest workflowRequest) {
+        WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowId, workflowRequest);
 
         return ResponseEntity.ok(ApiResponse.success("워크플로우 수정 성공", workflow));
     }

@@ -14,5 +14,5 @@ public interface WorkflowService {
 
     WorkflowEditResponse findWorkflow(Long workflowId, Long userId);
 
-    WorkflowResponse updateWorkflow(Long userId, WorkflowEditRequest workflowEditRequest) throws SchedulerException;
+    WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
 }
