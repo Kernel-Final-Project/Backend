@@ -1,11 +1,8 @@
 package com.ocp.ocp_finalproject.workflow.api;
 
-
 import com.ocp.ocp_finalproject.common.response.ApiResponse;
-import com.ocp.ocp_finalproject.workflow.dto.WorkflowEditResponse;
-import com.ocp.ocp_finalproject.workflow.dto.WorkflowListResponse;
-import com.ocp.ocp_finalproject.workflow.dto.WorkflowRequest;
-import com.ocp.ocp_finalproject.workflow.dto.WorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.request.*;
+import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,5 +53,16 @@ public class WorkflowController {
         return ResponseEntity.ok(ApiResponse.success("워크플로우 생성 성공", workflow));
     }
 
-}
+    /**
+     * 워크플로우 수정
+     * url, 트렌드 키워드, 블로그, 예약 시간, 블로그 계정 모두 수정 가능
+     */
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<WorkflowResponse>> updateWorkflow(@PathVariable Long userId,
+                                                                        @RequestBody WorkflowEditRequest workflowEditRequest) {
+        WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowEditRequest);
 
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 수정 성공", workflow));
+    }
+
+}
