@@ -193,6 +193,10 @@ public class WorkflowServiceImpl implements WorkflowService {
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
+        if (workflow.getStatus() == WorkflowStatus.DELETED) {
+            throw new CustomException(ALREADY_DELETED);
+        }
+
         workflow.delete();
 
         schedulerSyncService.removeWorkflowJobs(workflowId);
