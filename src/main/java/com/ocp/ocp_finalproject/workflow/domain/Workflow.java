@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,9 @@ public class Workflow extends BaseEntity {
     @Column(name = "is_test", nullable = false)
     private Boolean isTest = false;
 
+    @Column(name="deleted_at")
+    private LocalDateTime deletedAt;
+
     public static Workflow create(
             User user,
             UserBlog userBlog,
@@ -95,6 +99,11 @@ public class Workflow extends BaseEntity {
         }
 
         this.status = newStatus;
+    }
+
+    public void delete() {
+        this.status = WorkflowStatus.DELETED;
+        this.deletedAt = LocalDateTime.now();
     }
 
 }
