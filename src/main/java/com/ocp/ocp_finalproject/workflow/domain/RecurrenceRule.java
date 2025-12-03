@@ -1,8 +1,10 @@
 package com.ocp.ocp_finalproject.workflow.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.workflow.dto.RecurrenceRuleDto;
 import com.ocp.ocp_finalproject.workflow.enums.RepeatType;
 import com.ocp.ocp_finalproject.workflow.util.IntegerListConverter;
+import com.ocp.ocp_finalproject.workflow.util.RecurrenceRuleFormatter;
 import com.ocp.ocp_finalproject.workflow.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,14 +54,12 @@ public class RecurrenceRule extends BaseEntity {
     @Column(name = "end_at")
     private LocalDateTime endAt;
 
-    @Builder(builderMethodName = "createBuilder")
     public static RecurrenceRule create(
             RepeatType repeatType,
             Integer repeatInterval,
             List<Integer> daysOfWeek,
             List<Integer> daysOfMonth,
             List<String> timesOfDay,
-            String readableRule,
             LocalDateTime startAt,
             LocalDateTime endAt
     ) {
@@ -70,9 +69,22 @@ public class RecurrenceRule extends BaseEntity {
         recurrenceRule.daysOfWeek = daysOfWeek;
         recurrenceRule.daysOfMonth = daysOfMonth;
         recurrenceRule.timesOfDay = timesOfDay;
-        recurrenceRule.readableRule = readableRule;
+        recurrenceRule.readableRule = RecurrenceRuleFormatter.toReadableString(
+                repeatType, repeatInterval, daysOfWeek, daysOfMonth, timesOfDay
+        );
         recurrenceRule.startAt = startAt;
         recurrenceRule.endAt = endAt;
         return recurrenceRule;
+    }
+
+    public void update(RecurrenceRuleDto rule) {
+        this.repeatType = rule.getRepeatType();
+        this.repeatInterval = rule.getRepeatInterval();
+        this.daysOfWeek = rule.getDaysOfWeek();
+        this.daysOfMonth = rule.getDaysOfMonth();
+        this.timesOfDay = rule.getTimesOfDay();
+        this.readableRule = RecurrenceRuleFormatter.toReadableString(rule);
+        this.startAt = rule.getStartAt();
+        this.endAt = rule.getEndAt();
     }
 }
