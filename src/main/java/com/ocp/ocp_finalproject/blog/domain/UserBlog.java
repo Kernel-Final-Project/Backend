@@ -31,7 +31,6 @@ public class UserBlog extends BaseEntity {
     @Column(name = "blog_url", length = 500)
     private String blogUrl;
 
-    @Builder(builderMethodName = "createBuilder")
     public static UserBlog create(BlogType blogType, String accountId, String accountPassword, String blogUrl) {
         UserBlog userBlog = new UserBlog();
         userBlog.blogType = blogType;
@@ -49,4 +48,5 @@ public class UserBlog extends BaseEntity {
     public void updateBlogUrl(String blogUrl) {
         this.blogUrl = blogUrl;
     }
+
 }

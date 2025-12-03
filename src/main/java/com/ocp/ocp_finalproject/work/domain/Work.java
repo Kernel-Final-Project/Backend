@@ -49,7 +49,7 @@ public class Work extends BaseEntity {
         return work;
     }
 
-    public void updateCompletion(String postingUrl, boolean isSuccess, LocalDateTime completedAt) {
+    public void updateUrlCompletion(String postingUrl, boolean isSuccess, LocalDateTime completedAt) {
         this.postingUrl = postingUrl;
         this.completedAt = completedAt;
         if (isSuccess) {
@@ -57,6 +57,17 @@ public class Work extends BaseEntity {
         } else {
             this.status = WorkExecutionStatus.FAILED;
         }
+    }
+
+    public void updateKeywordCompletion(boolean isSuccess, LocalDateTime startedAt,LocalDateTime completedAt) {
+        if(isSuccess) {
+            this.status = WorkExecutionStatus.TREND_KEYWORD_DONE;
+        } else{
+            this.status = WorkExecutionStatus.FAILED;
+        }
+
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
     }
 
 }

@@ -51,13 +51,20 @@ public enum ErrorCode {
     WORKFLOW_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORKFLOW_007", "워크플로우 삭제에 실패했습니다"),
     WORKFLOW_TEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORKFLOW_008", "워크플로우 테스트에 실패했습니다"),
 
+    // Recurrence Rule 관련 에러
+    RECURRENCE_RULE_INVALID(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_001", "잘못된 반복 규칙입니다"),
+    RECURRENCE_RULE_REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_002", "필수 필드가 누락되었습니다"),
+    RECURRENCE_RULE_INVALID_FIELD_VALUE(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_003", "필드 값이 올바르지 않습니다"),
+    RECURRENCE_RULE_FIELD_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_004", "이 반복 유형에서는 사용할 수 없는 필드입니다"),
+    RECURRENCE_RULE_DATE_RANGE_INVALID(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_005", "종료 일시는 시작 일시보다 이후여야 합니다"),
+
     // ===== 작업 관련 (WORK) =====
     WORK_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_001", "작업을 찾을 수 없습니다"),
     WORK_ALREADY_RUNNING(HttpStatus.BAD_REQUEST, "WORK_002", "이미 실행 중인 작업입니다"),
     WORK_EXECUTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_003", "작업 실행에 실패했습니다"),
     WORK_LOG_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_004", "작업 로그를 찾을 수 없습니다"),
     WORK_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_005", "작업 생성에 실패했습니다"),
-    WORK_WEBHOOK_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "WORK_006", "유효하지 않은 블로그 웹훅 토큰입니다"),
+    WORK_WEBHOOK_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "WORK_006", "유효하지 않은 웹훅 토큰입니다"),
     WORK_WEBHOOK_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, "WORK_007", "블로그 웹훅 URL이 설정되지 않았습니다"),
 
     // ===== 블로그 관련 (BLOG) =====

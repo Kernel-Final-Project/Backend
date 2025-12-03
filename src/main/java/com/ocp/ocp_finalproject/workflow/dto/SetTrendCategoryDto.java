@@ -18,11 +18,15 @@ public class SetTrendCategoryDto {
 
     private String depth3Category;
 
-    public static SetTrendCategoryDto from(List<TrendCategory> path) {
+    public static SetTrendCategoryDto from(TrendCategory category) {
+
+        TrendCategory d2 = category.getParentCategory();
+        TrendCategory d1 = (d2 != null) ? d2.getParentCategory() : null;
+
         return SetTrendCategoryDto.builder()
-                .depth1Category(!path.isEmpty() ? path.getFirst().getTrendCategoryName() : null)
-                .depth2Category(path.size() > 1 ? path.get(1).getTrendCategoryName() : null)
-                .depth3Category(path.size() > 2 ? path.get(2).getTrendCategoryName() : null)
+                .depth1Category(d1 != null ? d1.getTrendCategoryName() : null)
+                .depth2Category(d2 != null ? d2.getTrendCategoryName() : null)
+                .depth3Category(category.getTrendCategoryName())
                 .build();
     }
 

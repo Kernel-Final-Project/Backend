@@ -1,5 +1,6 @@
-package com.ocp.ocp_finalproject.workflow.dto;
+package com.ocp.ocp_finalproject.workflow.dto.request;
 
+import com.ocp.ocp_finalproject.workflow.dto.RecurrenceRuleDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
