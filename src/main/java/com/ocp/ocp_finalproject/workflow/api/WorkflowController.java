@@ -6,6 +6,7 @@ import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +47,7 @@ public class WorkflowController {
      */
     @PostMapping("/{userId}")
     public ResponseEntity<ApiResponse<WorkflowResponse>> createWorkflow(@PathVariable Long userId,
-                                                                        @RequestBody WorkflowRequest workflowRequest) {
+                                                                        @RequestBody WorkflowRequest workflowRequest) throws SchedulerException {
 
         WorkflowResponse workflow = workflowService.createWorkflow(userId, workflowRequest);
 

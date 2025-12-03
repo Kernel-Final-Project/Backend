@@ -5,6 +5,7 @@ import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.blog.repository.BlogTypeRepository;
 import com.ocp.ocp_finalproject.blog.repository.UserBlogRepository;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
+import com.ocp.ocp_finalproject.scheduler.service.SchedulerSyncService;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.trend.repository.TrendCategoryRepository;
 import com.ocp.ocp_finalproject.user.domain.User;
@@ -17,10 +18,12 @@ import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -37,6 +40,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final PasswordEncoder passwordEncoder;
     private final UserBlogRepository userBlogRepository;
     private final RecurrenceRuleValidator validator;
+    private final SchedulerSyncService schedulerSyncService;
 
     @Override
     @Transactional(readOnly = true)
@@ -80,7 +84,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional
-    public WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) {
+    public WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) throws SchedulerException {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -121,7 +125,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional
-    public WorkflowResponse updateWorkflow(Long userId, WorkflowEditRequest workflowEditRequest) {
+    public WorkflowResponse updateWorkflow(Long userId, WorkflowEditRequest workflowEditRequest) throws SchedulerException {
 
         Workflow workflow = workflowRepository.findWorkflow(workflowEditRequest.getWorkflowId(), userId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
@@ -154,9 +158,18 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         workflow.update(userBlog, category, rule, workflowEditRequest.getSiteUrl());
+        schedulerSyncService.updateWorkflowJobs(workflow);
 
         return buildResponse(workflow, category);
     }
+
+    /**
+     * 워크플로우 삭제 api 개발 시 해당 로직을 삽입해주세요.
+     * public void deleteWorkflow(Long id) {
+     *     schedulerSyncService.removeWorkflowJobs(id); <--- 이 부분 추가
+     *     workflowRepository.deleteById(id);
+     * }
+     */
 
     private WorkflowResponse buildResponse(
             Workflow workflow,

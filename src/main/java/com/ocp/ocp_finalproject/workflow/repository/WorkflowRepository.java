@@ -46,4 +46,17 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             WHERE wf.id = :workflowId and u.id = :userId
     """)
     Optional<Workflow> findWorkflow(@Param("workflowId") Long workflowId, @Param("userId") Long userId);
+
+    /**
+     *
+     * 해당 메서드는 SpringBoot가 실행될 때 활성화된 Workflow를 Quartz 스케줄링하기 위해서 사용되는 메서드
+     *
+     * */
+    @Query("""
+        SELECT wf
+        FROM Workflow wf
+        LEFT JOIN FETCH wf.recurrenceRule rr
+        WHERE wf.status = 'ACTIVE'
+    """)
+    List<Workflow> findAllActive();
 }
