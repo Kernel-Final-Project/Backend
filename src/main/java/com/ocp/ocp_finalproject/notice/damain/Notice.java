@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.admin.domain;
+package com.ocp.ocp_finalproject.notice.damain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
