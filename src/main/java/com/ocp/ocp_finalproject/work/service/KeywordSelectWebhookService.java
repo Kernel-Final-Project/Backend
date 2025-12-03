@@ -7,13 +7,12 @@ import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.KeywordSelectWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
+import com.ocp.ocp_finalproject.work.util.WebhookTimeParser;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Slf4j
 @Service
@@ -37,13 +36,8 @@ public class KeywordSelectWebhookService {
                 .orElseThrow(() -> new CustomException(ErrorCode.AI_CONTENT_NOT_FOUND,"콘텐츠를 찾을 수 없습니다. workId="+workId));
 
 
-        LocalDateTime startedAt = request.getStartedAt() != null
-                ? request.getStartedAt().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime()
-                : LocalDateTime.now(ZoneOffset.UTC);
-
-        LocalDateTime completedAt = request.getCompletedAt() != null
-                ? request.getCompletedAt().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime()
-                : LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime startedAt = WebhookTimeParser.toUtcOrNow(request.getStartedAt());
+        LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
 
 
         log.info("웹훅 결과 수신 workId={} success={} keyword={} startedAt={} completedAt={}", workId, request.isSuccess(), request.getKeyword(), startedAt, completedAt);
