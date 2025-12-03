@@ -172,6 +172,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @Transactional
     public WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus newStatus) {
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
