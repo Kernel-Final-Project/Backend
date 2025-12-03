@@ -3,6 +3,7 @@ package com.ocp.ocp_finalproject.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.work.domain.Work;
@@ -15,6 +16,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.ocp.ocp_finalproject.common.exception.ErrorCode.INVALID_STATUS_CHANGE;
 
 @Entity
 @Table(name = "workflow")
@@ -57,9 +60,6 @@ public class Workflow extends BaseEntity {
     @Column(name = "is_test", nullable = false)
     private Boolean isTest = false;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
     public static Workflow create(
             User user,
             UserBlog userBlog,
@@ -75,7 +75,6 @@ public class Workflow extends BaseEntity {
         workflow.status = WorkflowStatus.PENDING;
         workflow.siteUrl = siteUrl;
         workflow.isTest = false;
-        workflow.isActive = true;
 
         return workflow;
     }
@@ -88,6 +87,14 @@ public class Workflow extends BaseEntity {
         this.trendCategory = trendCategory;
         this.recurrenceRule = recurrenceRule;
         this.siteUrl = siteUrl;
+    }
+
+    public void changeStatus(WorkflowStatus newStatus) {
+        if(!this.status.canTransitionTo(newStatus)) {
+            throw new CustomException(INVALID_STATUS_CHANGE);
+        }
+
+        this.status = newStatus;
     }
 
 }
