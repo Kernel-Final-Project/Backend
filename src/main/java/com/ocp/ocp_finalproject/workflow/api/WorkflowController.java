@@ -76,7 +76,7 @@ public class WorkflowController {
                                                                       @PathVariable Long workflowId,
                                                                       @RequestBody WorkflowStatusRequest workflowStatusRequest) {
 
-        WorkflowStatusResponse workflowStatus = workflowService.updateStatus(userId, workflowId, workflowStatusRequest.getStatus());
+        WorkflowStatusResponse workflowStatus = workflowService.updateStatus(userId, workflowId, workflowStatusRequest.getNewStatus());
 
         return ResponseEntity.ok(ApiResponse.success("워크플로우 상태 변경 성공", workflowStatus));
     }

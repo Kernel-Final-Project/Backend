@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class WorkflowStatusRequest {
 
     @NotNull
-    private WorkflowStatus status;
+    private WorkflowStatus newStatus;
 
 }
