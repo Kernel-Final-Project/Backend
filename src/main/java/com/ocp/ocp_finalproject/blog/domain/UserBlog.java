@@ -49,4 +49,5 @@ public class UserBlog extends BaseEntity {
     public void updateBlogUrl(String blogUrl) {
         this.blogUrl = blogUrl;
     }
+
 }
