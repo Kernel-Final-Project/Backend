@@ -2,6 +2,7 @@ package com.ocp.ocp_finalproject.workflow.service;
 
 import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import org.quartz.SchedulerException;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface WorkflowService {
     WorkflowEditResponse findWorkflow(Long workflowId, Long userId);
 
     WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
+
+    WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus status);
 }

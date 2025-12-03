@@ -14,6 +14,7 @@ import com.ocp.ocp_finalproject.workflow.domain.*;
 import com.ocp.ocp_finalproject.workflow.dto.*;
 import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -167,6 +169,21 @@ public class WorkflowServiceImpl implements WorkflowService {
         schedulerSyncService.updateWorkflowJobs(workflow);
 
         return buildResponse(workflow, category);
+    }
+
+    @Override
+    @Transactional
+    public WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus newStatus) {
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        workflow.changeStatus(newStatus);
+
+        return WorkflowStatusResponse.builder()
+                .workflowId(workflow.getId())
+                .status(workflow.getStatus())
+                .updatedAt(workflow.getUpdatedAt())
+                .build();
     }
 
     /**

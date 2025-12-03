@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.message.blog;
 
-import com.ocp.ocp_finalproject.config.RabbitConfig;
+import com.ocp.ocp_finalproject.common.config.rabbit.RabbitConfig;
 import com.ocp.ocp_finalproject.message.blog.dto.BlogUploadRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

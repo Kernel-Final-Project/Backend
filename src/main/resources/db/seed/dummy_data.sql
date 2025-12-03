@@ -73,19 +73,17 @@ VALUES
 -- ============================================
 -- 9. 워크플로우 (workflow)
 -- ============================================
-INSERT INTO `workflow` (`workflow_id`,`user_id`, `user_blog_id`, `trend_category_id`, `recurrence_rule_id`, `status`, `site_url`, `is_test`, `is_active`, `created_at`, `updated_at`)
+INSERT INTO `workflow` (`workflow_id`,`user_id`, `user_blog_id`, `trend_category_id`, `recurrence_rule_id`, `status`, `site_url`, `is_test`, `created_at`, `updated_at`)
 VALUES
 (1, 1, 1, 5, 1,
  'PENDING',          -- 엔티티 create()에서 기본값이 PENDING
  'https://example.com',
  FALSE,
- TRUE,
  NOW(), NOW()),
 (2, 2, 2, 6, 2,
  'PENDING',
  'https://example2.com',
  FALSE,
- TRUE,
  NOW(), NOW());
 
 -- ============================================
