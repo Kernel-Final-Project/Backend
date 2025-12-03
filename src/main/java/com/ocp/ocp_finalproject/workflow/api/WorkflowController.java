@@ -68,4 +68,17 @@ public class WorkflowController {
         return ResponseEntity.ok(ApiResponse.success("워크플로우 수정 성공", workflow));
     }
 
+    /**
+     * 워크플로우 상태 변경
+     */
+    @PatchMapping("/{userId}/{workflowId}/status")
+    public ResponseEntity<ApiResponse<WorkflowStatusResponse>> updateStatus(@PathVariable Long userId,
+                                                                      @PathVariable Long workflowId,
+                                                                      @RequestBody WorkflowStatusRequest workflowStatusRequest) {
+
+        WorkflowStatusResponse workflowStatus = workflowService.updateStatus(userId, workflowId, workflowStatusRequest.getStatus());
+
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 상태 변경 성공", workflowStatus));
+    }
+
 }

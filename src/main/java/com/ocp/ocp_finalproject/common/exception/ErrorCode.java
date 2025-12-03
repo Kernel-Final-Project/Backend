@@ -50,6 +50,7 @@ public enum ErrorCode {
     WORKFLOW_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORKFLOW_006", "워크플로우 수정에 실패했습니다"),
     WORKFLOW_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORKFLOW_007", "워크플로우 삭제에 실패했습니다"),
     WORKFLOW_TEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "WORKFLOW_008", "워크플로우 테스트에 실패했습니다"),
+    INVALID_STATUS_CHANGE(HttpStatus.BAD_REQUEST, "WORKFLOW_009", "허용되지 않는 상태 전환입니다"),
 
     // Recurrence Rule 관련 에러
     RECURRENCE_RULE_INVALID(HttpStatus.BAD_REQUEST, "RECURRENCE_RULE_001", "잘못된 반복 규칙입니다"),
