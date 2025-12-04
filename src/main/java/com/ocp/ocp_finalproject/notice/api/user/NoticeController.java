@@ -24,7 +24,7 @@ public class NoticeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<NoticeResponse>>> getAllNotices() {
-        return ResponseEntity.ok(ApiResponse.success("공지시항 목록 조회 성공", noticeService.getAllNotice()));
+        return ResponseEntity.ok(ApiResponse.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
     }
 
 
