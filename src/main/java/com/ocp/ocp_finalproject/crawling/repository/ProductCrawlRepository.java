@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductCrawlRepository extends JpaRepository<ProductCrawl, Long> {
 
-    List<ProductCrawl> findByWorkflowId(Long workflowId);
+    List<ProductCrawl> findBySiteNameIgnoreCase(String siteName);
 }

@@ -40,7 +40,6 @@ public class ContentGenerateRequest {
         private Long productId;     // 내부 DB id (있는 경우)
         private String name;
         private String price;
-        private String imageUrl;
         private String productUrl;
     }
 

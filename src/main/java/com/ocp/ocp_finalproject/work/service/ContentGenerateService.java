@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -98,27 +99,30 @@ public class ContentGenerateService {
     }
 
     private List<ProductInfo> fetchCrawledProducts(Workflow workflow) {
-        if (!supportsCrawling(workflow.getSiteUrl())) {
+        Optional<String> siteName = resolveSupportedSite(workflow.getSiteUrl());
+        if (siteName.isEmpty()) {
             return Collections.emptyList();
         }
-        return productCrawlRepository.findByWorkflowId(workflow.getId()).stream()
+        return productCrawlRepository.findBySiteNameIgnoreCase(siteName.get()).stream()
                 .map(this::toProductInfo)
                 .collect(Collectors.toList());
     }
 
-    private boolean supportsCrawling(String siteUrl) {
+    private Optional<String> resolveSupportedSite(String siteUrl) {
         if (siteUrl == null || siteUrl.isBlank()) {
-            return false;
+            return Optional.empty();
         }
         try {
             String host = new URI(siteUrl).getHost();
             if (host == null) {
-                return false;
+                return Optional.empty();
             }
             String lowerHost = host.toLowerCase(Locale.ROOT);
-            return SUPPORTED_CRAWL_DOMAINS.stream().anyMatch(lowerHost::contains);
+            return SUPPORTED_CRAWL_DOMAINS.stream()
+                    .filter(lowerHost::contains)
+                    .findFirst();
         } catch (URISyntaxException e) {
-            return false;
+            return Optional.empty();
         }
     }
 
@@ -127,7 +131,6 @@ public class ContentGenerateService {
         info.setProductId(productCrawl.getId());
         info.setName(productCrawl.getProductName());
         info.setPrice(productCrawl.getProductPrice() != null ? String.valueOf(productCrawl.getProductPrice()) : null);
-        info.setImageUrl(null);
         info.setProductUrl(productCrawl.getProductDetailUrl());
         return info;
     }
