@@ -26,7 +26,7 @@ public class TrendCategory extends BaseEntity {
     private TrendCategory parentCategory;
 
     @OneToMany(mappedBy = "parentCategory")
-    private List<TrendCategory> childrenCategory;
+    private List<TrendCategory> childrenCategory = new ArrayList<>();
 
     @Column(name = "trend_category_name", length = 100)
     private String trendCategoryName;
