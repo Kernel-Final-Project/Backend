@@ -92,4 +92,26 @@ public class WorkflowController {
         return ResponseEntity.ok(ApiResponse.success("워크플로우 삭제 성공", workflowStatus));
     }
 
+    /**
+     * 트렌드 목록 조회(워크플로우 등록 페이지)
+     */
+    @GetMapping("/trend-category")
+    public ResponseEntity<ApiResponse<List<TrendCategoryResponse>>> findTrendCategories() {
+
+        List<TrendCategoryResponse> trendCategories = workflowService.findTrendCategories();
+
+        return ResponseEntity.ok(ApiResponse.success("트렌드 카테고리 조회 성공", trendCategories));
+    }
+
+    /**
+     * 블로그 타입 조회(워크플로우 등록 페이지)
+     */
+    @GetMapping("/blog-type")
+    public ResponseEntity<ApiResponse<List<BlogTypeResponse>>> findBlogTypes() {
+
+        List<BlogTypeResponse> blogTypes = workflowService.findBlogTypes();
+
+        return ResponseEntity.ok(ApiResponse.success("블로그 타입 조회 성공", blogTypes));
+    }
+
 }

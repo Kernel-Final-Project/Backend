@@ -24,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -187,6 +186,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .build();
     }
 
+
+
     @Override
     @Transactional
     public WorkflowStatusResponse deleteWorkflow(Long userId, Long workflowId) {
@@ -206,6 +207,28 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .status(workflow.getStatus())
                 .changedAt(workflow.getDeletedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public List<TrendCategoryResponse> findTrendCategories() {
+
+        List<TrendCategory> roots = trendCategoryRepository.findByParentCategoryIsNull();
+
+        return roots.stream()
+                .map(TrendCategoryResponse::from)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public List<BlogTypeResponse> findBlogTypes() {
+
+        List<BlogType> blogTypes = blogTypeRepository.findAll();
+
+        return blogTypes.stream()
+                .map(BlogTypeResponse::from)
+                .toList();
     }
 
     private WorkflowResponse buildResponse(

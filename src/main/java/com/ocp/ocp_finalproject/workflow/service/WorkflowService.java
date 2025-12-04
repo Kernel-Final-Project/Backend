@@ -20,4 +20,8 @@ public interface WorkflowService {
     WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus status);
 
     WorkflowStatusResponse deleteWorkflow(Long userId, Long workflowId);
+
+    List<TrendCategoryResponse> findTrendCategories();
+
+    List<BlogTypeResponse> findBlogTypes();
 }
