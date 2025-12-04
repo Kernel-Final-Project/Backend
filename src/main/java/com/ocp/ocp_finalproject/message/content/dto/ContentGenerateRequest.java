@@ -1,6 +1,5 @@
 package com.ocp.ocp_finalproject.message.content.dto;
 
-import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import lombok.Data;
 
 import java.util.List;

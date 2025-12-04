@@ -26,7 +26,7 @@ public class BlogUploadJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         Long workflowId = context.getMergedJobDataMap().getLong("workflowId");
 
-        log.info("Workflow {} 스케줄 실행", workflowId);
+        log.info("Workflow {} 블로그 업로드 스케줄 실행", workflowId);
 
         // 해당 workflow에 대해 업로드 요청만 생성
         List<BlogUploadRequest> requests = blogUploadService.collectPendingBlogUploadsForWorkflow(workflowId);
