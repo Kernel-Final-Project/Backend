@@ -1,10 +1,12 @@
 package com.ocp.ocp_finalproject.trend.repository;
 
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
+import com.ocp.ocp_finalproject.workflow.dto.response.TrendCategoryResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TrendCategoryRepository extends JpaRepository<TrendCategory, Long> {
@@ -15,4 +17,5 @@ public interface TrendCategoryRepository extends JpaRepository<TrendCategory, Lo
             "WHERE tc.id = :categoryId")
     Optional<TrendCategory> findCategoryWithParent(@Param("categoryId") Long categoryId);
 
+    List<TrendCategory> findByParentCategoryIsNull();
 }
