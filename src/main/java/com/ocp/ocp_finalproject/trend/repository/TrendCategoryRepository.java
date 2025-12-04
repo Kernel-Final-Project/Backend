@@ -17,5 +17,8 @@ public interface TrendCategoryRepository extends JpaRepository<TrendCategory, Lo
             "WHERE tc.id = :categoryId")
     Optional<TrendCategory> findCategoryWithParent(@Param("categoryId") Long categoryId);
 
+    @Query("SELECT tc FROM TrendCategory tc " +
+            "LEFT JOIN FETCH tc.parentCategory p1 " +
+            "LEFT JOIN FETCH p1.parentCategory p2")
     List<TrendCategory> findByParentCategoryIsNull();
 }
