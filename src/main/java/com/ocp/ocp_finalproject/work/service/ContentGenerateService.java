@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class ContentGenerateService {
     private final ProductSelectProperties productSelectProperties;
     private final ContentGenerateProperties contentGenerateProperties;
 
+    @Transactional
     public ContentGenerateRequest createRequest(Long workflowId) {
         Workflow workflow = workflowRepository.findById(workflowId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORKFLOW_NOT_FOUND));
