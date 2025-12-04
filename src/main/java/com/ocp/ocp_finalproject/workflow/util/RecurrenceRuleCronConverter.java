@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.workflow.domain.RecurrenceRule;
 import com.ocp.ocp_finalproject.workflow.enums.RepeatType;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -30,6 +31,14 @@ public class RecurrenceRuleCronConverter {
     }
 
     public static List<String> toCronExpressions(RecurrenceRule rule) {
+        return toCronExpressionsInternal(rule, null);
+    }
+
+    public static List<String> toCronExpressionsWithOffset(RecurrenceRule rule, Duration offset) {
+        return toCronExpressionsInternal(rule, offset);
+    }
+
+    private static List<String> toCronExpressionsInternal(RecurrenceRule rule, Duration offset) {
         if (rule == null) {
             throw new IllegalArgumentException("RecurrenceRule이 null입니다.");
         }
@@ -44,12 +53,13 @@ public class RecurrenceRuleCronConverter {
                 if (startAt == null) {
                     throw new IllegalArgumentException("ONCE 반복 유형은 startAt 값이 필요합니다.");
                 }
-                cronComponents.dayOfMonth = String.valueOf(startAt.getDayOfMonth());
-                cronComponents.month = String.valueOf(startAt.getMonthValue());
+                LocalDateTime effectiveStart = offset != null && !offset.isZero() ? startAt.plus(offset) : startAt;
+                cronComponents.dayOfMonth = String.valueOf(effectiveStart.getDayOfMonth());
+                cronComponents.month = String.valueOf(effectiveStart.getMonthValue());
                 cronComponents.dayOfWeek = "?";
-                cronComponents.year = String.valueOf(startAt.getYear());
-                String minute = formatNumber(startAt.getMinute());
-                String hour = formatNumber(startAt.getHour());
+                cronComponents.year = String.valueOf(effectiveStart.getYear());
+                String minute = formatNumber(effectiveStart.getMinute());
+                String hour = formatNumber(effectiveStart.getHour());
                 return List.of(cronComponents.build(minute, hour));
             }
             case DAILY -> {
@@ -84,6 +94,11 @@ public class RecurrenceRuleCronConverter {
         }
 
         List<LocalTime> executionTimes = resolveTimes(rule.getTimesOfDay(), startAt);
+        if (offset != null && !offset.isZero()) {
+            executionTimes = executionTimes.stream()
+                    .map(time -> time.plus(offset))
+                    .collect(Collectors.toList());
+        }
         return buildCronExpressions(cronComponents, executionTimes);
     }
 

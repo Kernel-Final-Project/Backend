@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 public class ContentGenerationJob implements Job {
 
-
     private final ContentGenerateService contentGenerateService;
 
     private final ContentGenerateProducer contentGenerateProducer;
@@ -30,6 +29,5 @@ public class ContentGenerationJob implements Job {
         ContentGenerateRequest prepared = contentGenerateService.applyWebhookSettings(request);
         contentGenerateProducer.send(prepared);
         log.info("워크 {} 콘텐트 생성 메시지 전송", prepared.getWorkId());
-
     }
 }
