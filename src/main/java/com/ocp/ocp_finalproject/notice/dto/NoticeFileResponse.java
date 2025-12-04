@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.dto;
 
-import com.ocp.ocp_finalproject.notice.damain.NoticeFile;
+import com.ocp.ocp_finalproject.notice.domain.NoticeFile;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,6 +24,7 @@ public class NoticeFileResponse {
                 .fileName(file.getFileName())
                 .originalName(file.getOriginalName())
                 .fileUrl(file.getFileUrl())
+                .fileSize(file.getFileSize())
                 .fileType(file.getFileType())
                 .build();
     }

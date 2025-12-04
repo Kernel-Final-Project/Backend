@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.dto;
 
-import com.ocp.ocp_finalproject.notice.damain.Notice;
+import com.ocp.ocp_finalproject.notice.domain.Notice;
 import lombok.Builder;
 import lombok.Getter;
 

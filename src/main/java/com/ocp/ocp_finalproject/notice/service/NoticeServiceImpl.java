@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.service;
 
-import com.ocp.ocp_finalproject.notice.damain.Notice;
+import com.ocp.ocp_finalproject.notice.domain.Notice;
 import com.ocp.ocp_finalproject.notice.dto.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public List<NoticeResponse> getAllNotice() {
 
-        List<Notice> notices = noticeRepository.findAllWithFiles();
-
-        return notices.stream()
+        return noticeRepository.findAllWithFiles().stream()
                 .map(NoticeResponse::from)
                 .toList();
     }
