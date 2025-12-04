@@ -33,7 +33,8 @@ public interface AiContentRepository extends JpaRepository<AiContent, Long> {
         SELECT ac.choiceProduct
         FROM AiContent ac
         WHERE ac.choiceProduct IS NOT NULL
+          AND ac.work.workflow.id = :workflowId
         ORDER BY ac.completedAt DESC
     """)
-    List<String> findRecentChoiceProducts();
+    List<String> findRecentChoiceProductsByWorkflowId(@Param("workflowId") Long workflowId);
 }

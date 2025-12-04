@@ -69,7 +69,7 @@ public class ContentGenerateService {
         request.setHasCrawledItems(hasCrawled);
         request.setCrawledProducts(hasCrawled ? crawledProducts : null);
 
-        request.setRecentlyUsedProducts(hasCrawled ? null : fetchRecentlyUsedProducts());
+        request.setRecentlyUsedProducts(hasCrawled ? null : fetchRecentlyUsedProducts(workflow.getId()));
 
         return request;
     }
@@ -92,8 +92,8 @@ public class ContentGenerateService {
         return keywords.isEmpty() ? Collections.emptyList() : keywords;
     }
 
-    private List<String> fetchRecentlyUsedProducts() {
-        List<String> products = aiContentRepository.findRecentChoiceProducts();
+    private List<String> fetchRecentlyUsedProducts(Long workflowId) {
+        List<String> products = aiContentRepository.findRecentChoiceProductsByWorkflowId(workflowId);
         return products.isEmpty() ? Collections.emptyList() : products;
     }
 
