@@ -1,7 +1,6 @@
 package com.ocp.ocp_finalproject.crawling.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
-import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,9 +19,11 @@ public class ProductCrawl extends BaseEntity {
     @Column(name = "product_crawl_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_id", nullable = false)
-    private Workflow workflow;
+    @Column(name= "site_name", length = 100, nullable = false)
+    private String siteName;
+
+    @Column(name= "site_url", length = 100, nullable = false)
+    private String siteUrl;
 
     @Column(name = "product_name", length = 100, nullable = false)
     private String productName;
@@ -44,9 +45,19 @@ public class ProductCrawl extends BaseEntity {
     private LocalDateTime completedAt;
 
     @Builder(builderMethodName = "createBuilder")
-    public static ProductCrawl create(Workflow workflow, String productName, String productCode, String productDetailUrl, Integer productPrice, LocalDateTime startedAt, LocalDateTime completedAt) {
+    public static ProductCrawl create(
+            String siteName,
+            String siteUrl,
+            String productName,
+            String productCode,
+            String productDetailUrl,
+            Integer productPrice,
+            LocalDateTime startedAt,
+            LocalDateTime completedAt
+    ) {
         ProductCrawl crawl = new ProductCrawl();
-        crawl.workflow = workflow;
+        crawl.siteName = siteName;
+        crawl.siteUrl = siteUrl;
         crawl.productName = productName;
         crawl.productCode = productCode;
         crawl.productDetailUrl = productDetailUrl;

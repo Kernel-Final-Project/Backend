@@ -86,3 +86,11 @@ blog-upload:
 keyword-select:
   webhook-secret: ${KEYWORD_SELECT_WEBHOOK_SECRET:local-dev-secret}
   webhook-url: ${KEYWORD_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/keyword/webhook}
+
+product-select:
+  webhook-secret: ${PRODUCT_SELECT_WEBHOOK_SECRET:local-dev-secret}
+  webhook-url: ${PRODUCT_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/product/webhook}
+
+content-generate:
+  webhook-secret: ${CONTENT_GENERATE_WEBHOOK_SECRET:local-dev-secret}
+  webhook-url: ${CONTENT_GENERATE_WEBHOOK_URL:http://localhost:8080/api/v1/work/content/webhook}
