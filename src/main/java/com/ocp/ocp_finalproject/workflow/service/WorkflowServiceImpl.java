@@ -210,7 +210,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<TrendCategoryResponse> findTrendCategories() {
 
         List<TrendCategory> roots = trendCategoryRepository.findByParentCategoryIsNull();
@@ -221,7 +221,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BlogTypeResponse> findBlogTypes() {
 
         List<BlogType> blogTypes = blogTypeRepository.findAll();
