@@ -83,6 +83,11 @@ blog-upload:
   webhook-secret: ${BLOG_UPLOAD_WEBHOOK_SECRET:local-dev-secret}
   webhook-url: ${BLOG_UPLOAD_WEBHOOK_URL:http://localhost:8080/api/v1/work/blog/webhook}
 
-keyword-select:
+airflow:
   webhook-secret: ${KEYWORD_SELECT_WEBHOOK_SECRET:local-dev-secret}
-  webhook-url: ${KEYWORD_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/keyword/webhook}
+  keyword-select:
+    webhook-url: ${KEYWORD_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/keyword/webhook}
+  product-select:
+    webhook-url: ${KEYWORD_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/product/webhook}
+  content-generate:
+    webhook-url: ${KEYWORD_SELECT_WEBHOOK_URL:http://localhost:8080/api/v1/work/content/webhook}
