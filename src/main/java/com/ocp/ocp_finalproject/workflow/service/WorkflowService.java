@@ -18,4 +18,6 @@ public interface WorkflowService {
     WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
 
     WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus status);
+
+    WorkflowStatusResponse deleteWorkflow(Long userId, Long workflowId);
 }

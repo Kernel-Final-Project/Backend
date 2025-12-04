@@ -81,4 +81,15 @@ public class WorkflowController {
         return ResponseEntity.ok(ApiResponse.success("워크플로우 상태 변경 성공", workflowStatus));
     }
 
+    /**
+     * 워크플로우 삭제(논리 삭제)
+     */
+    @DeleteMapping("/{userId}/{workflowId}/delete")
+    public ResponseEntity<ApiResponse<WorkflowStatusResponse>> deleteWorkflow(@PathVariable Long userId,
+                                                                              @PathVariable Long workflowId) {
+        WorkflowStatusResponse workflowStatus = workflowService.deleteWorkflow(userId, workflowId);
+
+        return ResponseEntity.ok(ApiResponse.success("워크플로우 삭제 성공", workflowStatus));
+    }
+
 }
