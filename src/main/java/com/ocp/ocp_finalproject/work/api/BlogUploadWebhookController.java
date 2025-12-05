@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.work.api;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.work.config.BlogUploadProperties;
 import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
 import com.ocp.ocp_finalproject.work.service.BlogUploadWebhookService;
@@ -24,13 +24,13 @@ public class BlogUploadWebhookController {
     private final BlogUploadProperties blogUploadProperties;
 
     @PostMapping
-    public ApiResponse<Void> handleWebhook(
+    public ApiResult<Void> handleWebhook(
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody BlogUploadWebhookRequest request
     ) {
         validateSecret(authorization);
         webhookService.handleResult(request);
-        return ApiResponse.success("블로그 업로드 결과를 처리했습니다.");
+        return ApiResult.success("블로그 업로드 결과를 처리했습니다.");
     }
 
     private void validateSecret(String authorizationHeader) {

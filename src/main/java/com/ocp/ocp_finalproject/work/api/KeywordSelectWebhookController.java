@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.work.api;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.work.config.KeywordSelectProperties;
 import com.ocp.ocp_finalproject.work.dto.request.KeywordSelectWebhookRequest;
 import com.ocp.ocp_finalproject.work.service.KeywordSelectWebhookService;
@@ -20,13 +20,13 @@ public class KeywordSelectWebhookController {
     private final KeywordSelectWebhookService webhookService;
 
     @PostMapping
-    public ApiResponse<Void> handleWebhook(
+    public ApiResult<Void> handleWebhook(
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody KeywordSelectWebhookRequest request
     ) {
         validateSecret(authorization);
         webhookService.handleResult(request);
-        return ApiResponse.success("키워드 선택 결과를 처리했습니다.");
+        return ApiResult.success("키워드 선택 결과를 처리했습니다.");
     }
 
     private void validateSecret(String authorizationHeader) {
