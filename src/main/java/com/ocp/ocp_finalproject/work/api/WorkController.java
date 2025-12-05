@@ -1,7 +1,7 @@
 package com.ocp.ocp_finalproject.work.api;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.work.dto.response.WorkPageResponse;
 import com.ocp.ocp_finalproject.work.service.WorkService;
@@ -26,7 +26,7 @@ public class WorkController {
     private final WorkService workService;
 
     @GetMapping("/{workflowId}")
-    public ResponseEntity<ApiResponse<WorkPageResponse>> getAllWorks(
+    public ResponseEntity<ApiResult<WorkPageResponse>> getAllWorks(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable("workflowId") Long workflowId,
             @RequestParam(value = "page", defaultValue = "0") int page
@@ -38,6 +38,6 @@ public class WorkController {
         Long userId = principal.getUser().getId();
         WorkPageResponse workPage = workService.getWorks(userId, workflowId, page);
 
-        return ResponseEntity.ok(ApiResponse.success("워크 목록 조회 성공", workPage));
+        return ResponseEntity.ok(ApiResult.success("워크 목록 조회 성공", workPage));
     }
 }
