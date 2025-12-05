@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.user.controller;
 
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.user.dto.response.UserResponse;
@@ -30,7 +30,7 @@ public class AuthController {
      * GET /api/v1/auth/me
      */
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
+    public ResponseEntity<ApiResult<UserResponse>> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
 
         log.info("현재 사용자 정보 조회 요청");
 
@@ -40,7 +40,7 @@ public class AuthController {
 
         log.info("사용자 정보 조회 성공 - userId: {}",user.getId());
         return ResponseEntity.ok(
-            ApiResponse.success("사용자 상세 조회 성공",response)
+            ApiResult.success("사용자 상세 조회 성공",response)
         );
     }
 
@@ -49,7 +49,7 @@ public class AuthController {
      * POST /api/v1/auth/logout
      */
     @PostMapping("/logout")
-    public ResponseEntity <ApiResponse<Void>> logout(@AuthenticationPrincipal UserPrincipal principal ,HttpServletRequest request) {
+    public ResponseEntity <ApiResult<Void>> logout(@AuthenticationPrincipal UserPrincipal principal ,HttpServletRequest request) {
         log.info("로그아웃 요청 - userId: {}",principal.getUser().getId());
 
         try{
@@ -64,12 +64,12 @@ public class AuthController {
             }
 
             return ResponseEntity.ok(
-                    ApiResponse.success("로그아웃 성공")
+                    ApiResult.success("로그아웃 성공")
             );
         }catch (Exception e){
             log.error("로그아웃 처리 중 에러 발생",e);
             return ResponseEntity.status(500).body(
-                    ApiResponse.error("로그아웃 처리 중 오류가 발생했습니다.")
+                    ApiResult.error("로그아웃 처리 중 오류가 발생했습니다.")
             );
         }
     }
@@ -79,7 +79,7 @@ public class AuthController {
      * DELETE /api/v1/auth/withdraw
      */
     @DeleteMapping("/withdraw")
-    public ResponseEntity<ApiResponse<Void>> withdraw(@AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request) {
+    public ResponseEntity<ApiResult<Void>> withdraw(@AuthenticationPrincipal UserPrincipal principal, HttpServletRequest request) {
         User user = principal.getUser();
         log.info("회원 작ㄹ퇴 요청 - userId: {}",user.getId());
 
@@ -91,11 +91,11 @@ public class AuthController {
                 session.invalidate();
             }
 
-            return  ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다."));
+            return  ResponseEntity.ok(ApiResult.success("회원 탈퇴가 완료되었습니다."));
         }catch (Exception e){
             log.error("회원 탈퇴 처리 중 에러 발생 - userId: {}",user.getId(),e.getMessage());
             return ResponseEntity.status(500).body(
-                    ApiResponse.error("회원 탈퇴 처리 중 오류가 발생했습니다.")
+                    ApiResult.error("회원 탈퇴 처리 중 오류가 발생했습니다.")
             );
         }
     }

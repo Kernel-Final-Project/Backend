@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.content.controller;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.content.domain.ContentJob;
 import com.ocp.ocp_finalproject.content.dto.ContentJobResponse;
 import com.ocp.ocp_finalproject.content.dto.ContentRequestDto;
@@ -26,17 +26,17 @@ public class ContentJobController {
     private final ContentTaskProducer contentTaskProducer;
 
     @PostMapping("/job")
-    public ApiResponse<ContentJobResponse> createJob(@Valid @RequestBody ContentRequestDto requestDto) {
+    public ApiResult<ContentJobResponse> createJob(@Valid @RequestBody ContentRequestDto requestDto) {
         ContentJob job = contentJobService.createJob(requestDto);
         contentTaskProducer.sendTask(job.getJobId(), requestDto);
-        return ApiResponse.success(new ContentJobResponse(job));
+        return ApiResult.success(new ContentJobResponse(job));
     }
 
     @GetMapping("/job/{jobId}")
-    public ApiResponse<ContentJobResponse> getJob(@PathVariable String jobId) {
+    public ApiResult<ContentJobResponse> getJob(@PathVariable String jobId) {
         ContentJob job = contentJobService.getJob(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "Job not found: " + jobId));
-        return ApiResponse.success(new ContentJobResponse(job));
+        return ApiResult.success(new ContentJobResponse(job));
     }
 
      */
