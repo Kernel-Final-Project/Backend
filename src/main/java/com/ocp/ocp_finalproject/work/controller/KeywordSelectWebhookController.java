@@ -1,40 +1,36 @@
-package com.ocp.ocp_finalproject.work.api;
+package com.ocp.ocp_finalproject.work.controller;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
-import com.ocp.ocp_finalproject.work.config.BlogUploadProperties;
-import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
-import com.ocp.ocp_finalproject.work.service.BlogUploadWebhookService;
+import com.ocp.ocp_finalproject.work.config.KeywordSelectProperties;
+import com.ocp.ocp_finalproject.work.dto.request.KeywordSelectWebhookRequest;
+import com.ocp.ocp_finalproject.work.service.KeywordSelectWebhookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/work/blog/webhook")
+@RequestMapping("/api/v1/work/keyword/webhook")
 @RequiredArgsConstructor
-public class BlogUploadWebhookController {
+public class KeywordSelectWebhookController {
 
-    private final BlogUploadWebhookService webhookService;
-    private final BlogUploadProperties blogUploadProperties;
+    private final KeywordSelectProperties keywordSelectProperties;
+    private final KeywordSelectWebhookService webhookService;
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @RequestBody BlogUploadWebhookRequest request
+            @RequestBody KeywordSelectWebhookRequest request
     ) {
         validateSecret(authorization);
         webhookService.handleResult(request);
-        return ApiResult.success("블로그 업로드 결과를 처리했습니다.");
+        return ApiResult.success("키워드 선택 결과를 처리했습니다.");
     }
 
     private void validateSecret(String authorizationHeader) {
-        String expectedSecret = blogUploadProperties.getWebhookSecret();
+        String expectedSecret = keywordSelectProperties.getWebhookSecret();
         if (expectedSecret == null || expectedSecret.isBlank()) {
             log.warn("웹훅 시크릿이 설정되지 않았습니다.");
             throw new CustomException(ErrorCode.WORK_WEBHOOK_TOKEN_INVALID, "웹훅 시크릿이 설정되지 않았습니다.");
