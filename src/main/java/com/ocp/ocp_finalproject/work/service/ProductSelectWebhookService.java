@@ -1,0 +1,46 @@
+package com.ocp.ocp_finalproject.work.service;
+
+import com.ocp.ocp_finalproject.common.exception.CustomException;
+import com.ocp.ocp_finalproject.common.exception.ErrorCode;
+import com.ocp.ocp_finalproject.content.domain.AiContent;
+import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
+import com.ocp.ocp_finalproject.work.domain.Work;
+import com.ocp.ocp_finalproject.work.dto.request.ProductSelectWebhookRequest;
+import com.ocp.ocp_finalproject.work.repository.WorkRepository;
+import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ProductSelectWebhookService {
+
+    private final WorkRepository workRepository;
+    private final AiContentRepository aiContentRepository;
+
+    @Transactional
+    public void handleResult(ProductSelectWebhookRequest request) {
+        Long workId = request.getWorkId();
+        if (workId == null) {
+            throw new CustomException(ErrorCode.WORK_NOT_FOUND, "워크 ID가 누락되었습니다.");
+        }
+
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new CustomException(ErrorCode.WORK_NOT_FOUND, "워크를 찾을 수 없습니다. workId=" + workId));
+
+        AiContent aiContent = aiContentRepository.findByWorkId(workId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AI_CONTENT_NOT_FOUND, "콘텐츠를 찾을 수 없습니다. workId=" + workId));
+
+        LocalDateTime completedAt = LocalDateTime.now();
+        String productName = request.getProduct() != null ? request.getProduct().getProductName() : null;
+
+        log.info("상품 선택 웹훅 수신 workId={} productName={} productCode={}", workId, productName,
+                request.getProduct() != null ? request.getProduct().getProductCode() : null);
+
+        aiContent.updateProductSelection(true, productName, completedAt);
+        work.updateProductSelection(true, completedAt);
+    }
+}
