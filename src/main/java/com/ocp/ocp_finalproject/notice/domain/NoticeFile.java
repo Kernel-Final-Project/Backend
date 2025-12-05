@@ -2,14 +2,12 @@ package com.ocp.ocp_finalproject.notice.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@AllArgsConstructor
 @Table(name = "notice_file")
 public class NoticeFile extends BaseEntity {
 
