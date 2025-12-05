@@ -70,6 +70,10 @@ public class Work extends BaseEntity {
         this.completedAt = completedAt;
     }
 
+    public void markRequested() {
+        this.status = WorkExecutionStatus.REQUESTED;
+    }
+
     public void updateProductSelection(boolean isSuccess, LocalDateTime completedAt) {
         if (isSuccess) {
             this.status = WorkExecutionStatus.PRODUCT_SELECTED;

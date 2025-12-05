@@ -1,0 +1,31 @@
+package com.ocp.ocp_finalproject.work.api;
+
+import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.message.content.ContentGenerateProducer;
+import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest;
+import com.ocp.ocp_finalproject.work.service.ContentGenerateService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/workflows")
+@RequiredArgsConstructor
+public class ContentGenerateTriggerController {
+
+    private final ContentGenerateService contentGenerateService;
+    private final ContentGenerateProducer contentGenerateProducer;
+
+    @PostMapping("/{workflowId}/content-generate")
+    public ResponseEntity<ApiResponse<Void>> generate(@PathVariable Long workflowId) {
+        ContentGenerateRequest request = contentGenerateService.createRequest(workflowId);
+        contentGenerateService.applyWebhookSettings(request);
+        contentGenerateService.markWorkRequested(request.getWorkId());
+        contentGenerateProducer.send(request);
+
+        return ResponseEntity.ok(ApiResponse.success("콘텐츠 생성 요청을 전송했습니다."));
+    }
+}

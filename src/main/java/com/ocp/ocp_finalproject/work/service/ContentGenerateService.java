@@ -87,6 +87,13 @@ public class ContentGenerateService {
         return request;
     }
 
+    @Transactional
+    public void markWorkRequested(Long workId) {
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new CustomException(ErrorCode.WORK_NOT_FOUND, "워크를 찾을 수 없습니다. workId=" + workId));
+        work.markRequested();
+    }
+
     private List<String> fetchRecentTrendKeywords(Long workflowId) {
         List<String> keywords = aiContentRepository.findRecentTrendKeywordsByWorkflowId(
                 workflowId,

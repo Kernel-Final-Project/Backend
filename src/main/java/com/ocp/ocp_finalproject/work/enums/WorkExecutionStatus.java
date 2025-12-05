@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public enum WorkExecutionStatus {
 
     PENDING("대기", "실행 대기 중"),
+    REQUESTED("요청됨", "AI 처리 요청 전송 완료"),
     TREND_KEYWORD_DONE("키워드 추출 성공", "트렌드 키워드 추출 완료"),
     PRODUCT_SELECTED("상품 선택 완료", "상품 선택 완료"),
     CONTENT_GENERATED("콘텐츠 생성 완료", "콘텐츠 생성 완료"),
@@ -29,6 +30,7 @@ public enum WorkExecutionStatus {
      */
     public boolean isInProgress() {
         return this == PENDING
+                || this == REQUESTED
                 || this == TREND_KEYWORD_DONE
                 || this == PRODUCT_SELECTED
                 || this == CONTENT_GENERATED
