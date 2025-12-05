@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.notice.dto;
+package com.ocp.ocp_finalproject.notice.dto.response;
 
 import com.ocp.ocp_finalproject.notice.domain.Notice;
 import lombok.Builder;

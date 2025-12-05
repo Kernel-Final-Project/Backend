@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
@@ -16,4 +17,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
      */
     @Query("SELECT DISTINCT n FROM Notice n LEFT JOIN FETCH n.noticeFiles")
     List<Notice> findAllWithFiles();
+
+    @Query("SELECT n FROM Notice n LEFT JOIN FETCH n.noticeFiles WHERE n.id = :noticeId")
+    Optional<Notice> findByIdWithFiles(Long noticeId);
 }
