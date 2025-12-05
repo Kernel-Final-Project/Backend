@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class ApiResult<T> {
 
     @Schema(description = "성공 여부", example = "true")
     private boolean success;
@@ -18,17 +18,17 @@ public class ApiResponse<T> {
     private T data;
 
     //성공 응답 (데이터 O)
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, data);
+    public static <T> ApiResult<T> success(String message, T data) {
+        return new ApiResult<>(true, message, data);
     }
 
     //성공 응답 (데이터 x)
-    public static <T> ApiResponse<T> success(String message) {
-        return new ApiResponse<>(true, message, null);
+    public static <T> ApiResult<T> success(String message) {
+        return new ApiResult<>(true, message, null);
     }
 
-    public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(false, message, null);
+    public static <T> ApiResult<T> error(String message) {
+        return new ApiResult<>(false, message, null);
     }
 
 }

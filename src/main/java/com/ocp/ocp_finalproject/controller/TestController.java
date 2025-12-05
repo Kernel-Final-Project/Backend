@@ -2,7 +2,7 @@ package com.ocp.ocp_finalproject.controller;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +19,7 @@ public class TestController {
 
     // 성공 응답 테스트용
     @GetMapping("/success")
-    public ApiResponse<String> testSuccess() {
-        return ApiResponse.success("테스트 성공!");
+    public ApiResult<String> testSuccess() {
+        return ApiResult.success("테스트 성공!");
     }
 }

@@ -16,6 +16,6 @@ public class WorkflowStatusResponse {
 
     private WorkflowStatus status;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime changedAt;
 
 }

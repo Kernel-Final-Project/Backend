@@ -50,4 +50,13 @@ public class UserSuspension extends BaseEntity {
         userSuspension.isActive = (isActive != null) ? isActive : true;
         return userSuspension;
     }
+
+    // 비즈니스 메서드
+    /*
+    * 정지 해제
+    * */
+    public void deactivate(){
+        this.isActive = false;
+        this.unsuspendedAt = LocalDateTime.now();
+    }
 }

@@ -24,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -166,6 +165,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         workflow.update(userBlog, category, rule, workflowRequest.getSiteUrl());
+
         schedulerSyncService.updateWorkflowJobs(workflow);
 
         return buildResponse(workflow, category);
@@ -182,17 +182,54 @@ public class WorkflowServiceImpl implements WorkflowService {
         return WorkflowStatusResponse.builder()
                 .workflowId(workflow.getId())
                 .status(workflow.getStatus())
-                .updatedAt(workflow.getUpdatedAt())
+                .changedAt(workflow.getUpdatedAt())
                 .build();
     }
 
-    /**
-     * 워크플로우 삭제 api 개발 시 해당 로직을 삽입해주세요.
-     * public void deleteWorkflow(Long id) {
-     * schedulerSyncService.removeWorkflowJobs(id); <--- 이 부분 추가
-     * workflowRepository.deleteById(id);
-     * }
-     */
+
+
+    @Override
+    @Transactional
+    public WorkflowStatusResponse deleteWorkflow(Long userId, Long workflowId) {
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        if (workflow.getStatus() == WorkflowStatus.DELETED) {
+            throw new CustomException(ALREADY_DELETED);
+        }
+
+        workflow.delete();
+
+        schedulerSyncService.removeWorkflowJobs(workflowId);
+
+        return WorkflowStatusResponse.builder()
+                .workflowId(workflow.getId())
+                .status(workflow.getStatus())
+                .changedAt(workflow.getDeletedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TrendCategoryResponse> findTrendCategories() {
+
+        List<TrendCategory> roots = trendCategoryRepository.findByParentCategoryIsNull();
+
+        return roots.stream()
+                .map(TrendCategoryResponse::from)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BlogTypeResponse> findBlogTypes() {
+
+        List<BlogType> blogTypes = blogTypeRepository.findAll();
+
+        return blogTypes.stream()
+                .map(BlogTypeResponse::from)
+                .toList();
+    }
 
     private WorkflowResponse buildResponse(
             Workflow workflow,

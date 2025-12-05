@@ -1,15 +1,7 @@
 package com.ocp.ocp_finalproject.trend.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,6 +24,9 @@ public class TrendCategory extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
     private TrendCategory parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory")
+    private List<TrendCategory> childrenCategory = new ArrayList<>();
 
     @Column(name = "trend_category_name", length = 100)
     private String trendCategoryName;
@@ -57,12 +52,10 @@ public class TrendCategory extends BaseEntity {
     public List<TrendCategory> getFullPath() {
         List<TrendCategory> path = new ArrayList<>();
         TrendCategory current = this;
-
         while (current != null) {
             path.add(0, current);
             current = current.getParentCategory();
         }
-
         return path;
     }
 }
