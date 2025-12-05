@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.api.user;
 
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.notice.dto.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ public class NoticeController {
      */
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<NoticeResponse>>> getAllNotices() {
-        return ResponseEntity.ok(ApiResponse.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
+    public ResponseEntity<ApiResult<List<NoticeResponse>>> getAllNotices() {
+        return ResponseEntity.ok(ApiResult.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
     }
 
 
