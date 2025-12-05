@@ -2,10 +2,7 @@ package com.ocp.ocp_finalproject.notice.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@AllArgsConstructor
 @Table(name = "notice")
 public class Notice extends BaseEntity {
 
