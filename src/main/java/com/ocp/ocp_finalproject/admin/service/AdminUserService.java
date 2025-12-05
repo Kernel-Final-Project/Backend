@@ -51,9 +51,19 @@ public class AdminUserService {
     * 사용자 활동 정지
     * */
     @Transactional
-    public void suspendUser(Long userid, Long adminUserId, String reason) {
-        User user = getUserById(userid);
+    public void suspendUser(Long userId, Long adminUserId, String reason) {
+        User user = getUserById(userId);
         User admin = getUserById(adminUserId);
+
+        // 자기 자신을 정지할 수 없음
+        if (userId.equals(adminUserId)) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "자기 자신을 정지할 수 없습니다.");
+        }
+
+        // 관리자 계정은 정지할 수 없음
+        if (user.getRole() == UserRole.ADMIN) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED, "관리자 계정은 정지할 수 없습니다.");
+        }
 
         // 이미 정지된 사용자인지 확인
         if(user.getStatus() == UserStatus.SUSPENDED){
@@ -74,7 +84,7 @@ public class AdminUserService {
                 .build();
 
         userSuspensionRepository.save(suspension);
-        log.info("사용자 정지 완료 - userId: {}. admin: {}, reason: {}", userid, adminUserId, reason);
+        log.info("사용자 정지 완료 - userId: {}, admin: {}, reason: {}", userId, adminUserId, reason);
     }
 
     /*

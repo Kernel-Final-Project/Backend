@@ -19,6 +19,4 @@ public interface UserSuspensionRepository extends JpaRepository<UserSuspension, 
     * 사용자의 정지 여부 확인
     * */
     boolean existsByUserAndIsActiveTrue(User user);
-
-    Long user(User user);
 }
