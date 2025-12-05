@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.api.admin;
 
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.notice.dto.request.NoticeCreateRequest;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.service.NoticeService;
@@ -22,8 +22,8 @@ public class NoticeAdminController {
      * 공지사항 등록
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<NoticeResponse>> createNotice(@RequestBody NoticeCreateRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("공지사항 등록 성공", noticeService.createNotice(request))
+    public ResponseEntity<ApiResult<NoticeResponse>> createNotice(@RequestBody NoticeCreateRequest request) {
+        return ResponseEntity.ok(ApiResult.success("공지사항 등록 성공", noticeService.createNotice(request))
         );
     }
 }
