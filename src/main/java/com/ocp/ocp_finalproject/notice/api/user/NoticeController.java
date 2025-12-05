@@ -1,6 +1,6 @@
 package com.ocp.ocp_finalproject.notice.api.user;
 
-import com.ocp.ocp_finalproject.common.response.ApiResponse;
+import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +23,17 @@ public class NoticeController {
      * 공지사항 목록 조회
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<NoticeResponse>>> getAllNotices() {
-        return ResponseEntity.ok(ApiResponse.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
+    public ResponseEntity<ApiResult<List<NoticeResponse>>> getAllNotices() {
+        return ResponseEntity.ok(ApiResult.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
     }
     /**
      * 공지사항 상세 조회
      */
     @GetMapping("/{noticeId}")
-    public ResponseEntity<ApiResponse<NoticeResponse>> getNotice(
+    public ResponseEntity<ApiResult<NoticeResponse>> getNotice(
             @PathVariable Long noticeId
     ) {
-        return ResponseEntity.ok(ApiResponse.success("공지사항 조회 성공", noticeService.getNotice(noticeId)));
+        return ResponseEntity.ok(ApiResult.success("공지사항 조회 성공", noticeService.getNotice(noticeId)));
     }
 
 }

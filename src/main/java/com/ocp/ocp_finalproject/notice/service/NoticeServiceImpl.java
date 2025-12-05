@@ -60,6 +60,18 @@ public class NoticeServiceImpl implements NoticeService {
         // 4. 저장된 Notices -> DTO 변환 후 반환
         return NoticeResponse.from(savedNotice);
     }
+    /**
+     * 공지사항 삭제
+     */
+    @Override
+    @Transactional
+    public void deleteNotice(Long noticeId) {
 
+        // 1. 공지 + 파일까지 fetch join으로 조회
+        Notice notice = noticeRepository.findByIdWithFiles(noticeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
 
+        // 2. 삭제 (Cascade + orphanRemoval 로 파일도 함께 삭제)
+        noticeRepository.delete(notice);
+    }
 }

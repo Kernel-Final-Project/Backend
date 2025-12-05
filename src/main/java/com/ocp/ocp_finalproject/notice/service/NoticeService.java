@@ -21,4 +21,8 @@ public interface NoticeService {
      * 공지사항 등록
      */
     NoticeResponse createNotice(NoticeCreateRequest request);
+    /**
+     * 공지사항 삭제
+     */
+    void deleteNotice(Long noticeId);
 }

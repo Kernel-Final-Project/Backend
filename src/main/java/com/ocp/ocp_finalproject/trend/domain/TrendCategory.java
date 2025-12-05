@@ -48,4 +48,14 @@ public class TrendCategory extends BaseEntity {
         this.depth = depth;
         this.parentCategory = parentCategory;
     }
+
+    public List<TrendCategory> getFullPath() {
+        List<TrendCategory> path = new ArrayList<>();
+        TrendCategory current = this;
+        while (current != null) {
+            path.add(0, current);
+            current = current.getParentCategory();
+        }
+        return path;
+    }
 }
