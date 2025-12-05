@@ -107,4 +107,9 @@ public class AiContent extends BaseEntity {
         }
         this.completedAt = completedAt;
     }
+
+    public void updateBlogUploadResult(boolean isSuccess, LocalDateTime completedAt) {
+        this.status = isSuccess ? ContentStatus.PUBLISHED : ContentStatus.FAILED;
+        this.completedAt = completedAt;
+    }
 }
