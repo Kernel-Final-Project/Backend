@@ -3,9 +3,9 @@ package com.ocp.ocp_finalproject.work.controller;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
-import com.ocp.ocp_finalproject.work.config.BlogUploadProperties;
-import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
-import com.ocp.ocp_finalproject.work.service.BlogUploadWebhookService;
+import com.ocp.ocp_finalproject.work.config.ContentGenerateProperties;
+import com.ocp.ocp_finalproject.work.dto.request.ContentGenerateWebhookRequest;
+import com.ocp.ocp_finalproject.work.service.ContentGenerateWebhookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,29 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/work/blog/webhook")
+@RequestMapping("/api/v1/webhooks/content-generate")
 @RequiredArgsConstructor
-public class BlogUploadWebhookController {
+public class ContentGenerateWebhookController {
 
     private static final String WEBHOOK_HEADER = "X-WEBHOOK-SECRET";
 
-    private final BlogUploadWebhookService webhookService;
-    private final BlogUploadProperties blogUploadProperties;
+    private final ContentGenerateProperties contentGenerateProperties;
+    private final ContentGenerateWebhookService webhookService;
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
             @RequestHeader(value = WEBHOOK_HEADER, required = false) String secretHeader,
-            @RequestBody BlogUploadWebhookRequest request
+            @RequestBody ContentGenerateWebhookRequest request
     ) {
         validateSecret(secretHeader);
         webhookService.handleResult(request);
-        return ApiResult.success("블로그 업로드 결과를 처리했습니다.");
+        return ApiResult.success("콘텐츠 생성 결과를 처리했습니다.");
     }
 
     private void validateSecret(String secretHeader) {
-        String expectedSecret = blogUploadProperties.getWebhookSecret();
+        String expectedSecret = contentGenerateProperties.getWebhookSecret();
         if (expectedSecret == null || expectedSecret.isBlank()) {
-            log.warn("웹훅 시크릿이 설정되지 않았습니다.");
+            log.warn("콘텐츠 생성 웹훅 시크릿이 설정되지 않았습니다.");
             throw new CustomException(ErrorCode.WORK_WEBHOOK_TOKEN_INVALID, "웹훅 시크릿이 설정되지 않았습니다.");
         }
 
