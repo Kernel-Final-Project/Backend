@@ -18,6 +18,8 @@ public class WorkInfoResponse {
 
     private String blogPostUrl;
 
+    private String title;
+
     private String choiceProduct;
 
     private LocalDateTime createdAt;

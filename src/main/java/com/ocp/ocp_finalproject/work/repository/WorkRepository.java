@@ -52,6 +52,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
                     w.id,
                     w.viewCount,
                     w.postingUrl,
+                    ac.title,
                     ac.choiceProduct,
                     w.createdAt,
                     w.status
