@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.work.api;
+package com.ocp.ocp_finalproject.work.controller;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
