@@ -5,7 +5,7 @@ import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.content.domain.AiContent;
 import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
-import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
+import com.ocp.ocp_finalproject.work.dto.request.ProductSelectWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.work.util.WebhookTimeParser;
 import java.time.LocalDateTime;
@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BlogUploadWebhookService {
+public class ProductSelectWebhookService {
 
     private final WorkRepository workRepository;
     private final AiContentRepository aiContentRepository;
 
     @Transactional
-    public void handleResult(BlogUploadWebhookRequest request) {
+    public void handleResult(ProductSelectWebhookRequest request) {
         Long workId = request.getWorkId();
         if (workId == null) {
             throw new CustomException(ErrorCode.WORK_NOT_FOUND, "워크 ID가 누락되었습니다.");
@@ -35,10 +35,19 @@ public class BlogUploadWebhookService {
         AiContent aiContent = aiContentRepository.findByWorkId(workId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AI_CONTENT_NOT_FOUND, "콘텐츠를 찾을 수 없습니다. workId=" + workId));
 
-        LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
+        Boolean successFlag = request.getSuccess();
+        if (successFlag == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "성공 여부가 누락되었습니다.");
+        }
 
-        log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, request.isSuccess(), request.getPostingUrl(), completedAt);
-        work.updateUrlCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
-        aiContent.updateBlogUploadResult(request.isSuccess(), completedAt);
+        LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
+        String productName = request.getProduct() != null ? request.getProduct().getProductName() : null;
+
+        log.info("상품 선택 웹훅 수신 workId={} productName={} productCode={}", workId, productName,
+                request.getProduct() != null ? request.getProduct().getProductCode() : null);
+
+        boolean isSuccess = successFlag;
+        aiContent.updateProductSelection(isSuccess, productName, completedAt);
+        work.updateProductSelection(isSuccess, completedAt);
     }
 }
