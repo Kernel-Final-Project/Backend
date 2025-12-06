@@ -59,4 +59,11 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
         WHERE wf.status = 'ACTIVE'
     """)
     List<Workflow> findAllActive();
+
+    @Query("""
+        SELECT wf
+        FROM Workflow wf
+        WHERE wf.user.id = :userId
+    """)
+    Optional<Workflow> findByUserId(Long userId);
 }
