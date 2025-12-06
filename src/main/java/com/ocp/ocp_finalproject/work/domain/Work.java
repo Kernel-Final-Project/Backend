@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.work.domain;
 
 import com.ocp.ocp_finalproject.common.entity.BaseEntity;
+import com.ocp.ocp_finalproject.content.domain.AiContent;
 import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import jakarta.persistence.*;
@@ -39,6 +40,12 @@ public class Work extends BaseEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "view_count")
+    private Integer viewCount;
+
+    @OneToOne(mappedBy = "work", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private AiContent aiContent;
+
     @Builder(builderMethodName = "createBuilder")
     public static Work create(Workflow workflow, WorkExecutionStatus status, LocalDateTime startedAt, LocalDateTime completedAt) {
         Work work = new Work();
@@ -46,6 +53,7 @@ public class Work extends BaseEntity {
         work.status = status;
         work.startedAt = startedAt;
         work.completedAt = completedAt;
+        work.viewCount = 0;
         return work;
     }
 
@@ -68,6 +76,13 @@ public class Work extends BaseEntity {
 
         this.startedAt = startedAt;
         this.completedAt = completedAt;
+    }
+
+    public void setAiContent(AiContent aiContent) {
+        this.aiContent = aiContent;
+        if (aiContent != null && aiContent.getWork() != this) {
+            aiContent.setWork(this);
+        }
     }
 
 }
