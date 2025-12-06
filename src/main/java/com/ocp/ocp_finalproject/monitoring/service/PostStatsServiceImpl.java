@@ -21,9 +21,12 @@ public class PostStatsServiceImpl implements PostStatsService {
     @Transactional(readOnly = true)
     public WorkInfoResponse findWorkflowPosts(Long userId, Long workId) {
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        WorkInfoResponse workflowPosts = workRepository.findWorkflowPosts(userId, workId);
 
-        return workRepository.findWorkflowPosts(userId);
+        if (workflowPosts == null) {
+            throw new CustomException(WORK_NOT_FOUND);
+        }
+
+        return workflowPosts;
     }
 }

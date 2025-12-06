@@ -59,10 +59,10 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
                 )
             FROM Work w
             JOIN w.workflow wf
-            LEFT JOIN wf.user u
+            JOIN wf.user u
             JOIN w.aiContent ac
-            WHERE w.id = :workId
+            WHERE u.id = :userId and w.id = :workId
             """)
-    WorkInfoResponse findWorkflowPosts(Long workId);
+    WorkInfoResponse findWorkflowPosts(@Param("userId") Long userId, @Param("workId") Long workId);
 
 }
