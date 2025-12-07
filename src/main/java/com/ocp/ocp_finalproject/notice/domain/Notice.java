@@ -80,4 +80,11 @@ public class Notice extends BaseEntity {
         this.noticeFiles.add(file);
         file.setNotice(this);
     }
+    // 공지 기본 정보 수정(null 값은 기존 값 유지)
+    public void update(String title, String content, String announcementType, Boolean isImportant) {
+        if (title != null) this.title = title;
+        if (content != null) this.content = content;
+        if (announcementType != null) this.announcementType = announcementType;
+        if (isImportant != null) this.isImportant = isImportant;
+    }
 }

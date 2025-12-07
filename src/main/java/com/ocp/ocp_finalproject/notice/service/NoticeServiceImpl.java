@@ -5,6 +5,7 @@ import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.notice.domain.Notice;
 import com.ocp.ocp_finalproject.notice.domain.NoticeFile;
 import com.ocp.ocp_finalproject.notice.dto.request.NoticeCreateRequest;
+import com.ocp.ocp_finalproject.notice.dto.request.NoticeUpdateRequest;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.repository.NoticeFileRepository;
 import com.ocp.ocp_finalproject.notice.repository.NoticeRepository;
@@ -37,6 +38,9 @@ public class NoticeServiceImpl implements NoticeService {
         return NoticeResponse.from(notice);
     }
 
+    /**
+     * 공지사항 등록
+     */
     @Override
     @Transactional
     public NoticeResponse createNotice(NoticeCreateRequest request) {
@@ -48,15 +52,20 @@ public class NoticeServiceImpl implements NoticeService {
         Notice savedNotice = noticeRepository.save(notice);
 
         // 3. 첨부파일이 있는 경우 NoticeFile 엔티티 생성 + 저장
-        if (request.getNoticeFiles() != null && !request.getNoticeFiles().isEmpty()) {
+        if (request.getFileName() != null) {
+            NoticeFile file = NoticeFile.create(
+                    savedNotice,
+                    request.getFileName(),
+                    request.getFileName(), // originalName 동일 처리
+                    request.getFileUrl(),
+                    request.getFileSize(),
+                    request.getFileType()
+            );
 
-            List<NoticeFile> fileEntities = request.getNoticeFiles().stream()
-                    .map(fileReq -> fileReq.toEntity(savedNotice))
-                    .toList();
+            noticeFileRepository.save(file);
+            savedNotice.addNoticeFile(file);
 
-            noticeFileRepository.saveAll(fileEntities);
         }
-
         // 4. 저장된 Notices -> DTO 변환 후 반환
         return NoticeResponse.from(savedNotice);
     }
@@ -73,5 +82,49 @@ public class NoticeServiceImpl implements NoticeService {
 
         // 2. 삭제 (Cascade + orphanRemoval 로 파일도 함께 삭제)
         noticeRepository.delete(notice);
+    }
+
+    /**
+     * 공지사항 수정
+     */
+    @Override
+    @Transactional
+    public NoticeResponse updateNotice(Long noticeId, NoticeUpdateRequest request) {
+
+        Notice notice = noticeRepository.findByIdWithFiles(noticeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
+
+        // 1. 텍스트 필드 수정 (null인 값은 무시)
+        notice.update(
+                request.getTitle(),
+                request.getContent(),
+                request.getAnnouncementType(),
+                request.getIsImportant()
+        );
+
+        // 2. 파일 수정 (client가 파일 관련 정보 하나라도 전달하면 전체 교체)
+        boolean hasFileUpdate =
+                request.getFileName() != null ||
+                        request.getFileUrl() != null ||
+                        request.getFileSize() != null ||
+                        request.getFileType() != null;
+
+        if (hasFileUpdate) {
+            // 기존 파일 전체 삭제
+            notice.getNoticeFiles().clear();
+
+            NoticeFile newFile = NoticeFile.create(
+                    notice,
+                    request.getFileName(),
+                    request.getFileName(),  // originalName 동일 처리
+                    request.getFileUrl(),
+                    request.getFileSize(),
+                    request.getFileType()
+            );
+
+            notice.addNoticeFile(newFile);
+        }
+
+        return NoticeResponse.from(notice);
     }
 }

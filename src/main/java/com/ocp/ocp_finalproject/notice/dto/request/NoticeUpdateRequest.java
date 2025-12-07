@@ -1,25 +1,25 @@
 package com.ocp.ocp_finalproject.notice.dto.request;
 
-import com.ocp.ocp_finalproject.notice.domain.Notice;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class NoticeCreateRequest {
-
+public class NoticeUpdateRequest {
     private String title;
     private String content;
+    private String announcementType;
+    private Boolean isImportant;
 
+    // 단일 파일 업데이트
     private String fileName;
     private String fileUrl;
     private Long fileSize;
     private String fileType;
-
-    public Notice toEntity() {
-        return Notice.createBuilder()
-                .title(title)
-                .content(content)
-                .build();
-    }
 }
