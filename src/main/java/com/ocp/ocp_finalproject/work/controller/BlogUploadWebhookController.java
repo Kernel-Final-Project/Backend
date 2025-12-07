@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.work.api;
+package com.ocp.ocp_finalproject.work.controller;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
@@ -20,27 +20,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BlogUploadWebhookController {
 
+    private static final String WEBHOOK_HEADER = "X-WEBHOOK-SECRET";
+
     private final BlogUploadWebhookService webhookService;
     private final BlogUploadProperties blogUploadProperties;
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
-            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestHeader(value = WEBHOOK_HEADER, required = false) String secretHeader,
             @RequestBody BlogUploadWebhookRequest request
     ) {
-        validateSecret(authorization);
+        validateSecret(secretHeader);
         webhookService.handleResult(request);
         return ApiResult.success("블로그 업로드 결과를 처리했습니다.");
     }
 
-    private void validateSecret(String authorizationHeader) {
+    private void validateSecret(String secretHeader) {
         String expectedSecret = blogUploadProperties.getWebhookSecret();
         if (expectedSecret == null || expectedSecret.isBlank()) {
             log.warn("웹훅 시크릿이 설정되지 않았습니다.");
             throw new CustomException(ErrorCode.WORK_WEBHOOK_TOKEN_INVALID, "웹훅 시크릿이 설정되지 않았습니다.");
         }
 
-        if (authorizationHeader == null || !authorizationHeader.equals(expectedSecret)) {
+        if (secretHeader == null || !secretHeader.equals(expectedSecret)) {
             throw new CustomException(ErrorCode.WORK_WEBHOOK_TOKEN_INVALID);
         }
     }

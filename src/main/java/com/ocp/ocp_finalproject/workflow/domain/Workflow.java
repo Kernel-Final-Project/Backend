@@ -39,7 +39,7 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "user_blog_id")
     private UserBlog userBlog;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trend_category_id")
     private TrendCategory trendCategory;
 

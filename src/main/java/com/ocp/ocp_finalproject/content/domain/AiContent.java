@@ -25,6 +25,10 @@ public class AiContent extends BaseEntity {
 
     @Lob
     @Column
+    private String summary;
+
+    @Lob
+    @Column
     private String content;
 
     @Column(name = "choice_product")
@@ -61,6 +65,7 @@ public class AiContent extends BaseEntity {
     ) {
         AiContent aiContent = new AiContent();
         aiContent.title = title;
+        aiContent.summary = null;
         aiContent.content = content;
         aiContent.choiceProduct = choiceProduct;
         aiContent.choiceTrendKeyword = choiceTrendKeyword;
@@ -79,6 +84,32 @@ public class AiContent extends BaseEntity {
             this.status = ContentStatus.FAILED;
         }
         this.startedAt = startedAt;
+        this.completedAt = completedAt;
+    }
+    //DB에 ai_content.summary 컬럼 추가 (예: ALTER TABLE ai_content ADD COLUMN summary longtext NULL;).
+    public void updateProductSelection(boolean isSuccess, String productName, LocalDateTime completedAt) {
+        if (isSuccess) {
+            this.choiceProduct = productName;
+        } else {
+            this.status = ContentStatus.FAILED;
+        }
+        this.completedAt = completedAt;
+    }
+
+    public void updateContentGeneration(boolean isSuccess, String title, String summary, String content, LocalDateTime completedAt) {
+        if (isSuccess) {
+            this.title = title;
+            this.summary = summary;
+            this.content = content;
+            this.status = ContentStatus.GENERATED;
+        } else {
+            this.status = ContentStatus.FAILED;
+        }
+        this.completedAt = completedAt;
+    }
+
+    public void updateBlogUploadResult(boolean isSuccess, LocalDateTime completedAt) {
+        this.status = isSuccess ? ContentStatus.PUBLISHED : ContentStatus.FAILED;
         this.completedAt = completedAt;
     }
 }
