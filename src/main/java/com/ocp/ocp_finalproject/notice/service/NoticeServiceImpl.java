@@ -104,16 +104,14 @@ public class NoticeServiceImpl implements NoticeService {
 
         // 2. 파일 수정 (client가 파일 관련 정보 하나라도 전달하면 전체 교체)
         boolean hasFileUpdate =
-                request.getFileName() != null ||
-                        request.getFileUrl() != null ||
-                        request.getFileSize() != null ||
-                        request.getFileType() != null;
+                request.getFileName() != null &&
+                        request.getFileUrl() != null;
 
         if (hasFileUpdate) {
             // 기존 파일 전체 삭제
             notice.getNoticeFiles().clear();
 
-            NoticeFile newFile = NoticeFile.create(
+            NoticeFile.create(
                     notice,
                     request.getFileName(),
                     request.getFileName(),  // originalName 동일 처리
@@ -121,8 +119,6 @@ public class NoticeServiceImpl implements NoticeService {
                     request.getFileSize(),
                     request.getFileType()
             );
-
-            notice.addNoticeFile(newFile);
         }
 
         return NoticeResponse.from(notice);

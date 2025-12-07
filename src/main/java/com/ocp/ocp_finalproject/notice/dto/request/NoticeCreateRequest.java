@@ -16,10 +16,20 @@ public class NoticeCreateRequest {
     private Long fileSize;
     private String fileType;
 
+    private String announcementType;
+    private Boolean isImportant;
+    private Long authorId;
+
     public Notice toEntity() {
         return Notice.createBuilder()
                 .title(title)
                 .content(content)
+                .announcementType(announcementType)
+                .isImportant(isImportant)
+                .authorId(authorId)
+                .viewCount(0)
+                .attachmentUrl(null)
+                .noticeFiles(null)
                 .build();
     }
 }
