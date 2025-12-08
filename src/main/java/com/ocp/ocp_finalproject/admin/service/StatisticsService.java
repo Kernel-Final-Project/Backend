@@ -200,14 +200,18 @@ public class StatisticsService {
     *
     * 지정된 기간의 일별 발행된 포스팅 수를 조회
     *
-    * @param startDate 조회 시작 날짜
-    * @param endDate 조회 종료 날짜
+    * @param startDate 조회 시작 날짜 (포함)
+    * @param endDate 조회 종료 날짜 (포함)
     * @return 일별 포스팅 통계 응답 리스트
     * */
     public List<DailyPostStatisticsResponse> getDailyPostStatistics(LocalDate startDate, LocalDate endDate) {
         log.info("일별 포스팅 통계 조회 - startDate: {}, endDate: {}", startDate, endDate);
 
-        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(startDate, endDate);
+        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
+        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
+                startDate.atStartOfDay(),
+                endDate.plusDays(1).atStartOfDay()
+        );
 
         log.info("조회된 일별 포스팅 통계 건수: {}", results.size());
 
@@ -218,7 +222,7 @@ public class StatisticsService {
 
     /*
     * 주별 포스팅 통계 조회
-    * 
+    *
     * 지정된 년월의 일별 데이터를 주 단위로 집계하여 반환
     * ISO-8601 기준 주차 계산
     *
@@ -229,22 +233,29 @@ public class StatisticsService {
     public List<WeeklyPostStatisticsResponse> getWeeklyPostStatistics(int year, int month) {
         log.info("주별 포스팅 통계 조회 - year: {}, month: {}", year, month);
 
-        List<Object[]> results = aiContentRepository.countPublishedPostsByYearAndMonth(year, month);
+        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
+                firstDay.atStartOfDay(),
+                firstDay.plusMonths(1).atStartOfDay()
+        );
 
         log.info("주별 포스팅 집계를 위한 일별 포스팅 조회 건수: {}", results.size());
 
-        // 일별 데이터를 주차별로 그룹화
-        Map<Integer, List<Object[]>> weeklyGroup = results.stream()
+        // 일별 데이터를 주차별로 그룹화 (연도 경계 처리 포함)
+        Map<String, List<Object[]>> weeklyGroup = results.stream()
                 .collect(Collectors.groupingBy(result -> {
                     LocalDate date = (LocalDate) result[0];
-                    return date.get(WeekFields.ISO.weekOfWeekBasedYear());
+                    int weekBasedYear = date.get(WeekFields.ISO.weekBasedYear());
+                    int weekOfYear = date.get(WeekFields.ISO.weekOfWeekBasedYear());
+                    return String.format("%d-W%02d", weekBasedYear, weekOfYear);
                 }));
 
         log.info("집계된 포스팅 주차 수: {}", weeklyGroup.size());
 
         return weeklyGroup.entrySet().stream()
                 .map(entry -> {
-                    Integer weekNumber = entry.getKey();
+                    String weekString = entry.getKey();
                     List<Object[]> weekData = entry.getValue();
 
                     // 주의 시작일과 종료일
@@ -256,11 +267,8 @@ public class StatisticsService {
                             .mapToLong(result -> ((Number) result[1]).longValue())
                             .sum();
 
-                    // ISO-8601 주차 형식(YYYY-WW)
-                    String weekString = String.format("%d-W%02d", year, weekNumber);
-
                     log.debug("{} 주차 집계 - 기간: {} ~ {}, 총 포스팅: {}",
-                            weekNumber, weekStart, weekEnd, totalPosts);
+                            weekString, weekStart, weekEnd, totalPosts);
 
                     return WeeklyPostStatisticsResponse.builder()
                             .week(weekString)
@@ -275,16 +283,21 @@ public class StatisticsService {
 
     /*
     * 월별 포스팅 통계 조회
-    * 
+    *
     * 지정된 년도의 일별 데이터를 월 단위로 집계하여 반환
-    * 
+    *
     * @param year 조회할 년도
     * @return 월별 포스팅 통계 응답 리스트
     * */
     public List<MonthlyPostStatisticsResponse> getMonthlyPostStatistics(int year) {
         log.info("월별 포스팅 통계 조회 - year: {}", year);
 
-        List<Object[]> results = aiContentRepository.countPublishedPostsByYear(year);
+        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
+        LocalDate firstDay = LocalDate.of(year, 1, 1);
+        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
+                firstDay.atStartOfDay(),
+                firstDay.plusYears(1).atStartOfDay()
+        );
 
         log.info("월별 집계를 위한 일별 포스팅 조회 건수: {}", results.size());
         
