@@ -1,8 +1,13 @@
 package com.ocp.ocp_finalproject.admin.controller;
 
+//user
 import com.ocp.ocp_finalproject.admin.dto.response.DailyUserStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.MonthlyUserStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.WeeklyUserStatisticsResponse;
+//post
+import com.ocp.ocp_finalproject.admin.dto.response.DailyPostStatisticsResponse;
+import com.ocp.ocp_finalproject.admin.dto.response.WeeklyPostStatisticsResponse;
+import com.ocp.ocp_finalproject.admin.dto.response.MonthlyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.service.StatisticsService;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -171,6 +176,136 @@ public class StatisticsController {
                 statisticsService.getMonthlyUserStatistics(year);
 
         return ResponseEntity.ok(ApiResult.success("월별 사용자 통계 조회 성공", statistics));
+    }
+    // ============================================
+    // 포스팅 통계 조회
+    // ============================================
+
+    /*
+     * 일별 포스팅 통계를 조회합니다.
+     *
+     * 지정된 기간의 일별 발행된 포스팅 수를 조회합니다.
+     * 날짜는 (YYYY-MM-DD) 형식으로 전달
+     *
+     * <조회 데이터>
+     * 날짜별 발행된 포스팅 수 (PUBLISHED 상태)
+     * AiContent의 completedAt 기준으로 집계
+     *
+     * */
+    @Operation(summary = "일별 포스팅 통계 조회",
+            description = "지정한 기간의 일별 발행된 포스팅 수를 조회합니다. 날짜는 (YYYY-MM-DD) 형식으로 전달")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "일별 포스팅 통계 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (날짜 형식 오류, 시작일 > 종료일 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @GetMapping("/daily/posts")
+    public ResponseEntity<ApiResult<List<DailyPostStatisticsResponse>>> getDailyPostStatistics(
+            @Parameter(
+                    description = "조회 시작 날짜 (ISO-8601 형식)",
+                    example = "2025-01-01",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @Parameter(
+                    description = "조회 종료 날짜 (ISO-8601 형식)",
+                    example = "2025-01-31",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate) {
+
+        List<DailyPostStatisticsResponse> statistics =
+                statisticsService.getDailyPostStatistics(startDate, endDate);
+
+        return ResponseEntity.ok(ApiResult.success("일별 포스팅 조회 성공", statistics));
+    }
+
+    /*
+     * 주별 포스팅 통계를 조회합니다.
+     *
+     * 지정된 년월의 주별 발행된 포스팅 수를 조회합니다.
+     * 일별 데이터를 주 단위로 집계하여 반환
+     *
+     * <집계 방식>
+     * 주차 계산: ISO-8601 표준 (월요일 시작)
+     * 총 포스팅: 해당 주의 일별 포스팅 합계
+     *
+     * @param year 조회할 년도 (예: 2025)
+     * @param month 조회할 월 (1-12)
+     * @return 주별 포스팅 통계 리스트 (주차 오름차순)
+     * */
+    @Operation(summary = "주별 포스팅 통계 조회",
+            description = "지정한 년월의 주별 발행된 포스팅 수를 조회합니다. 일별 데이터를 주 단위로 집계")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "주별 포스팅 통계 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (월이 1-12 범위를 벗어난 경우 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @GetMapping("/weekly/posts")
+    public ResponseEntity<ApiResult<List<WeeklyPostStatisticsResponse>>> getWeeklyPostStatistics(
+            @Parameter(
+                    description = "조회할 년도",
+                    example = "2025",
+                    required = true
+            )
+            @RequestParam int year,
+
+            @Parameter(
+                    description = "조회할 월 (1-12)",
+                    example = "1",
+                    required = true
+            )
+            @RequestParam int month) {
+
+        List<WeeklyPostStatisticsResponse> statistics =
+                statisticsService.getWeeklyPostStatistics(year, month);
+
+        return ResponseEntity.ok(ApiResult.success("주별 포스팅 조회 성공", statistics));
+    }
+
+    /*
+     * 월별 포스팅 통계를 조회합니다.
+     *
+     * 지정된 년도의 월별 발행된 포스팅 수를 조회합니다.
+     * 일별 데이터를 월 단위로 집계하여 1월부터 12월까지 반환
+     *
+     * <집계 방식>
+     * 총 포스팅: 해당 월의 일별 포스팅 합계
+     *
+     * @param year 조회할 년도 (예: 2025)
+     * @return 월별 포스팅 통계 리스트 (월 오름차순, 1월~12월)
+     * */
+    @Operation(summary = "월별 포스팅 통계 조회",
+            description = "지정한 년도의 월별 발행된 포스팅 수를 조회합니다. 일별 데이터를 월 단위로 집계")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "월별 포스팅 통계 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @GetMapping("/monthly/posts")
+    public ResponseEntity<ApiResult<List<MonthlyPostStatisticsResponse>>> getMonthlyPostStatistics(
+            @Parameter(
+                    description = "조회할 년도",
+                    example = "2025",
+                    required = true
+            )
+            @RequestParam int year) {
+
+        List<MonthlyPostStatisticsResponse> statistics =
+                statisticsService.getMonthlyPostStatistics(year);
+
+        return ResponseEntity.ok(ApiResult.success("월별 포스팅 조회 성공", statistics));
     }
 }
 
