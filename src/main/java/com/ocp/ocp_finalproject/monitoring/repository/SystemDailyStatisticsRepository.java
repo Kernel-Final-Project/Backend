@@ -2,8 +2,6 @@ package com.ocp.ocp_finalproject.monitoring.repository;
 
 import com.ocp.ocp_finalproject.monitoring.domain.SystemDailyStatistics;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
