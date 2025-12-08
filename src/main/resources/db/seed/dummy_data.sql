@@ -270,11 +270,3 @@ INSERT INTO `system_daily_statistics` (`stat_id`, `stat_date`, `total_users`, `u
                                        `ai_cost_growth_rate`, `active_users_today`, `active_user_growth_rate`,
                                        `created_at`, `updated_at`)
 VALUES (1, CURDATE(), 2, 0.00, 2, 0, 0.00, 2, 0.03, 0.00, 2, 0.00, NOW(), NOW());
-
--- ============================================
--- 21. 포스트 일별 통계 (post_daily_stats)
--- ============================================
-INSERT INTO `post_daily_stats` (`post_stat_id`, `work_id`, `user_id`, `stat_date`, `view_count`, `created_at`,
-                                `updated_at`)
-VALUES (1, 1, 1, CURDATE(), 0, NOW(), NOW()),
-       (2, 3, 2, CURDATE(), 0, NOW(), NOW());

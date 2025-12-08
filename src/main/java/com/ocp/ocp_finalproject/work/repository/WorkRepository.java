@@ -1,6 +1,5 @@
 package com.ocp.ocp_finalproject.work.repository;
 
-import com.ocp.ocp_finalproject.monitoring.dto.response.WorkInfoResponse;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import java.util.List;
@@ -44,25 +43,5 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
             WHERE wf.user.id = :userId
             """)
     Optional<Work> findByUserId(@Param("userId") Long userId);
-
-    @Query("""
-            SELECT
-                new com.ocp.ocp_finalproject.monitoring.dto.response.WorkInfoResponse(
-                    wf.id,
-                    w.id,
-                    w.viewCount,
-                    w.postingUrl,
-                    ac.title,
-                    ac.choiceProduct,
-                    w.createdAt,
-                    w.status
-                )
-            FROM Work w
-            JOIN w.workflow wf
-            JOIN wf.user u
-            JOIN w.aiContent ac
-            WHERE u.id = :userId and w.id = :workId
-            """)
-    WorkInfoResponse findWorkflowPosts(@Param("userId") Long userId, @Param("workId") Long workId);
 
 }
