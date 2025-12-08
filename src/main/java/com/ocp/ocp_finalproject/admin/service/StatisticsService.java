@@ -46,6 +46,11 @@ public class StatisticsService {
     public List<DailyUserStatisticsResponse> getDailyUserStatistics(LocalDate startDate, LocalDate endDate) {
         log.info("일별 사용자 통계 조회 - startDate: {}, endDate: {}", startDate, endDate);
 
+        // 날짜 유효성 검사
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("시작일은 종료일보다 늦을 수 없습니다.");
+        }
+
         // Repository를 통해 기간 내 통계 조회
         List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
                 .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
@@ -76,9 +81,18 @@ public class StatisticsService {
     public List<WeeklyUserStatisticsResponse> getWeeklyUserStatistics(int year, int month) {
         log.info("주별 사용자 통계 - year: {}, month: {}", year, month);
 
+        // 월 유효성 검사
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("월(month)은 1에서 12 사이의 값이어야 합니다.");
+        }
+
+        // 날짜 범위 계산 (성능 최적화: 인덱스 활용 가능)
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+
         // 해당 년월의 모든 일별 통계 조회
         List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
-                .findByYearAndMonth(year, month);
+                .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
 
         log.info("주별 집계를 위한 일별 데이터 조회 건수: {}", statistics.size());
 
@@ -97,12 +111,12 @@ public class StatisticsService {
                     Integer weekNumber = entry.getKey();
                     List<SystemDailyStatistics> weekData = entry.getValue();
 
-                    // 주의 시작일과 종료일 계산
-                    LocalDate weekStart = weekData.getFirst().getStatDate();
-                    LocalDate weekEnd = weekData.getLast().getStatDate();
-
                     // 주의 마지막 날 데이터 (총 사용자, 증가율 계산에 사용)
-                    SystemDailyStatistics lastDayStat = weekData.getLast();
+                    SystemDailyStatistics lastDayStat = weekData.get(weekData.size() - 1);
+
+                    // 주의 시작일과 종료일 계산
+                    LocalDate weekStart = weekData.get(0).getStatDate();
+                    LocalDate weekEnd = lastDayStat.getStatDate();
 
                     // 주간 평균 활성 사용자 계산
                     // 각 날짜의 활성 사용자 수를 평균
@@ -144,8 +158,13 @@ public class StatisticsService {
     public List<MonthlyUserStatisticsResponse> getMonthlyUserStatistics(int year) {
         log.info("월별 사용자 통계 조회 - year: {}", year);
 
+        // 날짜 범위 계산 (성능 최적화: 인덱스 활용 가능)
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
         // 해당 년도의 모든 일별 통계 조회
-        List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository.findByYear(year);
+        List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
+                .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
 
         log.info("월별 집계를 위한 일별 데이터 조회 건수: {}", statistics.size());
 
@@ -162,7 +181,7 @@ public class StatisticsService {
                     List<SystemDailyStatistics> monthData = entry.getValue();
 
                     // 월의 마지막 날 데이터 (총 사용자, 증가율 계산에 사용)
-                    SystemDailyStatistics lastDayStat = monthData.getLast();
+                    SystemDailyStatistics lastDayStat = monthData.get(monthData.size() - 1);
 
                     // 월간 평균 활성 사용자 계산
                     // 각 날짜의 활성 사용자 수를 평균
