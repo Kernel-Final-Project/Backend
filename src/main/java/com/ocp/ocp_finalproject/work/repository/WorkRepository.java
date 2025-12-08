@@ -65,4 +65,8 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
             """)
     WorkInfoResponse findWorkflowPosts(@Param("userId") Long userId, @Param("workId") Long workId);
 
+    /**
+     *
+     */
+
 }
