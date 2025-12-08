@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
@@ -18,12 +17,10 @@ public class NoticeResponse {
     private Long authorId;
     private Integer viewCount;
     private String attachmentUrl;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
-    private List<NoticeFileResponse> noticeFiles;
+    private NoticeFileResponse noticeFile;
 
     public static NoticeResponse from(Notice notice) {
         return NoticeResponse.builder()
@@ -37,10 +34,10 @@ public class NoticeResponse {
                 .attachmentUrl(notice.getAttachmentUrl())
                 .createdAt(notice.getCreatedAt())
                 .updatedAt(notice.getUpdatedAt())
-                .noticeFiles(
-                        notice.getNoticeFiles().stream()
-                                .map(NoticeFileResponse::from)
-                                .toList()
+                .noticeFile(
+                        notice.getNoticeFiles().isEmpty() ?
+                                null :
+                                NoticeFileResponse.from(notice.getNoticeFiles().get(0))
                 )
                 .build();
     }
