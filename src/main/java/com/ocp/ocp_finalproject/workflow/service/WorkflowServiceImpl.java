@@ -121,14 +121,44 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @Transactional
     public WorkflowResponse updateWorkflow(Long userId,
                                            Long workflowId,
                                            WorkflowRequest workflowRequest) throws SchedulerException {
 
+        Workflow workflow = updateWorkflowTransaction(userId, workflowId, workflowRequest);
+
+        schedulerSyncService.updateWorkflowJobs(workflow);
+
+        return buildResponse(workflow, workflow.getTrendCategory());
+    }
+
+    @Transactional
+    protected Workflow updateWorkflowTransaction(Long userId, Long workflowId,
+                                                 WorkflowRequest workflowRequest) {
         Workflow workflow = workflowRepository.findWorkflow(workflowId, userId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
+        UserBlog userBlog = upsertUserBlog(workflowRequest);
+
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
+                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
+
+        RecurrenceRule rule = workflow.getRecurrenceRule();
+
+        if (rule != null) {
+            RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
+
+            validator.validate(ruleDto);
+
+            rule.update(ruleDto);
+        }
+
+        workflow.update(userBlog, category, rule, workflowRequest.getSiteUrl());
+
+        return workflow;
+    }
+
+    private UserBlog upsertUserBlog(WorkflowRequest workflowRequest) {
         BlogType blogType = blogTypeRepository.findById(workflowRequest.getBlogTypeId())
                 .orElseThrow(() -> new CustomException(BLOG_TYPE_NOT_FOUND));
 
@@ -151,24 +181,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
-                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
-
-        RecurrenceRule rule = workflow.getRecurrenceRule();
-
-        if (rule != null) {
-            RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
-
-            validator.validate(ruleDto);
-
-            rule.update(ruleDto);
-        }
-
-        workflow.update(userBlog, category, rule, workflowRequest.getSiteUrl());
-
-        schedulerSyncService.updateWorkflowJobs(workflow);
-
-        return buildResponse(workflow, category);
+        return userBlog;
     }
 
     @Override
@@ -185,7 +198,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .changedAt(workflow.getUpdatedAt())
                 .build();
     }
-
 
 
     @Override

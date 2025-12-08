@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.notice.api.user;
+package com.ocp.ocp_finalproject.notice.controller.user;
 
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;

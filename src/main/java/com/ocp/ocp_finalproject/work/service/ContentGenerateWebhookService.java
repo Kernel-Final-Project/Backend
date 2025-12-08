@@ -6,8 +6,8 @@ import com.ocp.ocp_finalproject.content.domain.AiContent;
 import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.ContentGenerateWebhookRequest;
-import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
+import com.ocp.ocp_finalproject.work.util.WebhookTimeParser;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +35,17 @@ public class ContentGenerateWebhookService {
         AiContent aiContent = aiContentRepository.findByWorkId(workId)
                 .orElseThrow(() -> new CustomException(ErrorCode.AI_CONTENT_NOT_FOUND, "콘텐츠를 찾을 수 없습니다. workId=" + workId));
 
-        LocalDateTime completedAt = LocalDateTime.now();
+        Boolean successFlag = request.getSuccess();
+        if (successFlag == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE, "성공 여부가 누락되었습니다.");
+        }
 
-        log.info("콘텐츠 생성 웹훅 수신 workId={} title={}", workId, request.getTitle());
+        LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
 
-        aiContent.updateContentGeneration(true, request.getTitle(), request.getSummary(), request.getContent(), completedAt);
-        work.updateContentGeneration(true, completedAt);
+        boolean isSuccess = successFlag;
+        log.info("콘텐츠 생성 웹훅 수신 workId={} success={} title={}", workId, isSuccess, request.getTitle());
+
+        aiContent.updateContentGeneration(isSuccess, request.getTitle(), request.getSummary(), request.getContent(), completedAt);
+        work.updateContentGeneration(isSuccess, completedAt);
     }
 }

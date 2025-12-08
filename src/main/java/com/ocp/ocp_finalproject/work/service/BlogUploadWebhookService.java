@@ -2,6 +2,8 @@ package com.ocp.ocp_finalproject.work.service;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
+import com.ocp.ocp_finalproject.content.domain.AiContent;
+import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlogUploadWebhookService {
 
     private final WorkRepository workRepository;
+    private final AiContentRepository aiContentRepository;
 
     @Transactional
     public void handleResult(BlogUploadWebhookRequest request) {
@@ -29,9 +32,13 @@ public class BlogUploadWebhookService {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORK_NOT_FOUND, "워크를 찾을 수 없습니다. workId=" + workId));
 
+        AiContent aiContent = aiContentRepository.findByWorkId(workId)
+                .orElseThrow(() -> new CustomException(ErrorCode.AI_CONTENT_NOT_FOUND, "콘텐츠를 찾을 수 없습니다. workId=" + workId));
+
         LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
 
         log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, request.isSuccess(), request.getPostingUrl(), completedAt);
         work.updateUrlCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
+        aiContent.updateBlogUploadResult(request.isSuccess(), completedAt);
     }
 }

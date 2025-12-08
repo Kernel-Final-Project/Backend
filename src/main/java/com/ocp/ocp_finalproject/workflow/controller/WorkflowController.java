@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.workflow.api;
+package com.ocp.ocp_finalproject.workflow.controller;
 
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.workflow.dto.request.*;

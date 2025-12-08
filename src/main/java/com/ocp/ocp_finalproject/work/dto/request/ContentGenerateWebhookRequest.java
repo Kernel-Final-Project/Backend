@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.work.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,11 @@ public class ContentGenerateWebhookRequest {
 
     @JsonProperty("workId")
     private Long workId;
+
+    private Boolean success;
+
+    @JsonProperty("completedAt")
+    private OffsetDateTime completedAt;
 
     private String title;
     private String content;

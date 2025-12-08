@@ -2,6 +2,8 @@ package com.ocp.ocp_finalproject.work.service;
 
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
+import com.ocp.ocp_finalproject.content.domain.AiContent;
+import com.ocp.ocp_finalproject.content.enums.ContentStatus;
 import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.crawling.domain.ProductCrawl;
 import com.ocp.ocp_finalproject.crawling.repository.ProductCrawlRepository;
@@ -51,14 +53,27 @@ public class ContentGenerateService {
         Workflow workflow = workflowRepository.findById(workflowId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORKFLOW_NOT_FOUND));
 
+        LocalDateTime now = LocalDateTime.now();
         Work work = workRepository.save(
                 Work.createBuilder()
                         .workflow(workflow)
                         .status(WorkExecutionStatus.PENDING)
-                        .startedAt(LocalDateTime.now())
+                        .startedAt(now)
                         .completedAt(null)
                         .build()
         );
+
+        AiContent aiContent = AiContent.createBuilder()
+                .title(null)
+                .content(null)
+                .choiceProduct(null)
+                .choiceTrendKeyword(null)
+                .status(ContentStatus.PENDING)
+                .startedAt(now)
+                .completedAt(null)
+                .work(work)
+                .build();
+        aiContentRepository.save(aiContent);
 
         ContentGenerateRequest request = new ContentGenerateRequest();
         request.setWorkId(work.getId());

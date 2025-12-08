@@ -86,6 +86,7 @@ public class AiContent extends BaseEntity {
         this.startedAt = startedAt;
         this.completedAt = completedAt;
     }
+
     //DB에 ai_content.summary 컬럼 추가 (예: ALTER TABLE ai_content ADD COLUMN summary longtext NULL;).
     public void updateProductSelection(boolean isSuccess, String productName, LocalDateTime completedAt) {
         if (isSuccess) {
@@ -105,6 +106,11 @@ public class AiContent extends BaseEntity {
         } else {
             this.status = ContentStatus.FAILED;
         }
+        this.completedAt = completedAt;
+    }
+
+    public void updateBlogUploadResult(boolean isSuccess, LocalDateTime completedAt) {
+        this.status = isSuccess ? ContentStatus.PUBLISHED : ContentStatus.FAILED;
         this.completedAt = completedAt;
     }
 }
