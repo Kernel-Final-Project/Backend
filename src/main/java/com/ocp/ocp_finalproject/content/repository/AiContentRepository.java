@@ -2,7 +2,6 @@ package com.ocp.ocp_finalproject.content.repository;
 
 import com.ocp.ocp_finalproject.content.domain.AiContent;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
