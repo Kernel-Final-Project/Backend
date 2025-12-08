@@ -4,19 +4,21 @@ import com.ocp.ocp_finalproject.notice.domain.Notice;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 @Builder
 public class NoticeCreateRequest {
 
     private String title;
     private String content;
+
+    private String fileName;
+    private String fileUrl;
+    private Long fileSize;
+    private String fileType;
+
     private String announcementType;
     private Boolean isImportant;
     private Long authorId;
-
-    private List<NoticeFileCreateRequest> noticeFiles;
 
     public Notice toEntity() {
         return Notice.createBuilder()
@@ -25,6 +27,9 @@ public class NoticeCreateRequest {
                 .announcementType(announcementType)
                 .isImportant(isImportant)
                 .authorId(authorId)
+                .viewCount(0)
+                .attachmentUrl(null)
+                .noticeFiles(null)
                 .build();
     }
 }
