@@ -95,7 +95,7 @@ public class WorkflowController {
     /**
      * 워크플로우 상태 변경
      */
-    @PatchMapping("/{userId}/{workflowId}/status")
+    @PatchMapping("/{workflowId}/status")
     public ResponseEntity<ApiResult<WorkflowStatusResponse>> updateStatus(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId,
@@ -111,7 +111,7 @@ public class WorkflowController {
     /**
      * 워크플로우 삭제(논리 삭제)
      */
-    @DeleteMapping("/{userId}/{workflowId}/delete")
+    @DeleteMapping("/{workflowId}/delete")
     public ResponseEntity<ApiResult<WorkflowStatusResponse>> deleteWorkflow(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId
