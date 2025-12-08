@@ -2,8 +2,6 @@ package com.ocp.ocp_finalproject.monitoring.repository;
 
 import com.ocp.ocp_finalproject.monitoring.domain.SystemDailyStatistics;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,23 +10,13 @@ public interface SystemDailyStatisticsRepository extends JpaRepository<SystemDai
 
     /*
     * 일별 통계 조회 (기간)
+    *
+    * 날짜 범위로 조회하여 인덱스 활용 가능 (SARGable)
+    * YEAR(), MONTH() 같은 함수를 WHERE 절에서 사용하지 않음
+    *
+    * @param startDate 시작 날짜 (포함)
+    * @param endDate 종료 날짜 (포함)
+    * @return 기간 내 일별 통계 리스트 (날짜 오름차순)
     * */
     List<SystemDailyStatistics> findByStatDateBetweenOrderByStatDateAsc(LocalDate startDate, LocalDate endDate);
-
-    /*
-    * 주별 통계 조회 (년, 월)
-    * */
-    @Query("SELECT s FROM SystemDailyStatistics s " +
-           "WHERE YEAR(s.statDate) = :year " +
-           "AND MONTH(s.statDate) = :month " +
-           "ORDER BY s.statDate ASC")
-    List<SystemDailyStatistics> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
-
-    /*
-    * 월별 통계 조회 (년)
-    * */
-    @Query("SELECT s FROM SystemDailyStatistics s " +
-           "WHERE YEAR(s.statDate) = :year " +
-           "ORDER BY s.statDate ASC")
-    List<SystemDailyStatistics> findByYear(@Param("year") int year);
 }
