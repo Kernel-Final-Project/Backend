@@ -6,6 +6,7 @@ import com.ocp.ocp_finalproject.user.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -54,12 +55,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionFixation().changeSessionId()
                 )
-
                 // ========== 인증/인가 설정 ==========
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                "/login/**",
+                                "/"
                         ).permitAll()
 
                         .requestMatchers(
@@ -67,6 +68,14 @@ public class SecurityConfig {
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/withdraw"
                         ).authenticated()
+
+                        // GET 요청은 공개 (읽기 전용)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/workflows/**").permitAll()
+
+                        // POST, PUT, DELETE는 로그인 필요 (쓰기 작업)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/workflows/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/workflows/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/workflows/**").authenticated()
 
                         .anyRequest().permitAll()
                 )
@@ -113,6 +122,7 @@ public class SecurityConfig {
 
         // 허용할 Origin (프론트엔드 URL)
         configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",      // Vite 개발 서버
                 "http://localhost:3000",      // React 개발 서버
                 "http://localhost:8080"       // 백엔드 (테스트용)
         ));
