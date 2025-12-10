@@ -12,6 +12,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
@@ -24,9 +26,14 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info("OAuth 로그인 실패 - {}", exception.getMessage(),exception);
 
-        String errorMessage = getErrorMessage(exception);
+//        String errorMessage = getErrorMessage(exception);
 
-        String redirectUrl = RedirectUrlBuilder.buildFailureUrl(oAuth2Properties.getFailureUrl(), errorMessage);
+        String errorMessage = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+
+        String failureRedirectUrl = RedirectUrlBuilder.buildFailureUrl(oAuth2Properties.getFailureUrl(), errorMessage);
+
+        String redirectUrl = failureRedirectUrl + "?success=false&error=" + errorMessage;
+
 
         log.info("로그인 실패 리다이렉트 : {}", redirectUrl);
 
