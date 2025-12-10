@@ -19,9 +19,9 @@ public class ProductCrawlService {
      */
     @Transactional
     public void saveAll(List<ProductCrawlDto> dtos) {
-        for (ProductCrawlDto dto : dtos) {
-            ProductCrawl entity = dto.toEntity();
-            productCrawlRepository.save(entity);
-        }
+        List<ProductCrawl> entities = dtos.stream()
+                .map(ProductCrawlDto::toEntity)
+                .toList();
+        productCrawlRepository.saveAll(entities);
     }
 }

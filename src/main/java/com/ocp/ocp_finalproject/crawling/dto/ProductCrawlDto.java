@@ -45,6 +45,7 @@ public class ProductCrawlDto {
 
     private Integer parsePrice(String price) {
         if (price == null) return null;
-        return Integer.parseInt(price.replaceAll("[^0-9]","")); // 숫자만 추출
+        String digits = price.replaceAll("[^0-9]",""); // 숫자만 추출
+        return digits.isEmpty() ? null : Integer.parseInt(digits);
     }
 }
