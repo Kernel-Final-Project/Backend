@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/webhooks/product-select")
+@RequestMapping("/api/v1/work/product/webhook")
 @RequiredArgsConstructor
 public class ProductSelectWebhookController {
 

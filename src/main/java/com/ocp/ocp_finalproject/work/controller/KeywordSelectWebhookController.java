@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class KeywordSelectWebhookController {
 
+    private static final String WEBHOOK_HEADER = "X-WEBHOOK-SECRET";
+
     private final KeywordSelectProperties keywordSelectProperties;
     private final KeywordSelectWebhookService webhookService;
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
-            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestHeader(value = WEBHOOK_HEADER, required = false) String authorization,
             @RequestBody KeywordSelectWebhookRequest request
     ) {
         validateSecret(authorization);
