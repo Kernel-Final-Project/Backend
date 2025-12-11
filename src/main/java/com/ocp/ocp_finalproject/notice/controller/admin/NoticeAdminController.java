@@ -9,12 +9,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/notices")
 public class NoticeAdminController {
 
     private final NoticeService noticeService;
+
+    /**
+     * 공지사항 목록 조회 (관리자용)
+     */
+    @GetMapping
+    public ResponseEntity<ApiResult<List<NoticeResponse>>> getAllNotices() {
+        return ResponseEntity.ok(ApiResult.success("공지사항 목록 조회 성공", noticeService.getAllNotice()));
+    }
 
     /**
      * 공지사항 등록
