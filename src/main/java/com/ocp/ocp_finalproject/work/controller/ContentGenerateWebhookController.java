@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/webhooks/content-generate")
+@RequestMapping("/api/v1/work/content/webhook")
 @RequiredArgsConstructor
 public class ContentGenerateWebhookController {
 

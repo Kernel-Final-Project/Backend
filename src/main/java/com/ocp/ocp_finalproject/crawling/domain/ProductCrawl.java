@@ -19,30 +19,27 @@ public class ProductCrawl extends BaseEntity {
     @Column(name = "product_crawl_id")
     private Long id;
 
-    @Column(name= "site_name", length = 100, nullable = false)
+    @Column(name= "site_name", length = 100)
     private String siteName;
 
-    @Column(name= "site_url", length = 100, nullable = false)
+    @Column(name= "site_url", length = 3000)
     private String siteUrl;
 
-    @Column(name = "product_name", length = 100, nullable = false)
+    @Column(name = "product_name", length = 100)
     private String productName;
 
-    @Column(name = "product_code", length = 100, nullable = false)
+    @Column(name = "product_code", length = 100)
     private String productCode;
 
-    @Column(name = "product_detail_url", length = 1000, nullable = false)
+    @Column(name = "product_detail_url", length = 3000)
     private String productDetailUrl;
+
+    @Column(name = "product_image_url", length = 1000)
+    private String productImageUrl;
 
     @Column(name = "product_price", length = 10)
     // DB에서 NULL이 들어올 수 있으면 primitive 타입 사용하면 NPE 위험해서 Integer 사용
     private Integer productPrice;
-
-    @Column(name = "started_at")
-    private LocalDateTime startedAt;
-
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
 
     @Builder(builderMethodName = "createBuilder")
     public static ProductCrawl create(
@@ -52,8 +49,7 @@ public class ProductCrawl extends BaseEntity {
             String productCode,
             String productDetailUrl,
             Integer productPrice,
-            LocalDateTime startedAt,
-            LocalDateTime completedAt
+            String productImageUrl
     ) {
         ProductCrawl crawl = new ProductCrawl();
         crawl.siteName = siteName;
@@ -62,8 +58,7 @@ public class ProductCrawl extends BaseEntity {
         crawl.productCode = productCode;
         crawl.productDetailUrl = productDetailUrl;
         crawl.productPrice = productPrice;
-        crawl.startedAt = startedAt;
-        crawl.completedAt = completedAt;
+        crawl.productImageUrl = productImageUrl;
         return crawl;
     }
 }

@@ -20,6 +20,9 @@ import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
+import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
 
 @Slf4j
 @Service
@@ -44,17 +48,19 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<WorkflowListResponse> findWorkflows(Long userId) {
+    public Page<WorkflowListResponse> getWorkflows(Long userId, int page) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        return workflowRepository.findWorkflows(user.getId());
+        PageRequest pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return workflowRepository.findWorkflows(user.getId(), pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowEditResponse findWorkflow(Long workflowId, Long userId) {
+    public WorkflowEditResponse getWorkflow(Long workflowId, Long userId) {
 
         Workflow workflow = workflowRepository.findWorkflow(workflowId, userId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
@@ -223,7 +229,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TrendCategoryResponse> findTrendCategories() {
+    public List<TrendCategoryResponse> getTrendCategories() {
 
         List<TrendCategory> roots = trendCategoryRepository.findByParentCategoryIsNull();
 
@@ -234,7 +240,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BlogTypeResponse> findBlogTypes() {
+    public List<BlogTypeResponse> getBlogTypes() {
 
         List<BlogType> blogTypes = blogTypeRepository.findAll();
 

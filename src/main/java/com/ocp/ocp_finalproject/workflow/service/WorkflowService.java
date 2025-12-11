@@ -4,16 +4,17 @@ import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import org.quartz.SchedulerException;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface WorkflowService {
 
-    List<WorkflowListResponse> findWorkflows(Long userId);
+    Page<WorkflowListResponse> getWorkflows(Long userId, int page);
 
     WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) throws SchedulerException;
 
-    WorkflowEditResponse findWorkflow(Long workflowId, Long userId);
+    WorkflowEditResponse getWorkflow(Long workflowId, Long userId);
 
     WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
 
@@ -21,7 +22,7 @@ public interface WorkflowService {
 
     WorkflowStatusResponse deleteWorkflow(Long userId, Long workflowId);
 
-    List<TrendCategoryResponse> findTrendCategories();
+    List<TrendCategoryResponse> getTrendCategories();
 
-    List<BlogTypeResponse> findBlogTypes();
+    List<BlogTypeResponse> getBlogTypes();
 }

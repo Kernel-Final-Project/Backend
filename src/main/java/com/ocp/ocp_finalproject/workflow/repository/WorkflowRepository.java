@@ -2,6 +2,8 @@ package com.ocp.ocp_finalproject.workflow.repository;
 
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,7 +35,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN ub.blogType bt
             WHERE u.id = :userId
     """)
-    List<WorkflowListResponse> findWorkflows(@Param("userId") Long userId);
+    Page<WorkflowListResponse> findWorkflows(@Param("userId") Long userId, Pageable pageable);
 
     @Query("""
             SELECT wf
@@ -60,10 +62,4 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     """)
     List<Workflow> findAllActive();
 
-    @Query("""
-        SELECT wf
-        FROM Workflow wf
-        WHERE wf.user.id = :userId
-    """)
-    Optional<Workflow> findByUserId(Long userId);
 }

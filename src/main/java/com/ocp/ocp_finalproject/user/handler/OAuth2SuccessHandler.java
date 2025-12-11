@@ -56,11 +56,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             boolean isNewUser = auth.isNewUser();
 
             // 5. 리다이렉트
-            String redirectUrl = RedirectUrlBuilder.buildSuccessUrl(
+            String successRedirectUrl = RedirectUrlBuilder.buildSuccessUrl(
                     oAuth2Properties.getSuccessUrl(),
                     user.getId(),
                     isNewUser
             );
+
+            // 프론트엔드로 리다이렉트 (세션 쿠키가 자동으로 설정됨)
+            String redirectUrl = successRedirectUrl + "&success=true";
 
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 
