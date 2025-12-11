@@ -23,7 +23,7 @@ public class KeywordSelectWebhookController {
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
-            @RequestHeader(value = WEBHOOK_HEADER, required = false) String authorization,
+            @RequestHeader(value = WEBHOOK_HEADER, required = false) String secretHeader,
             @RequestBody KeywordSelectWebhookRequest request
     ) {
         validateSecret(authorization);
