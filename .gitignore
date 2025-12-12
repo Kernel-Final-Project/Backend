@@ -39,3 +39,6 @@ out/
 
 # Environment variables
 .env
+
+# Docker Compose override (개인 설정)
+docker-compose.override.yml
