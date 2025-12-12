@@ -153,9 +153,11 @@ public class ContentGenerateService {
     private ProductInfo toProductInfo(ProductCrawl productCrawl) {
         ProductInfo info = new ProductInfo();
         info.setProductId(productCrawl.getId());
-        info.setName(productCrawl.getProductName());
-        info.setPrice(productCrawl.getProductPrice() != null ? String.valueOf(productCrawl.getProductPrice()) : null);
-        info.setProductUrl(productCrawl.getProductDetailUrl());
+        info.setProductName(productCrawl.getProductName());
+        info.setProductPrice(productCrawl.getProductPrice() != null ? productCrawl.getProductPrice() : null);
+        info.setProductDetailUrl(productCrawl.getProductDetailUrl());
+        info.setProductCode(productCrawl.getProductCode());
+        info.setProductImageUrl(productCrawl.getProductImageUrl());
         return info;
     }
 
