@@ -4,7 +4,6 @@
 INSERT INTO `user` (`user_id`, `name`, `email`, `status`, `role`, `created_at`, `updated_at`)
 VALUES (1, '김철수', 'user@example.com', 'ACTIVE', 'USER', NOW(), NOW()),
        (2, '관리자', 'admin@example.com', 'ACTIVE', 'ADMIN', NOW(), NOW());
-
 -- ============================================
 -- 2. 인증 정보 (auth)
 -- ============================================
@@ -75,25 +74,25 @@ VALUES
 -- ============================================
 INSERT INTO `workflow` (`workflow_id`,`user_id`, `user_blog_id`, `trend_category_id`, `recurrence_rule_id`, `status`, `site_url`, `is_test`, `deleted_at`, `created_at`, `updated_at`)
 VALUES
-(1, 1, 1, 5, 1, 'PENDING', 'https://www.coupang.com', FALSE, NULL, NOW(), NOW()),
-(2, 2, 2, 6, 2, 'PENDING', 'https://www.11st.co.kr', FALSE, NULL, NOW(), NOW()),
-(3, 1, 3, 3, 3, 'PENDING', 'https://www.gmarket.co.kr', FALSE, NULL, NOW(), NOW()),
-(4, 1, 4, 4, 4, 'ACTIVE', 'https://www.auction.co.kr', FALSE, NULL, NOW(), NOW()),
-(5, 1, 5, 6, 5, 'ACTIVE', 'https://www.ssg.com', FALSE, NULL, NOW(), NOW());
+(1, 2, 1, 5, 1, 'PENDING', 'https://www.musinsa.com', FALSE, NULL, NOW(), NOW()),
+(2, 2, 2, 6, 2, 'PENDING', 'https://www.gmarket.co.kr', FALSE, NULL, NOW(), NOW()),
+(3, 2, 3, 3, 3, 'PENDING', 'https://www.29cm.co.kr', FALSE, NULL, NOW(), NOW()),
+(4, 2, 4, 4, 4, 'ACTIVE', 'https://www.oliveyoung.co.kr', FALSE, NULL, NOW(), NOW()),
+(5, 2, 5, 6, 5, 'ACTIVE', 'https://www.11st.co.kr', FALSE, NULL, NOW(), NOW());
 
 -- ============================================
 -- 8. 작업 (work)
 -- ============================================
 INSERT INTO `work` (`work_id`, `workflow_id`, `status`, `posting_url`, `started_at`, `completed_at`, `view_count`, `created_at`, `updated_at`)
 VALUES (1, 1, 'COMPLETED', 'https://blog.naver.com/user123/123456', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 152, NOW(), NOW()),
-       (2, 1, 'PENDING', NULL, NOW(), NULL, 0, NOW(), NOW()),
+       (2, 1, 'COMPLETED', 'https://blog.naver.com/user123/123457', DATE_SUB(NOW(), INTERVAL 8 DAY), DATE_SUB(NOW(), INTERVAL 8 DAY), 95, NOW(), NOW()),
        (3, 2, 'COMPLETED', 'https://admin.tistory.com/123', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), 287, NOW(), NOW()),
-       (4, 2, 'PENDING', NULL, NOW(), NULL, 0, NOW(), NOW()),
-       (5, 1, 'PENDING', NULL, NOW(), NULL, 0, NOW(), NOW()),
+       (4, 2, 'COMPLETED', 'https://admin.tistory.com/124', DATE_SUB(NOW(), INTERVAL 9 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY), 143, NOW(), NOW()),
+       (5, 1, 'COMPLETED', 'https://blog.naver.com/user123/123458', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY), 221, NOW(), NOW()),
        (6, 3, 'COMPLETED', 'https://blog.naver.com/user123/234567', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY), 89, NOW(), NOW()),
        (7, 3, 'COMPLETED', 'https://blog.naver.com/user123/234568', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY), 124, NOW(), NOW()),
        (8, 4, 'COMPLETED', 'https://blog.naver.com/user123/345678', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_SUB(NOW(), INTERVAL 4 DAY), 203, NOW(), NOW()),
-       (9, 4, 'PENDING', NULL, NOW(), NULL, 0, NOW(), NOW()),
+       (9, 4, 'COMPLETED', 'https://blog.naver.com/user123/345679', DATE_SUB(NOW(), INTERVAL 11 DAY), DATE_SUB(NOW(), INTERVAL 11 DAY), 168, NOW(), NOW()),
        (10, 5, 'COMPLETED', 'https://blog.naver.com/user123/456789', DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY), 176, NOW(), NOW()),
        (11, 5, 'COMPLETED', 'https://blog.naver.com/user123/456790', DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 7 DAY), 312, NOW(), NOW());
 
@@ -139,8 +138,13 @@ VALUES (1, 1, 1, 'HTML 크롤링', '{"url": "https://www.coupang.com"}', 'SUCCES
 -- ============================================
 INSERT INTO `ai_usage_log` (`usage_log_id`, `work_id`, `user_id`, `feature_type`, `model`, `prompt_tokens`,
                             `completion_tokens`, `total_tokens`, `estimated_cost`, `created_at`, `updated_at`)
-VALUES (1, 1, 1, 'CONTENT_GENERATION', 'gpt-4', 150, 500, 650, 0.013000, NOW(), NOW()),
-       (2, 3, 2, 'CONTENT_GENERATION', 'gpt-4', 200, 600, 800, 0.016000, NOW(), NOW());
+VALUES (1, 1, 2, 'CONTENT_GENERATION', 'gpt-4', 150, 500, 650, 0.013000, NOW(), NOW()),
+       (2, 3, 2, 'CONTENT_GENERATION', 'gpt-4', 200, 600, 800, 0.016000, NOW(), NOW()),
+       (3, 6, 2, 'CONTENT_GENERATION', 'gpt-4', 180, 550, 730, 0.014600, NOW(), NOW()),
+       (4, 7, 2, 'CONTENT_GENERATION', 'gpt-4', 160, 520, 680, 0.013600, NOW(), NOW()),
+       (5, 8, 2, 'CONTENT_GENERATION', 'gpt-4', 190, 580, 770, 0.015400, NOW(), NOW()),
+       (6, 10, 2, 'CONTENT_GENERATION', 'gpt-4', 170, 540, 710, 0.014200, NOW(), NOW()),
+       (7, 11, 2, 'CONTENT_GENERATION', 'gpt-4', 200, 600, 800, 0.016000, NOW(), NOW());
 
 -- ============================================
 -- 13. 공지사항 (notice)
@@ -178,7 +182,8 @@ VALUES (1, 'EXECUTION_STATUS', '실행 상태', NOW(), NOW()),
        (7, 'REPEAT_TYPE', '반복 유형', NOW(), NOW()),
        (8, 'WORKFLOW_STATUS', '워크플로우 상태', NOW(), NOW()),
        (9, 'LOG_LEVEL', '로그 레벨', NOW(), NOW()),
-       (10, 'STEP_STATUS', '단계 실행 상태', NOW(), NOW());
+       (10, 'STEP_STATUS', '단계 실행 상태', NOW(), NOW()),
+       (11, 'SITE_URL_INFO', '쇼핑몰 사이트 정보', NOW(), NOW());
 
 -- ============================================
 -- 17. 공통 코드 (common_code)
@@ -241,7 +246,18 @@ VALUES
 ('SUCCESS', 10, '성공', '단계 실행 성공', 1, TRUE, NOW(), NOW()),
 ('STEP_FAILED', 10, '실패', '단계 실행 실패', 2, TRUE, NOW(), NOW()),
 ('SKIPPED', 10, '건너뜀', '단계 건너뜀', 3, TRUE, NOW(), NOW()),
-('RETRY', 10, '재시도', '재시도 중', 4, TRUE, NOW(), NOW());
+('RETRY', 10, '재시도', '재시도 중', 4, TRUE, NOW(), NOW()),
+-- SITE_URL_INFO
+('MUSINSA', 11, '무신사', 'https://www.musinsa.com', 1, TRUE, NOW(), NOW()),
+('GMARKET', 11, 'G마켓', 'https://www.gmarket.co.kr', 2, TRUE, NOW(), NOW()),
+('TWENTY_NINE_CM', 11, '29CM', 'https://www.29cm.co.kr', 3, TRUE, NOW(), NOW()),
+('OLIVEYOUNG', 11, '올리브영', 'https://www.oliveyoung.co.kr', 4, TRUE, NOW(), NOW()),
+('ELEVEN_ST', 11, '11번가', 'https://www.11st.co.kr', 5, TRUE, NOW(), NOW()),
+('SSG', 11, 'SSG', 'https://www.ssg.com', 6, TRUE, NOW(), NOW()),
+('EQL', 11, 'EQL', 'https://www.eql.kr', 7, TRUE, NOW(), NOW()),
+('KREAM', 11, '크림', 'https://kream.co.kr', 8, TRUE, NOW(), NOW()),
+('ZIGZAG', 11, '지그재그', 'https://www.zigzag.kr', 9, TRUE, NOW(), NOW()),
+('SSADAGU', 11, '싸다구', 'https://www.sadagu.kr', 10, TRUE, NOW(), NOW());
 
 -- ============================================
 -- 18. 시스템 로그 (system_logs)
