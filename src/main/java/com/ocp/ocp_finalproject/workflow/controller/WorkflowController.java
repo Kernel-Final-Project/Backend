@@ -5,6 +5,7 @@ import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.UNAUTHORIZED;
@@ -111,7 +113,7 @@ public class WorkflowController {
     /**
      * 워크플로우 삭제(논리 삭제)
      */
-    @DeleteMapping("/{workflowId}/delete")
+    @DeleteMapping("/{workflowId}")
     public ResponseEntity<ApiResult<WorkflowStatusResponse>> deleteWorkflow(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId
@@ -124,7 +126,7 @@ public class WorkflowController {
     }
 
     /**
-     * 트렌드 목록 조회(워크플로우 등록 페이지)
+     * 트렌드 카테고리 조회(워크플로우 등록 페이지)
      */
     @GetMapping("/trend-category")
     public ResponseEntity<ApiResult<List<TrendCategoryResponse>>> getTrendCategories() {
@@ -151,6 +153,18 @@ public class WorkflowController {
         }
 
         return principal.getUser().getId();
+    }
+
+    /**
+     * 사이트 정보
+     */
+    @GetMapping("/site-info")
+    public ResponseEntity<ApiResult<List<SiteUrlResponse>>> getSiteInfo() {
+
+        List<SiteUrlResponse> siteList = Arrays.stream(SiteUrlInfo.values())
+                .map(SiteUrlResponse::from)
+                .toList();
+        return ResponseEntity.ok(ApiResult.success("사이트 목록 조회", siteList));
     }
 
 }

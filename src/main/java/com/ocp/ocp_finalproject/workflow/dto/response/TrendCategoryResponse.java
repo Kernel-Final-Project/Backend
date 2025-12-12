@@ -12,17 +12,17 @@ import java.util.List;
 @AllArgsConstructor
 public class TrendCategoryResponse {
 
-    private Long trendCategoryId;
+    private Long categoryId;
 
-    private String trendCategoryName;
+    private String categoryName;
 
-    private List<TrendCategoryResponse> childrenCategory;
+    private List<TrendCategoryResponse> children;
 
     public static TrendCategoryResponse from(TrendCategory category) {
         return TrendCategoryResponse.builder()
-                .trendCategoryId(category.getId())
-                .trendCategoryName(category.getTrendCategoryName())
-                .childrenCategory(category.getChildrenCategory()
+                .categoryId(category.getId())
+                .categoryName(category.getTrendCategoryName())
+                .children(category.getChildrenCategory()
                         .stream()
                         .map(TrendCategoryResponse::from) // 재귀 호출
                         .toList())

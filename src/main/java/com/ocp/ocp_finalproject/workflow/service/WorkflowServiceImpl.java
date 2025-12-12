@@ -14,6 +14,7 @@ import com.ocp.ocp_finalproject.workflow.domain.*;
 import com.ocp.ocp_finalproject.workflow.dto.*;
 import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
@@ -54,15 +55,27 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         PageRequest pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<WorkflowListResponse> workflows = workflowRepository.findWorkflows(user.getId(), pageable);
 
-        return workflowRepository.findWorkflows(user.getId(), pageable);
+        return workflows.map(wf -> WorkflowListResponse.builder()
+                .workflowId(wf.getWorkflowId())
+                .userId(wf.getUserId())
+                .siteUrl(wf.getSiteUrl())
+                .siteName(SiteUrlInfo.getSiteNameFromUrl(wf.getSiteUrl()))
+                .blogType(wf.getBlogType())
+                .blogUrl(wf.getBlogUrl())
+                .trendCategoryName(wf.getTrendCategoryName())
+                .blogAccountId(wf.getBlogAccountId())
+                .readableRule(wf.getReadableRule())
+                .status(wf.getStatus())
+                .build());
     }
 
     @Override
     @Transactional(readOnly = true)
     public WorkflowEditResponse getWorkflow(Long workflowId, Long userId) {
 
-        Workflow workflow = workflowRepository.findWorkflow(workflowId, userId)
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
         User user = workflow.getUser();
@@ -127,6 +140,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @Transactional
     public WorkflowResponse updateWorkflow(Long userId,
                                            Long workflowId,
                                            WorkflowRequest workflowRequest) throws SchedulerException {
@@ -141,7 +155,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     protected Workflow updateWorkflowTransaction(Long userId, Long workflowId,
                                                  WorkflowRequest workflowRequest) {
-        Workflow workflow = workflowRepository.findWorkflow(workflowId, userId)
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
         UserBlog userBlog = upsertUserBlog(workflowRequest);

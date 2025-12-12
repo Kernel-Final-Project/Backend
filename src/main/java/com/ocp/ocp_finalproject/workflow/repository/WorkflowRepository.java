@@ -33,7 +33,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN wf.recurrenceRule rr
             JOIN wf.userBlog ub
             LEFT JOIN ub.blogType bt
-            WHERE u.id = :userId
+            WHERE u.id = :userId AND wf.status != 'DELETED'
     """)
     Page<WorkflowListResponse> findWorkflows(@Param("userId") Long userId, Pageable pageable);
 
@@ -45,9 +45,9 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN FETCH wf.recurrenceRule rr
             JOIN FETCH wf.userBlog ub
             LEFT JOIN FETCH ub.blogType bt
-            WHERE wf.id = :workflowId and u.id = :userId
+            WHERE u.id = :userId AND wf.id = :workflowId
     """)
-    Optional<Workflow> findWorkflow(@Param("workflowId") Long workflowId, @Param("userId") Long userId);
+    Optional<Workflow> findWorkflow(@Param("userId") Long userId, @Param("workflowId") Long workflowId);
 
     /**
      *
