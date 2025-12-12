@@ -12,11 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 public class SetTrendCategoryDto {
 
-    private String depth1Category;
+    private Long depth1Category;
 
-    private String depth2Category;
+    private Long depth2Category;
 
-    private String depth3Category;
+    private Long depth3Category;
 
     public static SetTrendCategoryDto from(TrendCategory category) {
 
@@ -24,9 +24,9 @@ public class SetTrendCategoryDto {
         TrendCategory d1 = (d2 != null) ? d2.getParentCategory() : null;
 
         return SetTrendCategoryDto.builder()
-                .depth1Category(d1 != null ? d1.getTrendCategoryName() : null)
-                .depth2Category(d2 != null ? d2.getTrendCategoryName() : null)
-                .depth3Category(category.getTrendCategoryName())
+                .depth1Category(d1 != null ? d1.getId() : null)
+                .depth2Category(d2 != null ? d2.getId() : null)
+                .depth3Category(category.getId())
                 .build();
     }
 
