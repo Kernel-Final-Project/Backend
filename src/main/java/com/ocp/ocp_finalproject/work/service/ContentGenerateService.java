@@ -22,11 +22,7 @@ import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -123,11 +119,22 @@ public class ContentGenerateService {
     }
 
     private List<ProductInfo> fetchCrawledProducts(Workflow workflow) {
+        // 1) site_url에서 지원 사이트 추출
         Optional<String> siteName = resolveSupportedSite(workflow.getSiteUrl());
         if (siteName.isEmpty()) {
             return Collections.emptyList();
         }
+
+        // 2) 최근 ai_content 의 choiceProduct 목록 조회 (이미 사용된 상품)
+        List<String> usedProducts = aiContentRepository.findRecentChoiceProductsByWorkflowId(workflow.getId());
+        Set<String> usedProductSet = usedProducts.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 3) 해당 사이트의 모든 크롤링 데이터 조회 후
+        //    이미 사용된 상품(choiceProduct) 목록은 제외
         return productCrawlRepository.findBySiteNameIgnoreCase(siteName.get()).stream()
+                .filter(product -> !usedProductSet.contains(product.getProductName()))
                 .map(this::toProductInfo)
                 .collect(Collectors.toList());
     }
