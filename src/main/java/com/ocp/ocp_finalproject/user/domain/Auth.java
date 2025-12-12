@@ -12,7 +12,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "auth")
+@Table(name = "auth",
+       uniqueConstraints = @UniqueConstraint(
+           name = "uk_auth_provider_user",
+           columnNames = {"provider", "provider_user_id"}
+       ))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Auth extends BaseEntity {

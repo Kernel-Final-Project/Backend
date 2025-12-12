@@ -18,9 +18,8 @@ public class NoticeCreateRequest {
 
     private String announcementType;
     private Boolean isImportant;
-    private Long authorId;
 
-    public Notice toEntity() {
+    public Notice toEntity(Long authorId) {
         return Notice.createBuilder()
                 .title(title)
                 .content(content)
