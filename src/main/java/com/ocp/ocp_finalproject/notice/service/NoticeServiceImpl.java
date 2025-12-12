@@ -9,11 +9,16 @@ import com.ocp.ocp_finalproject.notice.dto.request.NoticeUpdateRequest;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.repository.NoticeFileRepository;
 import com.ocp.ocp_finalproject.notice.repository.NoticeRepository;
+import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,21 +26,47 @@ public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final NoticeFileRepository noticeFileRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<NoticeResponse> getAllNotice() {
+        // 1. Notice 전체 조회
+        List<Notice> notices = noticeRepository.findAllWithFiles();
 
-        return noticeRepository.findAllWithFiles().stream()
-                .map(NoticeResponse::from)
+        // 2. authorId 추출 (중복 제거)
+        Set<Long> authorIds = notices.stream()
+                .map(Notice::getAuthorId)
+                .collect(Collectors.toSet());
+
+        // 3. User 일괄 조회 (N+1 방지)
+        Map<Long, String> authorNameMap = userRepository.findAllById(authorIds).stream()
+                .collect(Collectors.toMap(User::getId, User::getName));
+
+        // 4. Notice -> NoticeResponse 변환
+        return notices.stream()
+                .map(notice -> {
+                    String authorName = authorNameMap.getOrDefault(
+                            notice.getAuthorId(),
+                            "알 수 없음"
+                    );
+                    return NoticeResponse.of(notice, authorName);
+                })
                 .toList();
     }
 
     @Override
     public NoticeResponse getNotice(Long noticeId) {
+        // 1. Notice 조회
         Notice notice = noticeRepository.findByIdWithFiles(noticeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
 
-        return NoticeResponse.from(notice);
+        // 2. User 조회
+        String authorName = userRepository.findById(notice.getAuthorId())
+                .map(User::getName)
+                .orElse("알 수 없음");
+
+        // 3. Response 생성
+        return NoticeResponse.of(notice, authorName);
     }
 
     /**
@@ -66,8 +97,14 @@ public class NoticeServiceImpl implements NoticeService {
             savedNotice.addNoticeFile(file);
 
         }
-        // 4. 저장된 Notices -> DTO 변환 후 반환
-        return NoticeResponse.from(savedNotice);
+
+        // 4. User 조회
+        String authorName = userRepository.findById(savedNotice.getAuthorId())
+                .map(User::getName)
+                .orElse("알 수 없음");
+
+        // 5. 저장된 Notices -> DTO 변환 후 반환
+        return NoticeResponse.of(savedNotice, authorName);
     }
     /**
      * 공지사항 삭제
@@ -121,6 +158,12 @@ public class NoticeServiceImpl implements NoticeService {
             );
         }
 
-        return NoticeResponse.from(notice);
+        // 3. User 조회
+        String authorName = userRepository.findById(notice.getAuthorId())
+                .map(User::getName)
+                .orElse("알 수 없음");
+
+        // 4. Response 생성
+        return NoticeResponse.of(notice, authorName);
     }
 }

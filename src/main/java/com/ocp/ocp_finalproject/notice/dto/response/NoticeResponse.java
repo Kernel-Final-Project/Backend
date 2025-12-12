@@ -14,7 +14,7 @@ public class NoticeResponse {
     private String content;
     private String announcementType;
     private Boolean isImportant;
-    private Long authorId;
+    private String userName;
     private Integer viewCount;
     private String attachmentUrl;
     private LocalDateTime createdAt;
@@ -22,14 +22,14 @@ public class NoticeResponse {
 
     private NoticeFileResponse noticeFile;
 
-    public static NoticeResponse from(Notice notice) {
+    public static NoticeResponse of(Notice notice, String authorName) {
         return NoticeResponse.builder()
                 .noticeId(notice.getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .announcementType(notice.getAnnouncementType())
                 .isImportant(notice.getIsImportant())
-                .authorId(notice.getAuthorId())
+                .userName(authorName)
                 .viewCount(notice.getViewCount())
                 .attachmentUrl(notice.getAttachmentUrl())
                 .createdAt(notice.getCreatedAt())
