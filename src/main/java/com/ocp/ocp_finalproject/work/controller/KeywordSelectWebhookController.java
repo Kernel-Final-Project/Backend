@@ -23,10 +23,10 @@ public class KeywordSelectWebhookController {
 
     @PostMapping
     public ApiResult<Void> handleWebhook(
-            @RequestHeader(value = WEBHOOK_HEADER, required = false) String authorization,
+            @RequestHeader(value = WEBHOOK_HEADER, required = false) String secretHeader,
             @RequestBody KeywordSelectWebhookRequest request
     ) {
-        validateSecret(authorization);
+        validateSecret(secretHeader);
         webhookService.handleResult(request);
         return ApiResult.success("키워드 선택 결과를 처리했습니다.");
     }

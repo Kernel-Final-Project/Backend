@@ -69,7 +69,7 @@ spring:
 
 oauth2:
   redirect:
-    success-url: http://localhost:8080/api/v1/auth/me
+    success-url: http://localhost:5173/oauth2/callback?success=true
     failure-url: http://localhost:8080/login/failure
 
 
