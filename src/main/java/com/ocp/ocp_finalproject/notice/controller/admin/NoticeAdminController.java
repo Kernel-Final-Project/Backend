@@ -5,8 +5,10 @@ import com.ocp.ocp_finalproject.notice.dto.request.NoticeCreateRequest;
 import com.ocp.ocp_finalproject.notice.dto.request.NoticeUpdateRequest;
 import com.ocp.ocp_finalproject.notice.dto.response.NoticeResponse;
 import com.ocp.ocp_finalproject.notice.service.NoticeService;
+import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +32,19 @@ public class NoticeAdminController {
      * 공지사항 등록
      */
     @PostMapping
-    public ResponseEntity<ApiResult<NoticeResponse>> createNotice(@RequestBody NoticeCreateRequest request) {
-        return ResponseEntity.ok(ApiResult.success("공지사항 등록 성공", noticeService.createNotice(request))
+    public ResponseEntity<ApiResult<NoticeResponse>> createNotice(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody NoticeCreateRequest request
+    ) {
+        // principal null 체크
+        if (principal == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResult.error("인증이 필요합니다"));
+        }
+
+        Long authorId = principal.getUser().getId();
+        return ResponseEntity.ok(
+                ApiResult.success("공지사항 등록 성공", noticeService.createNotice(request, authorId))
         );
     }
 

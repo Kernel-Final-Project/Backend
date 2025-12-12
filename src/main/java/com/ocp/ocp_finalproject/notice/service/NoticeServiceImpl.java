@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,9 +34,10 @@ public class NoticeServiceImpl implements NoticeService {
         // 1. Notice 전체 조회
         List<Notice> notices = noticeRepository.findAllWithFiles();
 
-        // 2. authorId 추출 (중복 제거)
+        // 2. authorId 추출 (중복 제거, null 필터링)
         Set<Long> authorIds = notices.stream()
                 .map(Notice::getAuthorId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         // 3. User 일괄 조회 (N+1 방지)
@@ -60,10 +62,12 @@ public class NoticeServiceImpl implements NoticeService {
         Notice notice = noticeRepository.findByIdWithFiles(noticeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
 
-        // 2. User 조회
-        String authorName = userRepository.findById(notice.getAuthorId())
-                .map(User::getName)
-                .orElse("알 수 없음");
+        // 2. User 조회 (authorId null 체크)
+        String authorName = notice.getAuthorId() != null
+                ? userRepository.findById(notice.getAuthorId())
+                        .map(User::getName)
+                        .orElse("알 수 없음")
+                : "알 수 없음";
 
         // 3. Response 생성
         return NoticeResponse.of(notice, authorName);
@@ -74,10 +78,10 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     @Transactional
-    public NoticeResponse createNotice(NoticeCreateRequest request) {
+    public NoticeResponse createNotice(NoticeCreateRequest request, Long authorId) {
 
-        // 1. 공지사항 엔티티 생성
-        Notice notice = request.toEntity();
+        // 1. 공지사항 엔티티 생성 (authorId 전달)
+        Notice notice = request.toEntity(authorId);
 
         // 2. 공지사항 저장
         Notice savedNotice = noticeRepository.save(notice);
@@ -98,10 +102,12 @@ public class NoticeServiceImpl implements NoticeService {
 
         }
 
-        // 4. User 조회
-        String authorName = userRepository.findById(savedNotice.getAuthorId())
-                .map(User::getName)
-                .orElse("알 수 없음");
+        // 4. User 조회 (authorId null 체크)
+        String authorName = savedNotice.getAuthorId() != null
+                ? userRepository.findById(savedNotice.getAuthorId())
+                        .map(User::getName)
+                        .orElse("알 수 없음")
+                : "알 수 없음";
 
         // 5. 저장된 Notices -> DTO 변환 후 반환
         return NoticeResponse.of(savedNotice, authorName);
@@ -158,10 +164,12 @@ public class NoticeServiceImpl implements NoticeService {
             );
         }
 
-        // 3. User 조회
-        String authorName = userRepository.findById(notice.getAuthorId())
-                .map(User::getName)
-                .orElse("알 수 없음");
+        // 3. User 조회 (authorId null 체크)
+        String authorName = notice.getAuthorId() != null
+                ? userRepository.findById(notice.getAuthorId())
+                        .map(User::getName)
+                        .orElse("알 수 없음")
+                : "알 수 없음";
 
         // 4. Response 생성
         return NoticeResponse.of(notice, authorName);
