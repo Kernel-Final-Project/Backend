@@ -83,6 +83,12 @@ oauth2:
     success-url: http://localhost:5173/oauth2/callback
     failure-url: http://localhost:5173/oauth2/callback
 
+airflow:
+  api:
+    base-url: ${AIRFLOW_BASE_URL:http://localhost:8081}
+    username: ${AIRFLOW_USERNAME:airflow}
+    password: ${AIRFLOW_PASSWORD:airflow}
+
 
 app:
   rabbit:
