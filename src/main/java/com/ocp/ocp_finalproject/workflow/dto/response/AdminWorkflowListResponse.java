@@ -19,6 +19,8 @@ public class AdminWorkflowListResponse {
 
     private final Long userId;
 
+    private final String userName;
+
     private String siteName;
 
     private final String siteUrl;

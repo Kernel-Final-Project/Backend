@@ -65,6 +65,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             SELECT new com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse(
                 wf.id,
                 u.id,
+                u.name,
                 wf.siteUrl,
                 tc.trendCategoryName,
                 bt.blogTypeName,
@@ -79,7 +80,6 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN wf.recurrenceRule rr
             JOIN wf.userBlog ub
             LEFT JOIN ub.blogType bt
-            WHERE u.id = :userId
     """)
     Page<AdminWorkflowListResponse> findWorkflowsForAdmin(@Param("userId") Long userId, Pageable pageable);
 

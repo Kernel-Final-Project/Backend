@@ -38,6 +38,7 @@ public class AdminWorkflowImpl implements AdminWorkflowService {
         return workflows.map(wf -> AdminWorkflowListResponse.builder()
                 .workflowId(wf.getWorkflowId())
                 .userId(wf.getUserId())
+                .userName(wf.getUserName())
                 .siteUrl(wf.getSiteUrl())
                 .siteName(SiteUrlInfo.getSiteNameFromUrl(wf.getSiteUrl()))
                 .trendCategoryName(wf.getTrendCategoryName())
