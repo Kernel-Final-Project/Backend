@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.workflow.repository;
 
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,9 +51,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     Optional<Workflow> findWorkflow(@Param("userId") Long userId, @Param("workflowId") Long workflowId);
 
     /**
-     *
-     * 해당 메서드는 SpringBoot가 실행될 때 활성화된 Workflow를 Quartz 스케줄링하기 위해서 사용되는 메서드
-     *
+     * SpringBoot가 실행될 때 활성화된 Workflow를 Quartz 스케줄링하기 위해서 사용되는 메서드
      * */
     @Query("""
         SELECT wf
@@ -61,5 +60,27 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
         WHERE wf.status = 'ACTIVE'
     """)
     List<Workflow> findAllActive();
+
+    @Query("""
+            SELECT new com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse(
+                wf.id,
+                u.id,
+                wf.siteUrl,
+                tc.trendCategoryName,
+                bt.blogTypeName,
+                ub.accountId,
+                ub.blogUrl,
+                rr.readableRule,
+                wf.status
+            )
+            FROM Workflow wf
+            JOIN wf.user u
+            JOIN wf.trendCategory tc
+            LEFT JOIN wf.recurrenceRule rr
+            JOIN wf.userBlog ub
+            LEFT JOIN ub.blogType bt
+            WHERE u.id = :userId
+    """)
+    Page<AdminWorkflowListResponse> findWorkflowsForAdmin(@Param("userId") Long userId, Pageable pageable);
 
 }
