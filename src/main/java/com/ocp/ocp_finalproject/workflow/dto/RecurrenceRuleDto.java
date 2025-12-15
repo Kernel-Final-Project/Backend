@@ -5,30 +5,31 @@ import com.ocp.ocp_finalproject.workflow.enums.RepeatType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class RecurrenceRuleDto {
-    private RepeatType repeatType;
+    private final RepeatType repeatType;
 
-    private Integer repeatInterval;
+    private final Integer repeatInterval;
 
-    private List<Integer> daysOfWeek;
+    private final List<Integer> daysOfWeek;
 
-    private List<Integer> daysOfMonth;
+    private final List<Integer> daysOfMonth;
 
-    private List<String> timesOfDay;
+    private final List<String> timesOfDay;
 
-    private LocalDateTime startAt;
+    private final LocalDateTime startAt;
 
-    private LocalDateTime endAt;
+    private final LocalDateTime endAt;
+
+    private String readableRule;
 
     public static RecurrenceRuleDto from(RecurrenceRule rule) {
         return RecurrenceRuleDto.builder()
@@ -39,6 +40,7 @@ public class RecurrenceRuleDto {
                 .timesOfDay(rule.getTimesOfDay())
                 .startAt(rule.getStartAt())
                 .endAt(rule.getEndAt())
+                .readableRule(rule.getReadableRule())
                 .build();
     }
 
