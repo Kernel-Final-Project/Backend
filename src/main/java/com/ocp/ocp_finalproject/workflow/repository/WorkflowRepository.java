@@ -81,6 +81,31 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             JOIN wf.userBlog ub
             LEFT JOIN ub.blogType bt
     """)
-    Page<AdminWorkflowListResponse> findWorkflowsForAdmin(@Param("userId") Long userId, Pageable pageable);
+    Page<AdminWorkflowListResponse> findWorkflowsForAdmin(Pageable pageable);
 
+    @Query("""
+            SELECT new com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse(
+                wf.id,
+                u.id,
+                u.name,
+                wf.siteUrl,
+                tc.trendCategoryName,
+                bt.blogTypeName,
+                ub.accountId,
+                ub.blogUrl,
+                rr.readableRule,
+                wf.status
+            )
+            FROM Workflow wf
+            JOIN wf.user u
+            JOIN wf.trendCategory tc
+            LEFT JOIN wf.recurrenceRule rr
+            JOIN wf.userBlog ub
+            LEFT JOIN ub.blogType bt
+            WHERE u.id = :userId
+    """)
+    Page<AdminWorkflowListResponse> findWorkflowsForAdminByUserId(
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
 }

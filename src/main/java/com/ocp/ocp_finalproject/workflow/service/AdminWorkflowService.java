@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 
 public interface AdminWorkflowService {
 
-    Page<AdminWorkflowListResponse> getWorkflows(UserPrincipal principal, int page);
+    Page<AdminWorkflowListResponse> getWorkflows(UserPrincipal principal, int page, Long userId);
 }

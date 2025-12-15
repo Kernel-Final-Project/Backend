@@ -24,12 +24,13 @@ public class AdminWorkflowController {
      * 워크플로우 목록 조회(관리자)
      */
     @GetMapping
-    public ResponseEntity<ApiResult<Page<AdminWorkflowListResponse>>> getWorkflows(
+    public ResponseEntity<ApiResult<Page<AdminWorkflowListResponse>>> Ï(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestParam(value = "page", defaultValue = "0") int page
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(required = false) Long userId
     ) {
 
-        Page<AdminWorkflowListResponse> workflowList = workflowService.getWorkflows(principal, page);
+        Page<AdminWorkflowListResponse> workflowList = workflowService.getWorkflows(principal, page, userId);
 
         return ResponseEntity.ok(ApiResult.success("워크플로우 목록 조회 성공(관리자)", workflowList));
     }
