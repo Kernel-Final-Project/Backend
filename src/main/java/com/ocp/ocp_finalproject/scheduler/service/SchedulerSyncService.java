@@ -2,10 +2,16 @@ package com.ocp.ocp_finalproject.scheduler.service;
 
 import com.ocp.ocp_finalproject.scheduler.job.BlogUploadJob;
 import com.ocp.ocp_finalproject.scheduler.job.ContentGenerationJob;
+import com.ocp.ocp_finalproject.scheduler.job.WorkflowActivationJob;
+import com.ocp.ocp_finalproject.scheduler.job.WorkflowExpirationJob;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.util.RecurrenceRuleCronConverter;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +24,16 @@ import org.springframework.stereotype.Service;
 public class SchedulerSyncService {
 
     private static final Duration CONTENT_JOB_OFFSET = Duration.ofHours(-1);
+    private static final String CONTENT_JOB_PREFIX = "content-generate-";
+    private static final String CONTENT_TRIGGER_PREFIX = "content-generate-trigger-";
+    private static final String UPLOAD_JOB_PREFIX = "blog-upload-";
+    private static final String UPLOAD_TRIGGER_PREFIX = "blog-upload-trigger-";
+    private static final String EXPIRATION_JOB_PREFIX = "workflow-expiration-";
+    private static final String EXPIRATION_TRIGGER_PREFIX = "workflow-expiration-trigger-";
+    private static final String ACTIVATION_JOB_PREFIX = "workflow-activation-";
+    private static final String ACTIVATION_TRIGGER_PREFIX = "workflow-activation-trigger-";
 
+    private  final WorkflowRepository workflowRepository;
     private final Scheduler scheduler;
 
     public void startSchedulerIfNeeded() throws SchedulerException {
@@ -27,11 +42,23 @@ public class SchedulerSyncService {
         }
     }
 
+    public void registerWorkflowJobs(Long workflowId) throws SchedulerException {
+        Workflow workflow = workflowRepository.findByIdWithRecurrenceRule(workflowId)
+                .orElseThrow();
+
+        registerWorkflowJobs(workflow);
+    }
+
     public void registerWorkflowJobs(Workflow workflow) throws SchedulerException {
+        if (workflow.getStatus() != WorkflowStatus.ACTIVE) {
+            throw new IllegalStateException("ACTIVE 상태의 워크플로우만 스케줄링할 수 있습니다. id=" + workflow.getId());
+        }
+
+        removeActivationJob(workflow.getId());
 
         // 1. 콘텐츠 생성 Job/Trigger 생성 (블로그 업로드보다 1시간 빠르게 실행)
         JobDetail contentJob = JobBuilder.newJob(ContentGenerationJob.class)
-                .withIdentity("content-generate-" + workflow.getId())
+                .withIdentity(CONTENT_JOB_PREFIX + workflow.getId())
                 .usingJobData("workflowId", workflow.getId())
                 .storeDurably()
                 .build();
@@ -44,7 +71,7 @@ public class SchedulerSyncService {
         List<Trigger> contentTriggers = buildTriggers(
                 contentJob,
                 contentCronExpressions,
-                "content-generate-trigger-" + workflow.getId()
+                CONTENT_TRIGGER_PREFIX + workflow.getId()
         );
         if (scheduler.checkExists(contentJob.getKey())) {
             scheduler.deleteJob(contentJob.getKey());
@@ -53,7 +80,7 @@ public class SchedulerSyncService {
 
         // 2. 블로그 업로드 Job
         JobDetail uploadJob = JobBuilder.newJob(BlogUploadJob.class)
-                .withIdentity("blog-upload-" + workflow.getId())
+                .withIdentity(UPLOAD_JOB_PREFIX + workflow.getId())
                 .usingJobData("workflowId", workflow.getId())
                 .storeDurably()
                 .build();
@@ -65,7 +92,7 @@ public class SchedulerSyncService {
         List<Trigger> uploadTriggers = buildTriggers(
                 uploadJob,
                 cronExpressions,
-                "blog-upload-trigger-" + workflow.getId()
+                UPLOAD_TRIGGER_PREFIX + workflow.getId()
         );
 
         if (scheduler.checkExists(uploadJob.getKey())) {
@@ -73,17 +100,68 @@ public class SchedulerSyncService {
         }
         Set<Trigger> triggerSet = new HashSet<>(uploadTriggers);
         scheduler.scheduleJob(uploadJob, triggerSet, true);
+
+        // 3. 만료 Job
+        registerExpirationJob(workflow);
     }
 
-    public void updateWorkflowJobs(Workflow workflow) throws SchedulerException {
-        removeWorkflowJobs(workflow.getId());
-        registerWorkflowJobs(workflow);
+    public void updateWorkflowJobs(Long workflowId) throws SchedulerException {
+        removeWorkflowJobs(workflowId);
+        registerWorkflowJobs(workflowId);
     }
 
     public void removeWorkflowJobs(Long workflowId) {
         try {
-            scheduler.deleteJob(new JobKey("content-generate-" + workflowId));
-            scheduler.deleteJob(new JobKey("blog-upload-" + workflowId));
+            scheduler.deleteJob(new JobKey(CONTENT_JOB_PREFIX + workflowId));
+            scheduler.deleteJob(new JobKey(UPLOAD_JOB_PREFIX + workflowId));
+            scheduler.deleteJob(new JobKey(EXPIRATION_JOB_PREFIX + workflowId));
+        } catch (SchedulerException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public void registerActivationJob(Long workflowId) throws SchedulerException {
+        Workflow workflow = workflowRepository.findByIdWithRecurrenceRule(workflowId)
+                .orElseThrow();
+        registerActivationJob(workflow);
+    }
+
+    public void registerActivationJob(Workflow workflow) throws SchedulerException {
+        if (workflow.getRecurrenceRule() == null || workflow.getRecurrenceRule().getStartAt() == null) {
+            removeActivationJob(workflow.getId());
+            throw new IllegalStateException("워크플로우에 startAt 정보가 없습니다. id=" + workflow.getId());
+        }
+        if (workflow.getStatus() != WorkflowStatus.PENDING) {
+            removeActivationJob(workflow.getId());
+            return;
+        }
+
+        removeWorkflowJobs(workflow.getId());
+
+        JobKey jobKey = new JobKey(ACTIVATION_JOB_PREFIX + workflow.getId());
+        JobDetail activationJob = JobBuilder.newJob(WorkflowActivationJob.class)
+                .withIdentity(jobKey)
+                .usingJobData("workflowId", workflow.getId())
+                .build();
+
+        Trigger activationTrigger = TriggerBuilder.newTrigger()
+                .withIdentity(ACTIVATION_TRIGGER_PREFIX + workflow.getId())
+                .forJob(activationJob)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withMisfireHandlingInstructionFireNow())
+                .startAt(Date.from(workflow.getRecurrenceRule().getStartAt()
+                        .atZone(ZoneId.systemDefault()).toInstant()))
+                .build();
+
+        if (scheduler.checkExists(jobKey)) {
+            scheduler.deleteJob(jobKey);
+        }
+        scheduler.scheduleJob(activationJob, activationTrigger);
+    }
+
+    public void removeActivationJob(Long workflowId) {
+        try {
+            scheduler.deleteJob(new JobKey(ACTIVATION_JOB_PREFIX + workflowId));
         } catch (SchedulerException e) {
             throw new IllegalStateException(e);
         }
@@ -101,5 +179,37 @@ public class SchedulerSyncService {
             triggers.add(trigger);
         }
         return triggers;
+    }
+
+    private void registerExpirationJob(Workflow workflow) throws SchedulerException {
+        if (workflow.getRecurrenceRule() == null || workflow.getRecurrenceRule().getEndAt() == null) {
+            removeExpirationJob(workflow.getId());
+            return;
+        }
+
+        JobDetail expirationJob = JobBuilder.newJob(WorkflowExpirationJob.class)
+                .withIdentity(EXPIRATION_JOB_PREFIX + workflow.getId())
+                .usingJobData("workflowId", workflow.getId())
+                .storeDurably()
+                .build();
+
+        Trigger expirationTrigger = TriggerBuilder.newTrigger()
+                .withIdentity(EXPIRATION_TRIGGER_PREFIX + workflow.getId())
+                .forJob(expirationJob)
+                .startAt(Date.from(workflow.getRecurrenceRule().getEndAt()
+                        .atZone(ZoneId.systemDefault()).toInstant()))
+                .build();
+
+        if (scheduler.checkExists(expirationJob.getKey())) {
+            scheduler.deleteJob(expirationJob.getKey());
+        }
+        scheduler.scheduleJob(expirationJob, expirationTrigger);
+    }
+
+    private void removeExpirationJob(Long workflowId) throws SchedulerException {
+        JobKey expirationJobKey = new JobKey(EXPIRATION_JOB_PREFIX + workflowId);
+        if (scheduler.checkExists(expirationJobKey)) {
+            scheduler.deleteJob(expirationJobKey);
+        }
     }
 }
