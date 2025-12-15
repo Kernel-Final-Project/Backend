@@ -17,6 +17,7 @@ import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
+import com.ocp.ocp_finalproject.workflow.util.AesCryptoUtil;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final UserBlogRepository userBlogRepository;
     private final RecurrenceRuleValidator validator;
     private final SchedulerSyncService schedulerSyncService;
+    private final AesCryptoUtil aesCryptoUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -114,7 +116,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
                 .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
 
-        String encryptedPassword = passwordEncoder.encode(workflowRequest.getBlogAccountPwd());
+        String encryptedPassword = aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd());
 
         UserBlog userBlog = UserBlog.create(blogType,
                 workflowRequest.getBlogAccountId(),
