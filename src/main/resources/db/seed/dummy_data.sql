@@ -33,14 +33,14 @@ VALUES (1, 1, 'user123', 'password123', 'https://blog.naver.com/user123', NOW(),
 -- ============================================
 -- 5. 트렌드 카테고리 (trend_category)
 -- ============================================
-# INSERT INTO `trend_category` (`trend_category_id`, `parent_category_id`, `trend_category_name`, `depth`, `created_at`,
-#                               `updated_at`)
-# VALUES (1, NULL, '패션/뷰티', 1, NOW(), NOW()),
-#        (2, NULL, '디지털/가전', 1, NOW(), NOW()),
-#        (3, 1, '여성패션', 2, NOW(), NOW()),
-#        (4, 2, '스마트폰', 2, NOW(), NOW()),
-#        (5, 3, '원피스', 3, NOW(), NOW()),
-#        (6, 4, '갤럭시', 3, NOW(), NOW());
+INSERT INTO `trend_category` (`trend_category_id`, `parent_category_id`, `trend_category_name`, `depth`, `created_at`,
+                              `updated_at`)
+VALUES (1, NULL, '패션/뷰티', 1, NOW(), NOW()),
+       (2, NULL, '디지털/가전', 1, NOW(), NOW()),
+       (3, 1, '여성패션', 2, NOW(), NOW()),
+       (4, 2, '스마트폰', 2, NOW(), NOW()),
+       (5, 3, '원피스', 3, NOW(), NOW()),
+       (6, 4, '갤럭시', 3, NOW(), NOW());
 
 -- ============================================
 -- 6. 반복 규칙 (recurrence_rule)
