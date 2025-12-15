@@ -37,13 +37,7 @@ public class StatisticsAggregationService {
         log.info("통계 집계 시작 - 날짜: {}", targetDate);
 
         // 0. 중복 체크 - 이미 해당 날짜 통계가 있으면 스킵
-        boolean exists = systemDailyStatisticsRepository
-                .findByStatDateBetweenOrderByStatDateAsc(targetDate, targetDate)
-                .stream()
-                .findFirst()
-                .isPresent();
-
-        if (exists) {
+        if (systemDailyStatisticsRepository.existsByStatDate(targetDate)) {
             log.warn("통계 집계 스킵 - 이미 존재하는 날짜: {}", targetDate);
             return;
         }
@@ -52,12 +46,9 @@ public class StatisticsAggregationService {
         Integer totalUsers = Math.toIntExact(userRepository.count());
 
         // 2. 전날 총 사용자 수 가져오기
-        LocalDate previosDate = targetDate.minusDays(1);
+        LocalDate previousDate = targetDate.minusDays(1);
         Optional<SystemDailyStatistics> previousStats =
-                systemDailyStatisticsRepository
-                        .findByStatDateBetweenOrderByStatDateAsc(previosDate, previosDate)
-                        .stream()
-                        .findFirst();
+                systemDailyStatisticsRepository.findByStatDate(previousDate);
 
         Integer previousTotalUsers = previousStats
                 .map(SystemDailyStatistics::getTotalUsers)
