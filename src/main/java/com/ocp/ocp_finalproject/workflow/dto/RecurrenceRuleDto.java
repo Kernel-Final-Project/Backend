@@ -13,21 +13,20 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class RecurrenceRuleDto {
-    private final RepeatType repeatType;
+    private RepeatType repeatType;
 
-    private final Integer repeatInterval;
+    private Integer repeatInterval;
 
-    private final List<Integer> daysOfWeek;
+    private List<Integer> daysOfWeek;
 
-    private final List<Integer> daysOfMonth;
+    private List<Integer> daysOfMonth;
 
-    private final List<String> timesOfDay;
+    private List<String> timesOfDay;
 
-    private final LocalDateTime startAt;
+    private LocalDateTime startAt;
 
-    private final LocalDateTime endAt;
+    private LocalDateTime endAt;
 
     private String readableRule;
 
