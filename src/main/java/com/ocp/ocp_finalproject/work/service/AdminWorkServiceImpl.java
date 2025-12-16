@@ -89,25 +89,6 @@ public class AdminWorkServiceImpl implements AdminWorkService {
                 .build();
     }
 
-    private Map<Long, String> fetchChoiceProductMap(List<Work> works) {
-        List<Long> workIds = works.stream()
-                .map(Work::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        if (workIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return aiContentRepository.findByWorkIdIn(workIds).stream()
-                .filter(aiContent -> aiContent.getWork() != null)
-                .collect(Collectors.toMap(
-                        aiContent -> aiContent.getWork().getId(),
-                        AiContent::getChoiceProduct,
-                        (existing, ignore) -> existing
-                ));
-    }
-
     private void validateWorkflowOwner(Workflow workflow, Long userId) {
         if (workflow.getUser() == null || workflow.getUser().getId() == null || !workflow.getUser().getId().equals(userId)) {
             throw new CustomException(NOT_WORKFLOW_OWNER);
