@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.workflow.service;
 
 import com.ocp.ocp_finalproject.user.repository.UserRepository;
+import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.user.domain.User;
@@ -32,11 +33,11 @@ public class AdminWorkflowServiceImpl implements AdminWorkflowService {
     @Transactional(readOnly = true)
     public Page<AdminWorkflowListResponse> getWorkflows(UserPrincipal principal, int page, Long userId) {
 
-        User user = validateAndGetUser(principal);
+        validateAndGetUser(principal);
 
         PageRequest pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<AdminWorkflowListResponse> workflows;
+        Page<Workflow> workflows;
 
         if (userId != null) {
             workflows = workflowRepository.findWorkflowsForAdminByUserId(userId, pageable);
@@ -44,22 +45,10 @@ public class AdminWorkflowServiceImpl implements AdminWorkflowService {
             workflows = workflowRepository.findWorkflowsForAdmin(pageable);
         }
 
-        return workflows.map(wf -> AdminWorkflowListResponse.builder()
-                .workflowId(wf.getWorkflowId())
-                .userId(wf.getUserId())
-                .userName(wf.getUserName())
-                .siteUrl(wf.getSiteUrl())
-                .siteName(SiteUrlInfo.getSiteNameFromUrl(wf.getSiteUrl()))
-                .trendCategoryName(wf.getTrendCategoryName())
-                .blogType(wf.getBlogType())
-                .blogAccountId(wf.getBlogAccountId())
-                .blogUrl(wf.getBlogUrl())
-                .readableRule(wf.getReadableRule())
-                .status(wf.getStatus())
-                .build());
+        return workflows.map(this::toAdminWorkflowListResponse);
     }
 
-    private User validateAndGetUser(UserPrincipal principal) {
+    private void validateAndGetUser(UserPrincipal principal) {
         if (principal == null || principal.getUser() == null) {
             throw new CustomException(UNAUTHORIZED);
         }
@@ -67,11 +56,27 @@ public class AdminWorkflowServiceImpl implements AdminWorkflowService {
         User user = userRepository.findById(principal.getUser().getId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (user.getRole() != UserRole.ADMIN) {
+        if(user.getRole() != UserRole.ADMIN) {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        return user;
     }
+
+    private AdminWorkflowListResponse toAdminWorkflowListResponse(Workflow wf) {
+        return AdminWorkflowListResponse.builder()
+                .workflowId(wf.getId())
+                .userId(wf.getUser().getId())
+                .userName(wf.getUser().getName())
+                .siteUrl(wf.getSiteUrl())
+                .siteName(SiteUrlInfo.getSiteNameFromUrl(wf.getSiteUrl()))
+                .trendCategoryName(wf.getTrendCategory().getTrendCategoryName())
+                .blogType(wf.getUserBlog().getBlogType().getBlogTypeName())
+                .blogAccountId(wf.getUserBlog().getAccountId())
+                .blogUrl(wf.getUserBlog().getBlogUrl())
+                .readableRule(wf.getRecurrenceRule().getReadableRule())
+                .status(wf.getStatus())
+                .build();
+    }
+
 
 }

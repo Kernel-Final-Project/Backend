@@ -62,49 +62,27 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     List<Workflow> findAllActive();
 
     @Query("""
-            SELECT new com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse(
-                wf.id,
-                u.id,
-                u.name,
-                wf.siteUrl,
-                tc.trendCategoryName,
-                bt.blogTypeName,
-                ub.accountId,
-                ub.blogUrl,
-                rr.readableRule,
-                wf.status
-            )
+            SELECT wf
             FROM Workflow wf
-            JOIN wf.user u
-            JOIN wf.trendCategory tc
-            LEFT JOIN wf.recurrenceRule rr
-            JOIN wf.userBlog ub
-            LEFT JOIN ub.blogType bt
+            JOIN FETCH wf.user u
+            JOIN FETCH wf.trendCategory tc
+            LEFT JOIN FETCH wf.recurrenceRule rr
+            JOIN FETCH wf.userBlog ub
+            LEFT JOIN FETCH ub.blogType bt
     """)
-    Page<AdminWorkflowListResponse> findWorkflowsForAdmin(Pageable pageable);
+    Page<Workflow> findWorkflowsForAdmin(Pageable pageable);
 
     @Query("""
-            SELECT new com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse(
-                wf.id,
-                u.id,
-                u.name,
-                wf.siteUrl,
-                tc.trendCategoryName,
-                bt.blogTypeName,
-                ub.accountId,
-                ub.blogUrl,
-                rr.readableRule,
-                wf.status
-            )
+            SELECT wf
             FROM Workflow wf
-            JOIN wf.user u
-            JOIN wf.trendCategory tc
-            LEFT JOIN wf.recurrenceRule rr
-            JOIN wf.userBlog ub
-            LEFT JOIN ub.blogType bt
+            JOIN FETCH wf.user u
+            JOIN FETCH wf.trendCategory tc
+            LEFT JOIN FETCH wf.recurrenceRule rr
+            JOIN FETCH wf.userBlog ub
+            LEFT JOIN FETCH ub.blogType bt
             WHERE u.id = :userId
     """)
-    Page<AdminWorkflowListResponse> findWorkflowsForAdminByUserId(
+    Page<Workflow> findWorkflowsForAdminByUserId(
             @Param("userId") Long userId,
             Pageable pageable
     );
