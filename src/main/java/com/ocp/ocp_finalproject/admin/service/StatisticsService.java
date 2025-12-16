@@ -8,7 +8,6 @@ import com.ocp.ocp_finalproject.admin.dto.response.WeeklyUserStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.DailyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.WeeklyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.MonthlyPostStatisticsResponse;
-import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.monitoring.domain.SystemDailyStatistics;
 import com.ocp.ocp_finalproject.monitoring.repository.SystemDailyStatisticsRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 public class StatisticsService {
 
     private final SystemDailyStatisticsRepository systemDailyStatisticsRepository;
-    private final AiContentRepository aiContentRepository;
     /*
     * 일별 사용자 통계 조회
     *
@@ -231,16 +229,17 @@ public class StatisticsService {
             throw new IllegalArgumentException("시작일은 종료일보다 늦을 수 없습니다.");
         }
 
-        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
-        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
-                startDate.atStartOfDay(),
-                endDate.plusDays(1).atStartOfDay()
-        );
+        // SystemDailyStatistics에서 조회
+        List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
+                .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
 
-        log.info("조회된 일별 포스팅 통계 건수: {}", results.size());
+        log.info("조회된 일별 포스팅 통계 건수: {}", statistics.size());
 
-        return results.stream()
-                .map(DailyPostStatisticsResponse::from)
+        return statistics.stream()
+                .map(stat -> DailyPostStatisticsResponse.builder()
+                        .statDate(stat.getStatDate())
+                        .postCount(stat.getPostsToday() != null ? stat.getPostsToday().longValue() : 0L)
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -262,21 +261,21 @@ public class StatisticsService {
             throw new IllegalArgumentException("월(month)은 1에서 12 사이의 값이어야 합니다.");
         }
 
-        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
-        LocalDate firstDay = LocalDate.of(year, month, 1);
-        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
-                firstDay.atStartOfDay(),
-                firstDay.plusMonths(1).atStartOfDay()
-        );
+        // 날짜 범위 계산
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        log.info("주별 포스팅 집계를 위한 일별 포스팅 조회 건수: {}", results.size());
+        // SystemDailyStatistics에서 조회
+        List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
+                .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
 
-        // 일별 데이터를 주차별로 그룹화 (연도 경계 처리 포함)
-        Map<String, List<Object[]>> weeklyGroup = results.stream()
-                .collect(Collectors.groupingBy(result -> {
-                    LocalDate date = (LocalDate) result[0];
-                    int weekBasedYear = date.get(WeekFields.ISO.weekBasedYear());
-                    int weekOfYear = date.get(WeekFields.ISO.weekOfWeekBasedYear());
+        log.info("주별 포스팅 집계를 위한 일별 데이터 조회 건수: {}", statistics.size());
+
+        // 주차별로 그룹화 (연도 경계 처리 포함)
+        Map<String, List<SystemDailyStatistics>> weeklyGroup = statistics.stream()
+                .collect(Collectors.groupingBy(stat -> {
+                    int weekBasedYear = stat.getStatDate().get(WeekFields.ISO.weekBasedYear());
+                    int weekOfYear = stat.getStatDate().get(WeekFields.ISO.weekOfWeekBasedYear());
                     return String.format("%d-W%02d", weekBasedYear, weekOfYear);
                 }));
 
@@ -285,15 +284,15 @@ public class StatisticsService {
         return weeklyGroup.entrySet().stream()
                 .map(entry -> {
                     String weekString = entry.getKey();
-                    List<Object[]> weekData = entry.getValue();
+                    List<SystemDailyStatistics> weekData = entry.getValue();
 
                     // 주의 시작일과 종료일
-                    LocalDate weekStart = (LocalDate) weekData.get(0)[0];
-                    LocalDate weekEnd = (LocalDate) weekData.get(weekData.size() - 1)[0];
+                    LocalDate weekStart = weekData.get(0).getStatDate();
+                    LocalDate weekEnd = weekData.get(weekData.size() - 1).getStatDate();
 
                     // 주간 총 포스팅 수 (합계)
                     long totalPosts = weekData.stream()
-                            .mapToLong(result -> ((Number) result[1]).longValue())
+                            .mapToLong(stat -> stat.getPostsToday() != null ? stat.getPostsToday().longValue() : 0L)
                             .sum();
 
                     log.debug("{} 주차 집계 - 기간: {} ~ {}, 총 포스팅: {}",
@@ -321,36 +320,34 @@ public class StatisticsService {
     public List<MonthlyPostStatisticsResponse> getMonthlyPostStatistics(int year) {
         log.info("월별 포스팅 통계 조회 - year: {}", year);
 
-        // LocalDateTime 범위로 변환 (성능 최적화: 인덱스 활용 가능)
-        LocalDate firstDay = LocalDate.of(year, 1, 1);
-        List<Object[]> results = aiContentRepository.countPublishedPostsByDateRange(
-                firstDay.atStartOfDay(),
-                firstDay.plusYears(1).atStartOfDay()
-        );
+        // 날짜 범위 계산
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
 
-        log.info("월별 집계를 위한 일별 포스팅 조회 건수: {}", results.size());
-        
+        // SystemDailyStatistics에서 조회
+        List<SystemDailyStatistics> statistics = systemDailyStatisticsRepository
+                .findByStatDateBetweenOrderByStatDateAsc(startDate, endDate);
+
+        log.info("월별 집계를 위한 일별 데이터 조회 건수: {}", statistics.size());
+
         // 월별로 그룹화
-        Map<Integer, List<Object[]>> monthlyGroup = results.stream()
-                .collect(Collectors.groupingBy(result -> {
-                    LocalDate date = (LocalDate) result[0];
-                    return date.getMonthValue();
-                }));
+        Map<Integer, List<SystemDailyStatistics>> monthlyGroup = statistics.stream()
+                .collect(Collectors.groupingBy(stat -> stat.getStatDate().getMonthValue()));
 
         log.info("집계된 포스팅 월 수: {}", monthlyGroup.size());
 
         return monthlyGroup.entrySet().stream()
                 .map(entry -> {
                     Integer monthNumber = entry.getKey();
-                    List<Object[]> monthData = entry.getValue();
+                    List<SystemDailyStatistics> monthData = entry.getValue();
 
                     // 월의 시작일과 종료일
-                    LocalDate monthStart = (LocalDate) monthData.get(0)[0];
-                    LocalDate monthEnd = (LocalDate) monthData.get(monthData.size() - 1)[0];
+                    LocalDate monthStart = monthData.get(0).getStatDate();
+                    LocalDate monthEnd = monthData.get(monthData.size() - 1).getStatDate();
 
                     // 월간 총 포스팅 수 (합계)
                     long totalPosts = monthData.stream()
-                            .mapToLong(result -> ((Number) result[1]).longValue())
+                            .mapToLong(stat -> stat.getPostsToday() != null ? stat.getPostsToday().longValue() : 0L)
                             .sum();
 
                     log.debug("{}월 집계 - 일수: {}, 총 포스팅: {}",

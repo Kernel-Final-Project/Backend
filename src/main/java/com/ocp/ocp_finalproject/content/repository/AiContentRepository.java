@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.content.repository;
 
 import com.ocp.ocp_finalproject.content.domain.AiContent;
+import com.ocp.ocp_finalproject.content.enums.ContentStatus;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -65,4 +66,14 @@ public interface AiContentRepository extends JpaRepository<AiContent, Long> {
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime
     );
+
+    /*
+     * 특정 기간 동안 특정 상태의 콘텐츠 수 조회
+     *
+     * @param status 조회할 콘텐츠 상태
+     * @param startDateTime 시작 날짜-시간 (포함)
+     * @param endDateTime 종료 날짜-시간 (미포함)
+     * @return 해당 기간의 콘텐츠 수
+     */
+    Long countByStatusAndCompletedAtBetween(ContentStatus status, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
