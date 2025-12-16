@@ -17,6 +17,8 @@ import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
+import com.ocp.ocp_finalproject.workflow.dto.response.GetWorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.util.AesCryptoUtil;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +47,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final TrendCategoryRepository trendCategoryRepository;
     private final BlogTypeRepository blogTypeRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserBlogRepository userBlogRepository;
     private final RecurrenceRuleValidator validator;
     private final SchedulerSyncService schedulerSyncService;
+    private final AesCryptoUtil aesCryptoUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,7 +78,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowEditResponse getWorkflow(Long workflowId, Long userId) {
+    public WorkflowEditResponse getWorkflowForEdit(Long workflowId, Long userId) {
 
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
@@ -98,9 +100,42 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .siteUrl(workflow.getSiteUrl())
                 .blogTypeId(blogType.getId())
                 .blogUrl(userBlog.getBlogUrl())
-                .setTrendCategory(SetTrendCategoryDto.from(category))
+                .setTrendCategory(SetTrendCategoryIdDto.from(category))
                 .blogAccountId(userBlog.getAccountId())
                 .recurrenceRule(RecurrenceRuleDto.from(rule))
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetWorkflowResponse getWorkflow(Long workflowId, Long userId) {
+
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        User user = workflow.getUser();
+
+        UserBlog userBlog = workflow.getUserBlog();
+
+        BlogType blogType = userBlog.getBlogType();
+
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflow.getTrendCategory().getId())
+                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
+
+        RecurrenceRule rule = workflow.getRecurrenceRule();
+
+        return GetWorkflowResponse.builder()
+                .workflowId(workflow.getId())
+                .userId(user.getId())
+                .userName(user.getName())
+                .siteName(SiteUrlInfo.getSiteNameFromUrl(workflow.getSiteUrl()))
+                .siteUrl(workflow.getSiteUrl())
+                .blogType(blogType.getBlogTypeName())
+                .blogUrl(userBlog.getBlogUrl())
+                .blogAccountId(userBlog.getAccountId())
+                .setTrendCategory(SetTrendCategoryNameDto.from(category))
+                .recurrenceRule(RecurrenceRuleDto.from(rule))
+                .status(workflow.getStatus())
                 .build();
     }
 
@@ -117,11 +152,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
                 .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
 
-        String encryptedPassword = passwordEncoder.encode(workflowRequest.getBlogAccountPwd());
 
         UserBlog userBlog = UserBlog.create(blogType,
                 workflowRequest.getBlogAccountId(),
-                encryptedPassword, workflowRequest.getBlogUrl());
+                aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()),
+                workflowRequest.getBlogUrl());
 
         RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
 
@@ -193,7 +228,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (userBlog == null) {
             userBlog = UserBlog.create(blogType,
                     workflowRequest.getBlogAccountId(),
-                    passwordEncoder.encode(workflowRequest.getBlogAccountPwd()),
+                    aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()),
                     workflowRequest.getBlogUrl());
 
             userBlogRepository.save(userBlog);
@@ -203,7 +238,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             if (workflowRequest.getBlogAccountPwd() != null
                     && !workflowRequest.getBlogAccountPwd().isBlank()) {
                 userBlog.updateCredentials(workflowRequest.getBlogAccountId(),
-                        passwordEncoder.encode(workflowRequest.getBlogAccountPwd()));
+                        aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()));
             }
         }
 
@@ -309,7 +344,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .siteUrl(workflow.getSiteUrl())
                 .blogType(blogType.getBlogTypeName())
                 .blogUrl(userBlog.getBlogUrl())
-                .setTrendCategory(SetTrendCategoryDto.from(category))
+                .setTrendCategory(SetTrendCategoryIdDto.from(category))
                 .blogAccountId(userBlog.getAccountId())
                 .readableRule(rule.getReadableRule())
                 .build();

@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.admin.controller;
+package com.ocp.ocp_finalproject.workflow.service.controller;
 
 import com.ocp.ocp_finalproject.admin.domain.CommonCodeGroup;
 import com.ocp.ocp_finalproject.admin.dto.request.CommonCodeGroupRequest;

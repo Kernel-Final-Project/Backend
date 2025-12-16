@@ -1,5 +1,7 @@
 package com.ocp.ocp_finalproject.monitoring.service;
 
+import com.ocp.ocp_finalproject.content.enums.ContentStatus;
+import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.monitoring.domain.SystemDailyStatistics;
 import com.ocp.ocp_finalproject.monitoring.repository.SystemDailyStatisticsRepository;
 import com.ocp.ocp_finalproject.user.repository.UserRepository;
@@ -31,6 +33,7 @@ public class StatisticsAggregationService {
     private final SystemDailyStatisticsRepository systemDailyStatisticsRepository;
     private final UserRepository userRepository;
     private final WorkflowRepository workflowRepository;
+    private final AiContentRepository aiContentRepository;
 
     @Transactional
     public void aggregateAndSaveDailyStatistics(LocalDate targetDate){
@@ -80,14 +83,27 @@ public class StatisticsAggregationService {
 
         Integer workflowGrowthRate = totalWorkflows - previousWorkflows;
 
-        // 9. SystemDailyStatistics 엔티티 생성 및 저장
+        // 9. 당일 발행된 포스팅 수 (PUBLISHED 상태)
+        Integer postsToday = Math.toIntExact(
+                aiContentRepository.countByStatusAndCompletedAtBetween(
+                        ContentStatus.PUBLISHED, dayStart, dayEnd));
+
+        // 10. 포스팅 증가율
+        Integer previousPostsToday = previousStats
+                .map(SystemDailyStatistics::getPostsToday)
+                .orElse(0);
+
+        BigDecimal postGrowthRate = calculateGrowthRate(postsToday, previousPostsToday);
+
+        // 11. SystemDailyStatistics 엔티티 생성 및 저장
         SystemDailyStatistics statistics = SystemDailyStatistics.createBuilder()
                 .statDate(targetDate)
                 .totalUsers(totalUsers)
                 .userGrowthRate(userGrowthRate)
                 .totalWorkflows(totalWorkflows)
                 .workflowGrowthRate(workflowGrowthRate)
-                .postGrowthRate(BigDecimal.ZERO)  // 필요시 계산
+                .postsToday(postsToday)
+                .postGrowthRate(postGrowthRate)
                 .totalAiRequests(0)  // 필요시 계산
                 .totalAiCost(BigDecimal.ZERO)  // 필요시 계산
                 .aiCostGrowthRate(BigDecimal.ZERO)  // 필요시 계산
@@ -97,8 +113,8 @@ public class StatisticsAggregationService {
 
         systemDailyStatisticsRepository.save(statistics);
 
-        log.info("통계 저장 완료 - 날짜: {}, 총 사용자: {}, 증가율: {}%, 활성 사용자: {}",
-                targetDate, totalUsers, userGrowthRate, activeUsersToday);
+        log.info("통계 저장 완료 - 날짜: {}, 총 사용자: {}, 사용자 증가율: {}%, 활성 사용자: {}, 당일 포스팅: {}, 포스팅 증가율: {}%",
+                targetDate, totalUsers, userGrowthRate, activeUsersToday, postsToday, postGrowthRate);
     }
 
 

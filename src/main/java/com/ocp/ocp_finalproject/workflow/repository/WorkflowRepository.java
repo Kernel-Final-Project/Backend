@@ -2,6 +2,7 @@ package com.ocp.ocp_finalproject.workflow.repository;
 
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,9 +52,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     Optional<Workflow> findWorkflow(@Param("userId") Long userId, @Param("workflowId") Long workflowId);
 
     /**
-     *
-     * 해당 메서드는 SpringBoot가 실행될 때 활성화된 Workflow를 Quartz 스케줄링하기 위해서 사용되는 메서드
-     *
+     * SpringBoot가 실행될 때 활성화된 Workflow를 Quartz 스케줄링하기 위해서 사용되는 메서드
      * */
     @Query("""
         SELECT wf
@@ -63,6 +62,32 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     """)
     List<Workflow> findAllActive();
 
+    @Query("""
+            SELECT wf
+            FROM Workflow wf
+            JOIN FETCH wf.user u
+            JOIN FETCH wf.trendCategory tc
+            LEFT JOIN FETCH wf.recurrenceRule rr
+            JOIN FETCH wf.userBlog ub
+            LEFT JOIN FETCH ub.blogType bt
+    """)
+    Page<Workflow> findWorkflowsForAdmin(Pageable pageable);
+
+    @Query("""
+            SELECT wf
+            FROM Workflow wf
+            JOIN FETCH wf.user u
+            JOIN FETCH wf.trendCategory tc
+            LEFT JOIN FETCH wf.recurrenceRule rr
+            JOIN FETCH wf.userBlog ub
+            LEFT JOIN FETCH ub.blogType bt
+            WHERE u.id = :userId
+    """)
+    Page<Workflow> findWorkflowsForAdminByUserId(
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
+           
     @Query("""
         select w
         from Workflow w
@@ -78,4 +103,5 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
         where w.id = :id
     """)
     Optional<Workflow> findByIdWithRecurrenceRule(@Param("id") Long id);
+
 }
