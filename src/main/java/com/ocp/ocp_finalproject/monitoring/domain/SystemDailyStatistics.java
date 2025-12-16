@@ -55,6 +55,12 @@ public class SystemDailyStatistics extends BaseEntity {
     private Integer workflowGrowthRate;
 
     /**
+     * 당일 발행된 포스팅 수
+     */
+    @Column(name = "posts_today")
+    private Integer postsToday;
+
+    /**
      * 게시글 증가율
      */
     @Column(name = "post_growth_rate", precision = 5, scale = 2)
@@ -92,15 +98,16 @@ public class SystemDailyStatistics extends BaseEntity {
 
     @Builder(builderMethodName = "createBuilder")
     public static SystemDailyStatistics create(LocalDate statDate, Integer totalUsers, BigDecimal userGrowthRate,
-                                              Integer totalWorkflows, Integer workflowGrowthRate, BigDecimal postGrowthRate,
-                                              Integer totalAiRequests, BigDecimal totalAiCost, BigDecimal aiCostGrowthRate,
-                                              Integer activeUsersToday, BigDecimal activeUserGrowthRate) {
+                                              Integer totalWorkflows, Integer workflowGrowthRate, Integer postsToday,
+                                              BigDecimal postGrowthRate, Integer totalAiRequests, BigDecimal totalAiCost,
+                                              BigDecimal aiCostGrowthRate, Integer activeUsersToday, BigDecimal activeUserGrowthRate) {
         SystemDailyStatistics systemDailyStatistics = new SystemDailyStatistics();
         systemDailyStatistics.statDate = statDate;
         systemDailyStatistics.totalUsers = totalUsers;
         systemDailyStatistics.userGrowthRate = userGrowthRate;
         systemDailyStatistics.totalWorkflows = totalWorkflows;
         systemDailyStatistics.workflowGrowthRate = workflowGrowthRate;
+        systemDailyStatistics.postsToday = postsToday;
         systemDailyStatistics.postGrowthRate = postGrowthRate;
         systemDailyStatistics.totalAiRequests = totalAiRequests;
         systemDailyStatistics.totalAiCost = totalAiCost;

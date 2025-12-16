@@ -36,12 +36,20 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     Page<Work> findByWorkflowId(Long workflowId, Pageable pageable);
 
     @Query("""
-            SELECT w
-            FROM Work w
-            JOIN FETCH w.workflow wf
-            JOIN FETCH wf.user u
-            WHERE wf.user.id = :userId
-            """)
-    Optional<Work> findByUserId(@Param("userId") Long userId);
+        SELECT w
+        FROM Work w
+        JOIN FETCH w.workflow wf
+        JOIN FETCH w.aiContent ac
+        WHERE wf.id = :workflowId
+    """)
+    Page<Work> findByWorkflowIdForAdmin(Long workflowId, Pageable pageable);
+
+    @Query("""
+        SELECT w
+        FROM Work w
+        JOIN FETCH w.workflow wf
+        JOIN FETCH w.aiContent ac
+    """)
+    Page<Work> findAllForAdmin(Pageable pageable);
 
 }

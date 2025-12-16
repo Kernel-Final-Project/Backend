@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SetTrendCategoryDto {
+public class SetTrendCategoryIdDto {
 
     private Long depth1Category;
 
@@ -18,12 +18,12 @@ public class SetTrendCategoryDto {
 
     private Long depth3Category;
 
-    public static SetTrendCategoryDto from(TrendCategory category) {
+    public static SetTrendCategoryIdDto from(TrendCategory category) {
 
         TrendCategory d2 = category.getParentCategory();
         TrendCategory d1 = (d2 != null) ? d2.getParentCategory() : null;
 
-        return SetTrendCategoryDto.builder()
+        return SetTrendCategoryIdDto.builder()
                 .depth1Category(d1 != null ? d1.getId() : null)
                 .depth2Category(d2 != null ? d2.getId() : null)
                 .depth3Category(category.getId())
