@@ -29,6 +29,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -171,6 +174,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflowRepository.save(workflow);
 
+
+        scheduleJobsAfterCommit(workflow.getId(), workflow.getStatus());
+
         return buildResponse(workflow, category);
     }
 
@@ -182,7 +188,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         Workflow workflow = updateWorkflowTransaction(userId, workflowId, workflowRequest);
 
-        schedulerSyncService.updateWorkflowJobs(workflow);
+        scheduleJobsAfterCommit(workflowId, workflow.getStatus());
 
         return buildResponse(workflow, workflow.getTrendCategory());
     }
@@ -246,6 +252,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
         workflow.changeStatus(newStatus);
+        WorkflowStatus updatedStatus = workflow.getStatus();
+
+        scheduleJobsAfterCommit(workflowId, updatedStatus);
 
         return WorkflowStatusResponse.builder()
                 .workflowId(workflow.getId())
@@ -267,7 +276,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflow.delete();
 
-        schedulerSyncService.removeWorkflowJobs(workflowId);
+        scheduleJobsAfterCommit(workflowId, workflow.getStatus());
 
         return WorkflowStatusResponse.builder()
                 .workflowId(workflow.getId())
@@ -296,6 +305,28 @@ public class WorkflowServiceImpl implements WorkflowService {
         return blogTypes.stream()
                 .map(BlogTypeResponse::from)
                 .toList();
+    }
+
+    private void scheduleJobsAfterCommit(Long workflowId, WorkflowStatus status) {
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            if (status == WorkflowStatus.PENDING) {
+                                schedulerSyncService.registerActivationJob(workflowId);
+                            } else if (status == WorkflowStatus.ACTIVE) {
+                                schedulerSyncService.updateWorkflowJobs(workflowId);
+                            } else {
+                                schedulerSyncService.removeWorkflowJobs(workflowId);
+                                schedulerSyncService.removeActivationJob(workflowId);
+                            }
+                        } catch (SchedulerException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+        );
     }
 
     private WorkflowResponse buildResponse(

@@ -1,6 +1,8 @@
 package com.ocp.ocp_finalproject.user.service;
 
 import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.domain.Auth;
+import com.ocp.ocp_finalproject.user.enums.AuthProvider;
 import com.ocp.ocp_finalproject.user.enums.UserStatus;
 import com.ocp.ocp_finalproject.user.repository.AuthRepository;
 import com.ocp.ocp_finalproject.user.repository.UserRepository;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuthRepository authRepository;
 
     /**
      * User Id로 조회
@@ -77,5 +80,15 @@ public class UserService {
 
         user.updateStatus(UserStatus.WITHDRAWN);
         log.info("회원 탈퇴 처리 완료 - userId: {}", userId);
+    }
+
+    /**
+     * 사용자 인증 제공자 조회
+     */
+    @Transactional(readOnly = true)
+    public AuthProvider getUserProvider(User user) {
+        return authRepository.findTopByUserOrderByCreatedAtDesc(user)
+                .map(Auth::getProvider)
+                .orElse(null);
     }
 }
