@@ -44,7 +44,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final TrendCategoryRepository trendCategoryRepository;
     private final BlogTypeRepository blogTypeRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserBlogRepository userBlogRepository;
     private final RecurrenceRuleValidator validator;
     private final SchedulerSyncService schedulerSyncService;
@@ -150,11 +149,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
                 .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
 
-        String encryptedPassword = aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd());
 
         UserBlog userBlog = UserBlog.create(blogType,
                 workflowRequest.getBlogAccountId(),
-                encryptedPassword, workflowRequest.getBlogUrl());
+                aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()),
+                workflowRequest.getBlogUrl());
 
         RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
 
@@ -223,7 +222,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (userBlog == null) {
             userBlog = UserBlog.create(blogType,
                     workflowRequest.getBlogAccountId(),
-                    passwordEncoder.encode(workflowRequest.getBlogAccountPwd()),
+                    aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()),
                     workflowRequest.getBlogUrl());
 
             userBlogRepository.save(userBlog);
@@ -233,7 +232,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             if (workflowRequest.getBlogAccountPwd() != null
                     && !workflowRequest.getBlogAccountPwd().isBlank()) {
                 userBlog.updateCredentials(workflowRequest.getBlogAccountId(),
-                        passwordEncoder.encode(workflowRequest.getBlogAccountPwd()));
+                        aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()));
             }
         }
 
