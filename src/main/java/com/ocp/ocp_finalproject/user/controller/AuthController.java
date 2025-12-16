@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.user.dto.response.UserResponse;
+import com.ocp.ocp_finalproject.user.enums.AuthProvider;
 import com.ocp.ocp_finalproject.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -35,8 +36,9 @@ public class AuthController {
         log.info("현재 사용자 정보 조회 요청");
 
         User user = principal.getUser();
+        AuthProvider provider = userService.getUserProvider(user);
 
-        UserResponse response = UserResponse.from(user);
+        UserResponse response = UserResponse.from(user, provider);
 
         log.info("사용자 정보 조회 성공 - userId: {}",user.getId());
         return ResponseEntity.ok(

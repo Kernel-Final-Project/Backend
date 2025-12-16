@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.workflow.repository;
 
+import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
@@ -108,4 +109,21 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             @Param("userId") Long userId,
             Pageable pageable
     );
+           
+    @Query("""
+        select w
+        from Workflow w
+        left join fetch w.recurrenceRule rr
+        where w.status = 'PENDING'
+    """)
+    List<Workflow> findAllPending();
+
+    @Query("""
+        select w
+        from Workflow w
+        join fetch w.recurrenceRule
+        where w.id = :id
+    """)
+    Optional<Workflow> findByIdWithRecurrenceRule(@Param("id") Long id);
+
 }

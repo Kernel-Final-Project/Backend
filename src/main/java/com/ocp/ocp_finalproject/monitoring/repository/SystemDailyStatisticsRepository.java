@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface SystemDailyStatisticsRepository extends JpaRepository<SystemDailyStatistics, Long> {
 
@@ -19,4 +20,22 @@ public interface SystemDailyStatisticsRepository extends JpaRepository<SystemDai
     * @return 기간 내 일별 통계 리스트 (날짜 오름차순)
     * */
     List<SystemDailyStatistics> findByStatDateBetweenOrderByStatDateAsc(LocalDate startDate, LocalDate endDate);
+
+    /*
+    * 특정 날짜의 통계 조회
+    *
+    * 단일 날짜로 직접 조회하여 효율적
+    *
+    * @param date 조회할 날짜
+    * @return 해당 날짜의 통계 (Optional)
+    * */
+    Optional<SystemDailyStatistics> findByStatDate(LocalDate date);
+
+    /*
+    * 특정 날짜의 통계 존재 여부 확인
+    *
+    * @param date 확인할 날짜
+    * @return 존재 여부
+    * */
+    boolean existsByStatDate(LocalDate date);
 }
