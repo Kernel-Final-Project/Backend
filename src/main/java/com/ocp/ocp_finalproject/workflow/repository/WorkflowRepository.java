@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.workflow.repository;
 
+import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN wf.recurrenceRule rr
             JOIN wf.userBlog ub
             LEFT JOIN ub.blogType bt
-            WHERE u.id = :userId
+            WHERE u.id = :userId AND wf.status != 'DELETED'
     """)
     Page<WorkflowListResponse> findWorkflows(@Param("userId") Long userId, Pageable pageable);
 
@@ -45,9 +46,9 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN FETCH wf.recurrenceRule rr
             JOIN FETCH wf.userBlog ub
             LEFT JOIN FETCH ub.blogType bt
-            WHERE wf.id = :workflowId and u.id = :userId
+            WHERE u.id = :userId AND wf.id = :workflowId
     """)
-    Optional<Workflow> findWorkflow(@Param("workflowId") Long workflowId, @Param("userId") Long userId);
+    Optional<Workflow> findWorkflow(@Param("userId") Long userId, @Param("workflowId") Long workflowId);
 
     /**
      *
@@ -62,4 +63,19 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     """)
     List<Workflow> findAllActive();
 
+    @Query("""
+        select w
+        from Workflow w
+        left join fetch w.recurrenceRule rr
+        where w.status = 'PENDING'
+    """)
+    List<Workflow> findAllPending();
+
+    @Query("""
+        select w
+        from Workflow w
+        join fetch w.recurrenceRule
+        where w.id = :id
+    """)
+    Optional<Workflow> findByIdWithRecurrenceRule(@Param("id") Long id);
 }

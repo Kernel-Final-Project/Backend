@@ -20,15 +20,15 @@ public class AiContent extends BaseEntity {
     @Column(name = "ai_content_id")
     private Long id;
 
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     private String title;
 
     @Lob
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     private String summary;
 
     @Lob
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(name = "choice_product")

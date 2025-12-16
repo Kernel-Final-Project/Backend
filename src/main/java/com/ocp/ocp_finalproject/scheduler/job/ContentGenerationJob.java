@@ -1,5 +1,6 @@
 package com.ocp.ocp_finalproject.scheduler.job;
 
+import com.ocp.ocp_finalproject.integration.airflow.AirflowTriggerClient;
 import com.ocp.ocp_finalproject.message.content.ContentGenerateProducer;
 import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest;
 import com.ocp.ocp_finalproject.work.service.ContentGenerateService;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 public class ContentGenerationJob implements Job {
 
     private final ContentGenerateService contentGenerateService;
-
     private final ContentGenerateProducer contentGenerateProducer;
+    private final AirflowTriggerClient airflowTriggerClient;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -29,5 +30,7 @@ public class ContentGenerationJob implements Job {
         ContentGenerateRequest prepared = contentGenerateService.applyWebhookSettings(request);
         contentGenerateProducer.send(prepared);
         log.info("워크 {} 콘텐트 생성 메시지 전송", prepared.getWorkId());
+
+        airflowTriggerClient.triggerTrendPipeline(workflowId);
     }
 }

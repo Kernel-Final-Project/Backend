@@ -38,9 +38,14 @@ public class ContentGenerateRequest {
     @Data
     public static class ProductInfo {
         private Long productId;     // 내부 DB id (있는 경우)
-        private String name;
-        private String price;
-        private String productUrl;
+        // 상품 고유 정보
+        private String productName;         // 상품명
+        private String productCode;         // 상품 코드 (쇼핑몰별 id 등)
+
+        // 상세 정보
+        private String productDetailUrl;    // 상품 상세 페이지 URL
+        private Integer productPrice;       // 가격 (null 허용 → Integer)
+        private String productImageUrl;     // 상품 이미지 URL
     }
 
     // ===== 내부 DTO: Webhook URL 모음 =====

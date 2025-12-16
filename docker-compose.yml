@@ -84,6 +84,7 @@ services:
       AIRFLOW__CORE__FERNET_KEY: ""
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./airflow/dags:/opt/airflow/dags
@@ -109,6 +110,7 @@ services:
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./airflow/dags:/opt/airflow/dags
@@ -132,6 +134,7 @@ services:
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./airflow/dags:/opt/airflow/dags
@@ -153,6 +156,7 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./airflow/dags:/opt/airflow/dags
@@ -172,6 +176,7 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./ai_module:/opt/airflow/ai_module
@@ -193,6 +198,7 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
       PYTHONPATH: /opt/airflow/dags:/opt/airflow/ai_module
     volumes:
       - ./airflow/dags:/opt/airflow/dags

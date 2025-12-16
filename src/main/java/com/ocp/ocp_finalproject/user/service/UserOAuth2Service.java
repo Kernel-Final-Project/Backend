@@ -9,6 +9,7 @@ import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.user.service.oauth2.OAuth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +35,17 @@ public class UserOAuth2Service {
 
         log.info("OAuth2 사용자 처리 - Provider: {}, Email: {}", provider, email);
 
-        return authRepository.findByProviderAndProviderUserId(provider, providerUserId)
-                .map(auth -> updateExistingUser(auth))
-                .orElseGet(()->createNewUser(provider, providerUserId, email, name));
+        try {
+            return authRepository.findByProviderAndProviderUserId(provider, providerUserId)
+                    .map(auth -> updateExistingUser(auth))
+                    .orElseGet(() -> createNewUser(provider, providerUserId, email, name));
+        } catch (DataIntegrityViolationException e) {
+            // 동시성 문제로 중복 생성 시도 → 재조회
+            log.warn("중복 Auth 생성 시도 감지 - Provider: {}, UserId: {}", provider, providerUserId);
+            return authRepository.findByProviderAndProviderUserId(provider, providerUserId)
+                    .map(Auth::getUser)
+                    .orElseThrow(() -> new RuntimeException("Auth 조회 실패"));
+        }
     }
 
     /**

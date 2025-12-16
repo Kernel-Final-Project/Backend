@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -57,4 +58,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
             Pageable pageable
     );
 
+    /*
+    * 특정 기간에 생성된 사용자 수 조회
+    * */
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt BETWEEN :startTime AND :endTime")
+    Long countByCreatedAtBetween(
+            @Param("startTime")LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+            );
+
+    /*
+    * 특정 기간에 생성된 사용자 수 조회
+    * */
+    @Query("SELECT COUNT(DISTINCT u) FROM User u WHERE u.updatedAt BETWEEN :startTime AND :endTime")
+    Long countActiveUsersBetween(
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
 }

@@ -12,7 +12,7 @@ public interface NoticeService {
 
     NoticeResponse getNotice(Long noticeId);
 
-    NoticeResponse createNotice(NoticeCreateRequest request);
+    NoticeResponse createNotice(NoticeCreateRequest request, Long authorId);
 
     void deleteNotice(Long noticeId);
 

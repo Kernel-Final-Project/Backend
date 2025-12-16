@@ -58,6 +58,7 @@ public class SecurityConfig {
                 // ========== 인증/인가 설정 ==========
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/v1/test/**",
                                 "/login/oauth2/**",
                                 "/login/**",
                                 "/"
