@@ -51,10 +51,10 @@ public class WorkService {
         List<WorkListResponse> responses = works.stream()
                 .map(work -> WorkListResponse.builder()
                         .workId(work.getId())
-                        .status(work.getStatus() != null ? work.getStatus().name() : null)
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())
                         .choiceProduct(choiceProductByWorkId.get(work.getId()))
+                        .status(work.getStatus() != null ? work.getStatus().name() : null)
                         .build())
                 .collect(Collectors.toList());
 

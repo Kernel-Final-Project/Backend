@@ -17,6 +17,7 @@ import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
+import com.ocp.ocp_finalproject.workflow.dto.response.GetWorkflowResponse;
 import com.ocp.ocp_finalproject.workflow.util.AesCryptoUtil;
 import com.ocp.ocp_finalproject.workflow.validator.RecurrenceRuleValidator;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +76,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowEditResponse getWorkflow(Long workflowId, Long userId) {
+    public WorkflowEditResponse getWorkflowForEdit(Long workflowId, Long userId) {
 
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
@@ -97,9 +98,42 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .siteUrl(workflow.getSiteUrl())
                 .blogTypeId(blogType.getId())
                 .blogUrl(userBlog.getBlogUrl())
-                .setTrendCategory(SetTrendCategoryDto.from(category))
+                .setTrendCategory(SetTrendCategoryIdDto.from(category))
                 .blogAccountId(userBlog.getAccountId())
                 .recurrenceRule(RecurrenceRuleDto.from(rule))
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetWorkflowResponse getWorkflow(Long workflowId, Long userId) {
+
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        User user = workflow.getUser();
+
+        UserBlog userBlog = workflow.getUserBlog();
+
+        BlogType blogType = userBlog.getBlogType();
+
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflow.getTrendCategory().getId())
+                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
+
+        RecurrenceRule rule = workflow.getRecurrenceRule();
+
+        return GetWorkflowResponse.builder()
+                .workflowId(workflow.getId())
+                .userId(user.getId())
+                .userName(user.getName())
+                .siteName(SiteUrlInfo.getSiteNameFromUrl(workflow.getSiteUrl()))
+                .siteUrl(workflow.getSiteUrl())
+                .blogType(blogType.getBlogTypeName())
+                .blogUrl(userBlog.getBlogUrl())
+                .blogAccountId(userBlog.getAccountId())
+                .setTrendCategory(SetTrendCategoryNameDto.from(category))
+                .recurrenceRule(RecurrenceRuleDto.from(rule))
+                .status(workflow.getStatus())
                 .build();
     }
 
@@ -280,7 +314,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .siteUrl(workflow.getSiteUrl())
                 .blogType(blogType.getBlogTypeName())
                 .blogUrl(userBlog.getBlogUrl())
-                .setTrendCategory(SetTrendCategoryDto.from(category))
+                .setTrendCategory(SetTrendCategoryIdDto.from(category))
                 .blogAccountId(userBlog.getAccountId())
                 .readableRule(rule.getReadableRule())
                 .build();

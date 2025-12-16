@@ -69,7 +69,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
         List<AdminWorkListResponse> responses = works.stream()
                 .map(work -> AdminWorkListResponse.builder()
                         .workId(work.getId())
-                        .status(work.getStatus() != null ? work.getStatus().name() : null)
+                        .status(work.getStatus())
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())
                         .title(work.getAiContent().getTitle())
