@@ -48,15 +48,6 @@ public class RecurrenceRuleValidator {
         if (dto.getRepeatInterval() != null) {
             throw new CustomException(RECURRENCE_RULE_FIELD_NOT_ALLOWED, "1회 실행은 반복 간격을 지정할 수 없습니다");
         }
-        if (isNotEmpty(dto.getDaysOfWeek())) {
-            throw new CustomException(RECURRENCE_RULE_FIELD_NOT_ALLOWED, "1회 실행은 요일을 지정할 수 없습니다");
-        }
-        if (isNotEmpty(dto.getDaysOfMonth())) {
-            throw new CustomException(RECURRENCE_RULE_FIELD_NOT_ALLOWED, "1회 실행은 날짜를 지정할 수 없습니다");
-        }
-        if (isNotEmpty(dto.getTimesOfDay())) {
-            throw new CustomException(RECURRENCE_RULE_FIELD_NOT_ALLOWED, "1회 실행은 실행 시간을 지정할 수 없습니다");
-        }
     }
 
     private void validateDaily(RecurrenceRuleDto dto) {

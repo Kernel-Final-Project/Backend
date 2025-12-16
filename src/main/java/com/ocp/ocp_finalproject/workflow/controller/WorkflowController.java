@@ -45,9 +45,9 @@ public class WorkflowController {
     }
 
     /**
-     * 워크플로우 상세 조회
+     * 워크플로우 상세 조회 (수정용)
      */
-    @GetMapping("/{workflowId}")
+    @GetMapping("/{workflowId}/edit")
     public ResponseEntity<ApiResult<WorkflowEditResponse>> getWorkflowEdit(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId
@@ -55,9 +55,25 @@ public class WorkflowController {
 
         Long userId = validateAndGetUserId(principal);
 
-        WorkflowEditResponse workflow = workflowService.getWorkflow(workflowId, userId);
+        WorkflowEditResponse workflow = workflowService.getWorkflowForEdit(workflowId, userId);
 
-        return ResponseEntity.ok(ApiResult.success("워크플로우 상세 조회 성공", workflow));
+        return ResponseEntity.ok(ApiResult.success("워크플로우 상세 조회 성공(수정용)", workflow));
+    }
+
+    /**
+     * 워크플로우 상세 조회 (조회용)
+     */
+    @GetMapping("/{workflowId}")
+    public ResponseEntity<ApiResult<GetWorkflowResponse>> getWorkflow(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long workflowId
+    ) {
+
+        Long userId = validateAndGetUserId(principal);
+
+        GetWorkflowResponse workflow = workflowService.getWorkflow(workflowId, userId);
+
+        return ResponseEntity.ok(ApiResult.success("워크플로우 상세 조회 성공(조회용)", workflow));
     }
 
     /**
