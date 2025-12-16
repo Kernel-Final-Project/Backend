@@ -8,6 +8,7 @@ import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -61,6 +62,10 @@ public class Workflow extends BaseEntity {
     @Column(name = "is_test", nullable = false)
     private Boolean isTest = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "test_status", length = 50)
+    private WorkflowTestStatus testStatus;
+
     @Column(name="deleted_at")
     private LocalDateTime deletedAt;
 
@@ -79,6 +84,7 @@ public class Workflow extends BaseEntity {
         workflow.status = WorkflowStatus.PENDING;
         workflow.siteUrl = siteUrl;
         workflow.isTest = false;
+        workflow.testStatus = null;
 
         return workflow;
     }
@@ -104,6 +110,17 @@ public class Workflow extends BaseEntity {
     public void delete() {
         this.status = WorkflowStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void markAsTest() {
+        this.isTest = true;
+        this.testStatus = WorkflowTestStatus.TEST_IN_PROGRESS;
+    }
+
+    public void updateTestStatus(WorkflowTestStatus newStatus) {
+        if (this.isTest) {
+            this.testStatus = newStatus;
+        }
     }
 
 }

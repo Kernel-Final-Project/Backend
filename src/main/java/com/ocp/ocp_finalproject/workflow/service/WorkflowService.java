@@ -18,6 +18,8 @@ public interface WorkflowService {
 
     GetWorkflowResponse getWorkflow(Long workflowId, Long userId);
 
+    void markWorkflowAsTest(Long workflowId);
+
     WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
 
     WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus status);

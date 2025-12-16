@@ -349,4 +349,13 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .readableRule(rule.getReadableRule())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void markWorkflowAsTest(Long workflowId) {
+        Workflow workflow = workflowRepository.findById(workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+        workflow.markAsTest();
+        log.info("워크플로우 {} 테스트 모드로 설정 완료", workflowId);
+    }
 }
