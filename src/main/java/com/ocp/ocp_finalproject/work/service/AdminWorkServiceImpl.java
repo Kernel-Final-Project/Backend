@@ -56,8 +56,6 @@ public class AdminWorkServiceImpl implements AdminWorkService {
             Workflow workflow = workflowRepository.findById(workflowId)
                     .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
-            validateWorkflowOwner(workflow, user.getId());
-
             workPage = workRepository.findByWorkflowIdForAdmin(workflowId, pageable);
         } else {
             workPage = workRepository.findAllForAdmin(pageable);
@@ -87,12 +85,6 @@ public class AdminWorkServiceImpl implements AdminWorkService {
                 .totalPages(workPage.getTotalPages())
                 .last(workPage.isLast())
                 .build();
-    }
-
-    private void validateWorkflowOwner(Workflow workflow, Long userId) {
-        if (workflow.getUser() == null || workflow.getUser().getId() == null || !workflow.getUser().getId().equals(userId)) {
-            throw new CustomException(NOT_WORKFLOW_OWNER);
-        }
     }
 
     private User validateAndGetUser(UserPrincipal principal) {
