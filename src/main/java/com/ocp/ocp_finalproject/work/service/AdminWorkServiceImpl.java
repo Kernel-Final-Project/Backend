@@ -45,7 +45,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
             throw new CustomException(INVALID_INPUT_VALUE, "페이지 번호는 0 이상의 정수여야 합니다.");
         }
 
-        User user = validateAndGetUser(principal);
+        validateAndGetUser(principal);
 
         PageRequest pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -53,7 +53,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
 
         if (workflowId != null) {
 
-            Workflow workflow = workflowRepository.findById(workflowId)
+            workflowRepository.findById(workflowId)
                     .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
             workPage = workRepository.findByWorkflowIdForAdmin(workflowId, pageable);
@@ -67,6 +67,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
         List<AdminWorkListResponse> responses = works.stream()
                 .map(work -> AdminWorkListResponse.builder()
                         .workId(work.getId())
+                        .userId(work.getWorkflow().getUser().getId())
                         .status(work.getStatus())
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())

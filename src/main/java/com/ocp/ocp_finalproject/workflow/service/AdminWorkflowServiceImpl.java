@@ -75,6 +75,7 @@ public class AdminWorkflowServiceImpl implements AdminWorkflowService {
                 .blogUrl(wf.getUserBlog().getBlogUrl())
                 .readableRule(wf.getRecurrenceRule().getReadableRule())
                 .status(wf.getStatus())
+                .testStatus(wf.getTestStatus())
                 .build();
     }
 

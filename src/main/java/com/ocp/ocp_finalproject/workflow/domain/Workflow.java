@@ -114,7 +114,7 @@ public class Workflow extends BaseEntity {
 
     public void markAsTest() {
         this.isTest = true;
-        this.testStatus = WorkflowTestStatus.TEST_IN_PROGRESS;
+        this.testStatus = WorkflowTestStatus.NOT_TESTED;
     }
 
     public void updateTestStatus(WorkflowTestStatus newStatus) {
