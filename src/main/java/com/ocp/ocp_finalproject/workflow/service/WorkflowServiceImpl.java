@@ -136,6 +136,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .setTrendCategory(SetTrendCategoryNameDto.from(category))
                 .recurrenceRule(RecurrenceRuleDto.from(rule))
                 .status(workflow.getStatus())
+                .testStatus(workflow.getTestStatus())
                 .build();
     }
 
