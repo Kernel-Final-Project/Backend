@@ -54,6 +54,7 @@ public class ContentGenerateRequest {
         private String keywordSelect;
         private String productSelect;
         private String contentGenerate;
+        private String airflowLog;
     }
 
     @Data

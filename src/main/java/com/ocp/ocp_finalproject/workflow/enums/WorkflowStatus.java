@@ -62,7 +62,7 @@ public enum WorkflowStatus {
     public boolean canTransitionTo(WorkflowStatus newStatus) {
         return switch (this) {
             case PENDING ->
-                    newStatus == TEST_PASSED
+                    newStatus == ACTIVE
                             || newStatus == TEST_FAILED
                             || newStatus == INACTIVE
                             || newStatus == DELETED;
