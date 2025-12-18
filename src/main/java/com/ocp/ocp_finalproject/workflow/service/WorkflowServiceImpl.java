@@ -182,8 +182,12 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowResponse registerWorkflow(Long userId, Long workflowId, Long replaceWorkflowId) throws SchedulerException {
-        Workflow draftWorkflow = workflowRepository.findWorkflow(userId, workflowId)
+        Workflow draftWorkflow = workflowRepository.findById(workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        if (!draftWorkflow.getUser().getId().equals(userId)) {
+            throw new CustomException(NOT_WORKFLOW_OWNER);
+        }
 
         if (draftWorkflow.getTestStatus() != WorkflowTestStatus.TEST_PASSED) {
             throw new CustomException(ErrorCode.WORKFLOW_TEST_NOT_PASSED);
