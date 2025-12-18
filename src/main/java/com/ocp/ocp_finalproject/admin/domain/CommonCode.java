@@ -49,9 +49,7 @@ public class CommonCode extends BaseEntity {
         code.description = description;
         code.sortOrder = sortOrder;
         code.isActive = isActive;
-        if (commonCodeGroup != null) {
-            commonCodeGroup.addCode(code);  // 편의 메서드로 양방향 연결
-        }
+        code.commonCodeGroup = commonCodeGroup;  // 단방향 설정만
         return code;
     }
 

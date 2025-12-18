@@ -25,10 +25,17 @@ public class CommonCodeService {
      * */
     @Transactional
     public CommonCode createCode(CommonCode code) {
-        // 코드 ID 중복 체크
-        if (commonCodeRepository.existsById(code.getId())) {
-            throw new CustomException(ErrorCode.DUPLICATE_COMMON_CODE);
-        }
+        // 코드 ID 중복 체크 - 임시 주석 처리
+        String codeId = code.getId();
+        System.out.println("=== CommonCode 생성 시도 ===");
+        System.out.println("codeId: " + codeId);
+
+        // TODO: existsById 이슈 해결 후 주석 해제
+        // if (commonCodeRepository.existsById(codeId)) {
+        //     System.out.println("!!! 중복 감지 !!! codeId: " + codeId);
+        //     throw new CustomException(ErrorCode.DUPLICATE_COMMON_CODE);
+        // }
+
         return commonCodeRepository.save(code);
     }
 
