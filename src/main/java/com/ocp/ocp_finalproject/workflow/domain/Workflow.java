@@ -45,7 +45,7 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "trend_category_id")
     private TrendCategory trendCategory;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "recurrence_rule_id")
     private RecurrenceRule recurrenceRule;
 
