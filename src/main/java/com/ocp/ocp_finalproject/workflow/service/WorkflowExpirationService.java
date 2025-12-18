@@ -44,7 +44,7 @@ public class WorkflowExpirationService {
             return false;
         }
 
-        if (!workflow.getStatus().canTransitionTo(WorkflowStatus.COMPLETED)) {
+        if (workflow.getStatus().canTransitionTo(WorkflowStatus.COMPLETED)) {
             log.debug("워크플로우 {} 는 완료 상태로 전환할 수 없어 만료 처리를 건너뜁니다. currentStatus={}", workflowId, workflow.getStatus());
             return false;
         }

@@ -31,7 +31,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
@@ -256,6 +255,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus newStatus) {
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
@@ -266,7 +269,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         return WorkflowStatusResponse.builder()
                 .workflowId(workflow.getId())
-                .status(workflow.getStatus())
+                .status(newStatus)
                 .changedAt(workflow.getUpdatedAt())
                 .build();
     }

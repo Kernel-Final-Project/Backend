@@ -31,6 +31,8 @@ public class ContentGenerationJob implements Job {
         contentGenerateProducer.send(prepared);
         log.info("워크 {} 콘텐트 생성 메시지 전송", prepared.getWorkId());
 
-        airflowTriggerClient.triggerTrendPipeline(workflowId);
+        // workId로 트리거 & dagRunId 받기
+        String dagRunId = airflowTriggerClient.triggerTrendPipeline(prepared.getWorkId());
+        log.info("스케줄 실행 - workId: {}, dagRunId: {}", prepared.getWorkId(), dagRunId);
     }
 }

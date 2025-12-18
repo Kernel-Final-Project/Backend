@@ -17,6 +17,8 @@ public class AdminWorkListResponse {
 
     private Long workId;
 
+    private Long workflowId;
+
     private Long userId;
 
     private String postingUrl;
