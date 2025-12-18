@@ -82,7 +82,7 @@ public class WorkService {
                 .filter(aiContent -> aiContent.getWork() != null)
                 .collect(Collectors.toMap(
                         aiContent -> aiContent.getWork().getId(),
-                        AiContent::getChoiceProduct,
+                        aiContent -> Optional.ofNullable(aiContent.getChoiceProduct()).orElse(""),
                         (existing, ignore) -> existing
                 ));
     }

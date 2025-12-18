@@ -37,21 +37,21 @@ public class AirflowTriggerClient {
     /**
      * trend_pipeline DAG를 실행하도록 Airflow에 요청한다.
      *
-     * @param workflowId  실행 중인 워크플로우 ID
+     * @param workId  실행 중인 워크 ID
      */
-    public void triggerTrendPipeline(Long workflowId) {
+    public String triggerTrendPipeline(Long workId) {
         if (!StringUtils.hasText(baseUrl)) {
             log.warn("Airflow base URL이 설정되지 않아 DAG를 트리거하지 못했습니다.");
-            return;
+            return null;
         }
 
         String dagRunId = String.format("auto__%s_%d",
-                workflowId != null ? workflowId : "unknown",
+                workId != null ? workId : "unknown",
                 Instant.now().toEpochMilli());
 
         Map<String, Object> conf = new HashMap<>();
-        if (workflowId != null) {
-            conf.put("workflowId", workflowId);
+        if (workId != null) {
+            conf.put("workflowId", workId);
         }
 
         Map<String, Object> payload = new HashMap<>();
@@ -70,9 +70,11 @@ public class AirflowTriggerClient {
                 : baseUrl + "/api/v1/dags/trend_pipeline/dagRuns";
         try {
             restTemplate.postForEntity(endpoint, request, String.class);
-            log.info("Airflow trend_pipeline DAG 트리거 요청 완료 dagRunId={}", dagRunId);
+            log.info("Airflow trend_pipeline DAG 트리거 요청 완료 workId={} dagRunId={}",workId ,dagRunId);
+            return dagRunId;
         } catch (RestClientException ex) {
-            log.warn("Airflow DAG 트리거 실패 dagRunId={} : {}", dagRunId, ex.getMessage());
+            log.warn("Airflow DAG 트리거 실패 workId={} dagRunId={} : {}", workId , dagRunId, ex.getMessage());
+            return null;
         }
     }
 }
