@@ -34,6 +34,9 @@ public class ContentGenerateRequest {
     // ===== 7. 트렌드 카테고리 =====
     private TrendCategory trendCategory;
 
+    // ===== 8. 테스트 여부 =====
+    private Boolean isTest;
+
     // ===== 내부 DTO: 상품 정보 ===== //이건 크롤링 파트랑 상의 후 변경 예정
     @Data
     public static class ProductInfo {

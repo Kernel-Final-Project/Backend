@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,9 +25,10 @@ public class WorkflowTestController {
     @PostMapping("/test")
     public ResponseEntity<ApiResult<WorkflowTestResponse>> executeWorkflowTest(
             @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody WorkflowRequest workflowRequest
+            @RequestBody WorkflowRequest workflowRequest,
+            @RequestParam(value = "replaceWorkflowId", required = false) Long replaceWorkflowId
     ) throws SchedulerException {
-        WorkflowTestResponse response = workflowTestService.executeWorkflowTest(principal, workflowRequest);
+        WorkflowTestResponse response = workflowTestService.executeWorkflowTest(principal, workflowRequest, replaceWorkflowId);
 
         return ResponseEntity.ok(
                 ApiResult.success("워크플로우 생성 및 테스트 실행 완료", response)

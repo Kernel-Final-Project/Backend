@@ -12,15 +12,15 @@ public interface WorkflowService {
 
     Page<WorkflowListResponse> getWorkflows(Long userId, int page);
 
-    WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) throws SchedulerException;
+    WorkflowResponse createWorkflowDraft(Long userId, WorkflowRequest workflowRequest) throws SchedulerException;
+
+    WorkflowResponse registerWorkflow(Long userId, Long workflowId, Long replaceWorkflowId) throws SchedulerException;
 
     WorkflowEditResponse getWorkflowForEdit(Long workflowId, Long userId);
 
     GetWorkflowResponse getWorkflow(Long workflowId, Long userId);
 
     void markWorkflowAsTest(Long workflowId);
-
-    WorkflowResponse updateWorkflow(Long userId, Long workflowId, WorkflowRequest workflowRequest) throws SchedulerException;
 
     WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus status);
 

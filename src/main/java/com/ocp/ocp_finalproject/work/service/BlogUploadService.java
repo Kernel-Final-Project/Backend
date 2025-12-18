@@ -15,6 +15,7 @@ import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.workflow.domain.RecurrenceRule;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,6 +72,7 @@ public class BlogUploadService {
                 log.warn("워크 {} : 블로그 정보 없음 -> 업로드 스킵", work.getId());
                 continue;
             }
+            boolean isTestWorkflow = workflow.getStatus() == WorkflowStatus.PRE_REGISTERED;
 
             // 4. 업로드 요청 생성
             BlogUploadRequest req = new BlogUploadRequest();
@@ -81,6 +83,7 @@ public class BlogUploadService {
             req.setBlogId(blog.getAccountId());
             req.setBlogPassword(blog.getAccountPassword());
             req.setBlogUrl(blog.getBlogUrl());
+            req.setIsTest(isTestWorkflow);
 
             requests.add(req);
         }

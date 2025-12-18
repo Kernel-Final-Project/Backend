@@ -18,6 +18,7 @@ import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,6 +50,8 @@ public class ContentGenerateService {
         Workflow workflow = workflowRepository.findById(workflowId)
                 .orElseThrow(() -> new CustomException(ErrorCode.WORKFLOW_NOT_FOUND));
 
+        boolean isTestWorkflow = workflow.getStatus() == WorkflowStatus.PRE_REGISTERED;
+
         LocalDateTime now = LocalDateTime.now();
         Work work = workRepository.save(
                 Work.createBuilder()
@@ -75,6 +78,7 @@ public class ContentGenerateService {
         request.setWorkId(work.getId());
         request.setSiteUrl(workflow.getSiteUrl());
         request.setTrendCategory(convertTrendCategory(workflow));
+        request.setIsTest(isTestWorkflow);
 
         request.setRecentTrendKeywords(fetchRecentTrendKeywords(workflow.getId()));
 

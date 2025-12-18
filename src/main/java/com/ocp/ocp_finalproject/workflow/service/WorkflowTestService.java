@@ -7,6 +7,6 @@ import org.quartz.SchedulerException;
 
 public interface WorkflowTestService {
 
-    WorkflowTestResponse executeWorkflowTest(UserPrincipal userPrincipal, WorkflowRequest workflowRequest) throws SchedulerException;
+    WorkflowTestResponse executeWorkflowTest(UserPrincipal userPrincipal, WorkflowRequest workflowRequest, Long replaceWorkflowId) throws SchedulerException;
 
 }

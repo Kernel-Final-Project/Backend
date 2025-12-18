@@ -59,9 +59,6 @@ public class Workflow extends BaseEntity {
     @Column(name = "site_url", length = 100)
     private String siteUrl;
 
-    @Column(name = "is_test", nullable = false)
-    private Boolean isTest = false;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "test_status", length = 50)
     private WorkflowTestStatus testStatus;
@@ -81,10 +78,9 @@ public class Workflow extends BaseEntity {
         workflow.userBlog = userBlog;
         workflow.trendCategory = trendCategory;
         workflow.recurrenceRule = recurrenceRule;
-        workflow.status = WorkflowStatus.PENDING;
+        workflow.status = WorkflowStatus.PRE_REGISTERED;
         workflow.siteUrl = siteUrl;
-        workflow.isTest = false;
-        workflow.testStatus = null;
+        workflow.testStatus = WorkflowTestStatus.NOT_TESTED;
 
         return workflow;
     }
@@ -113,14 +109,10 @@ public class Workflow extends BaseEntity {
     }
 
     public void markAsTest() {
-        this.isTest = true;
         this.testStatus = WorkflowTestStatus.NOT_TESTED;
     }
 
     public void updateTestStatus(WorkflowTestStatus newStatus) {
-        if (this.isTest) {
-            this.testStatus = newStatus;
-        }
+        this.testStatus = newStatus;
     }
-
 }

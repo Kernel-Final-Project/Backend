@@ -22,4 +22,7 @@ public class ContentGenerateWebhookRequest {
     private String title;
     private String content;
     private String summary;
+
+    @JsonProperty("isTest")
+    private Boolean isTest;
 }

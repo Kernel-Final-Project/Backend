@@ -79,35 +79,16 @@ public class WorkflowController {
     /**
      * 워크플로우 등록
      */
-    @PostMapping
-    public ResponseEntity<ApiResult<WorkflowResponse>> createWorkflow(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody WorkflowRequest workflowRequest
-    ) throws SchedulerException {
-
-        Long userId = validateAndGetUserId(principal);
-
-        WorkflowResponse workflow = workflowService.createWorkflow(userId, workflowRequest);
-
-        return ResponseEntity.ok(ApiResult.success("워크플로우 생성 성공", workflow));
-    }
-
-    /**
-     * 워크플로우 수정
-     * url, 트렌드 키워드, 블로그, 예약 시간, 블로그 계정 모두 수정 가능
-     */
-    @PutMapping("/{workflowId}")
-    public ResponseEntity<ApiResult<WorkflowResponse>> updateWorkflow(
+    @PostMapping("/{workflowId}/register")
+    public ResponseEntity<ApiResult<WorkflowResponse>> registerWorkflow(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId,
-            @RequestBody WorkflowRequest workflowRequest
+            @RequestBody(required = false) WorkflowRegisterRequest request
     ) throws SchedulerException {
-
         Long userId = validateAndGetUserId(principal);
-
-        WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowId, workflowRequest);
-
-        return ResponseEntity.ok(ApiResult.success("워크플로우 수정 성공", workflow));
+        Long replaceWorkflowId = request != null ? request.getReplaceWorkflowId() : null;
+        WorkflowResponse workflow = workflowService.registerWorkflow(userId, workflowId, replaceWorkflowId);
+        return ResponseEntity.ok(ApiResult.success("워크플로우 등록 성공", workflow));
     }
 
     /**
