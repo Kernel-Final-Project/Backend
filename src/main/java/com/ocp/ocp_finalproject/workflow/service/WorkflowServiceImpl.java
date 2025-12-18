@@ -251,7 +251,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Workflow workflow = workflowRepository.findById(workflowId)
+        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
         workflow.changeStatus(newStatus);
