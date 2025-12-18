@@ -26,11 +26,9 @@ import org.quartz.SchedulerException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
@@ -136,6 +134,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .setTrendCategory(SetTrendCategoryNameDto.from(category))
                 .recurrenceRule(RecurrenceRuleDto.from(rule))
                 .status(workflow.getStatus())
+                .testStatus(workflow.getTestStatus())
                 .build();
     }
 
@@ -248,6 +247,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowStatusResponse updateStatus(Long userId, Long workflowId, WorkflowStatus newStatus) {
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
@@ -258,7 +261,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         return WorkflowStatusResponse.builder()
                 .workflowId(workflow.getId())
-                .status(workflow.getStatus())
+                .status(newStatus)
                 .changedAt(workflow.getUpdatedAt())
                 .build();
     }
@@ -348,5 +351,14 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .blogAccountId(userBlog.getAccountId())
                 .readableRule(rule.getReadableRule())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void markWorkflowAsTest(Long workflowId) {
+        Workflow workflow = workflowRepository.findById(workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+        workflow.markAsTest();
+        log.info("워크플로우 {} 테스트 모드로 설정 완료", workflowId);
     }
 }

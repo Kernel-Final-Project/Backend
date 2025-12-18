@@ -39,6 +39,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
         SELECT w
         FROM Work w
         JOIN FETCH w.workflow wf
+        LEFT JOIN FETCH wf.user u
         JOIN FETCH w.aiContent ac
         WHERE wf.id = :workflowId
     """)
@@ -48,6 +49,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
         SELECT w
         FROM Work w
         JOIN FETCH w.workflow wf
+        LEFT JOIN FETCH wf.user u
         JOIN FETCH w.aiContent ac
     """)
     Page<Work> findAllForAdmin(Pageable pageable);

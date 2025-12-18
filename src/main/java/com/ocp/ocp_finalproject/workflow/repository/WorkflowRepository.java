@@ -27,7 +27,8 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
                 tc.trendCategoryName,
                 ub.accountId,
                 rr.readableRule,
-                wf.status
+                wf.status,
+                wf.testStatus
             )
             FROM Workflow wf
             JOIN wf.user u

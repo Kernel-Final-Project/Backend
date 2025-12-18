@@ -12,8 +12,6 @@ public enum WorkflowStatus {
 
     PENDING("대기", "워크플로우 생성 후 첫 실행 대기 중"),
     ACTIVE("활성", "워크플로우가 활성화되어 자동 실행 중"),
-    TEST_PASSED("테스트 성공", "모든 테스트를 통과하여 실제 실행으로 전환 가능"),
-    TEST_FAILED("테스트 실패", "테스트 실패"),
     INACTIVE("비활성", "워크플로우가 비활성화되어 실행 중지"),
     COMPLETED("완료", "워크플로우 완전 종료"),
     DELETED("삭제", "워크플로우 삭제됨");
@@ -61,37 +59,21 @@ public enum WorkflowStatus {
      */
     public boolean canTransitionTo(WorkflowStatus newStatus) {
         return switch (this) {
-            case PENDING ->
-                    newStatus == TEST_PASSED
-                            || newStatus == TEST_FAILED
-                            || newStatus == INACTIVE
-                            || newStatus == DELETED;
 
-            case TEST_FAILED ->
-                    newStatus == TEST_PASSED
-                            || newStatus == INACTIVE
-                            || newStatus == DELETED;
+            case PENDING -> newStatus == ACTIVE
+                    || newStatus == DELETED;
 
-            case TEST_PASSED ->
-                    newStatus == ACTIVE
-                            || newStatus == INACTIVE
-                            || newStatus == DELETED;
+            case ACTIVE -> newStatus == INACTIVE
+                    || newStatus == COMPLETED
+                    || newStatus == DELETED;
 
-            case ACTIVE ->
-                    newStatus == INACTIVE
-                            || newStatus == COMPLETED
-                            || newStatus == DELETED;
+            case INACTIVE -> newStatus == ACTIVE
+                    || newStatus == COMPLETED
+                    || newStatus == DELETED;
 
-            case INACTIVE ->
-                    newStatus == ACTIVE
-                            || newStatus == COMPLETED
-                            || newStatus == DELETED;
+            case COMPLETED -> newStatus == DELETED;
 
-            case COMPLETED ->
-                    newStatus == DELETED;
-
-            case DELETED ->
-                    false;
+            case DELETED -> false;
         };
     }
 

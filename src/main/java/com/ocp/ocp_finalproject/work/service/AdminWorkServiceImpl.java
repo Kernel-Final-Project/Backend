@@ -45,7 +45,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
             throw new CustomException(INVALID_INPUT_VALUE, "페이지 번호는 0 이상의 정수여야 합니다.");
         }
 
-        User user = validateAndGetUser(principal);
+        validateAndGetUser(principal);
 
         PageRequest pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -53,10 +53,8 @@ public class AdminWorkServiceImpl implements AdminWorkService {
 
         if (workflowId != null) {
 
-            Workflow workflow = workflowRepository.findById(workflowId)
+            workflowRepository.findById(workflowId)
                     .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
-
-            validateWorkflowOwner(workflow, user.getId());
 
             workPage = workRepository.findByWorkflowIdForAdmin(workflowId, pageable);
         } else {
@@ -65,10 +63,11 @@ public class AdminWorkServiceImpl implements AdminWorkService {
 
         List<Work> works = workPage.getContent();
 
-
         List<AdminWorkListResponse> responses = works.stream()
                 .map(work -> AdminWorkListResponse.builder()
                         .workId(work.getId())
+                        .workflowId(work.getWorkflow().getId())
+                        .userId(work.getWorkflow().getUser().getId())
                         .status(work.getStatus())
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())
@@ -87,31 +86,6 @@ public class AdminWorkServiceImpl implements AdminWorkService {
                 .totalPages(workPage.getTotalPages())
                 .last(workPage.isLast())
                 .build();
-    }
-
-    private Map<Long, String> fetchChoiceProductMap(List<Work> works) {
-        List<Long> workIds = works.stream()
-                .map(Work::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        if (workIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return aiContentRepository.findByWorkIdIn(workIds).stream()
-                .filter(aiContent -> aiContent.getWork() != null)
-                .collect(Collectors.toMap(
-                        aiContent -> aiContent.getWork().getId(),
-                        AiContent::getChoiceProduct,
-                        (existing, ignore) -> existing
-                ));
-    }
-
-    private void validateWorkflowOwner(Workflow workflow, Long userId) {
-        if (workflow.getUser() == null || workflow.getUser().getId() == null || !workflow.getUser().getId().equals(userId)) {
-            throw new CustomException(NOT_WORKFLOW_OWNER);
-        }
     }
 
     private User validateAndGetUser(UserPrincipal principal) {

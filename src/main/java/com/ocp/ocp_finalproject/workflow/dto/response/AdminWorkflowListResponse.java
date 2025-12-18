@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.workflow.dto.response;
 
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,4 +35,5 @@ public class AdminWorkflowListResponse {
 
     private final WorkflowStatus status;
 
+    private WorkflowTestStatus testStatus;
 }

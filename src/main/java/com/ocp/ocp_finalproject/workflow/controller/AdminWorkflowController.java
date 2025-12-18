@@ -35,5 +35,4 @@ public class AdminWorkflowController {
         return ResponseEntity.ok(ApiResult.success("워크플로우 목록 조회 성공(관리자)", workflowList));
     }
 
-
 }

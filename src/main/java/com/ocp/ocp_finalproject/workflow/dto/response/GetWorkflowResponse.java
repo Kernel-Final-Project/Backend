@@ -3,6 +3,7 @@ package com.ocp.ocp_finalproject.workflow.dto.response;
 import com.ocp.ocp_finalproject.workflow.dto.RecurrenceRuleDto;
 import com.ocp.ocp_finalproject.workflow.dto.SetTrendCategoryNameDto;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,4 +34,6 @@ public class GetWorkflowResponse {
     private RecurrenceRuleDto recurrenceRule;
 
     private WorkflowStatus status;
+
+    private WorkflowTestStatus testStatus;
 }

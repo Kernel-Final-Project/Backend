@@ -8,11 +8,12 @@ import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import static com.ocp.ocp_finalproject.common.exception.ErrorCode.INVALID_STATUS
 @Entity
 @Table(name = "workflow")
 @Getter
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Workflow extends BaseEntity {
 
@@ -58,8 +60,9 @@ public class Workflow extends BaseEntity {
     @Column(name = "site_url", length = 100)
     private String siteUrl;
 
-    @Column(name = "is_test", nullable = false)
-    private Boolean isTest = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "test_status", length = 50)
+    private WorkflowTestStatus testStatus;
 
     @Column(name="deleted_at")
     private LocalDateTime deletedAt;
@@ -78,7 +81,7 @@ public class Workflow extends BaseEntity {
         workflow.recurrenceRule = recurrenceRule;
         workflow.status = WorkflowStatus.PENDING;
         workflow.siteUrl = siteUrl;
-        workflow.isTest = false;
+        workflow.testStatus = null;
 
         return workflow;
     }
@@ -95,6 +98,7 @@ public class Workflow extends BaseEntity {
 
     public void changeStatus(WorkflowStatus newStatus) {
         if(!this.status.canTransitionTo(newStatus)) {
+            log.info(String.valueOf(newStatus));
             throw new CustomException(INVALID_STATUS_CHANGE);
         }
 
@@ -104,6 +108,14 @@ public class Workflow extends BaseEntity {
     public void delete() {
         this.status = WorkflowStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void markAsTest() {
+        this.testStatus = WorkflowTestStatus.NOT_TESTED;
+    }
+
+    public void updateTestStatus(WorkflowTestStatus newStatus) {
+        this.testStatus = newStatus;
     }
 
 }

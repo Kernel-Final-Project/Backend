@@ -11,6 +11,7 @@ import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest;
 import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest.ProductInfo;
 import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest.TrendCategory;
 import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest.WebhookUrls;
+import com.ocp.ocp_finalproject.work.config.AirflowLogProperties;
 import com.ocp.ocp_finalproject.work.config.ContentGenerateProperties;
 import com.ocp.ocp_finalproject.work.config.KeywordSelectProperties;
 import com.ocp.ocp_finalproject.work.config.ProductSelectProperties;
@@ -43,6 +44,7 @@ public class ContentGenerateService {
     private final KeywordSelectProperties keywordSelectProperties;
     private final ProductSelectProperties productSelectProperties;
     private final ContentGenerateProperties contentGenerateProperties;
+    private final AirflowLogProperties airflowLogProperties;
 
     @Transactional
     public ContentGenerateRequest createRequest(Long workflowId) {
@@ -94,6 +96,7 @@ public class ContentGenerateService {
         webhookUrls.setKeywordSelect(keywordSelectProperties.getWebhookUrl());
         webhookUrls.setProductSelect(productSelectProperties.getWebhookUrl());
         webhookUrls.setContentGenerate(contentGenerateProperties.getWebhookUrl());
+        webhookUrls.setAirflowLog(airflowLogProperties.getWebhookUrl());
         request.setWebhookUrls(webhookUrls);
         return request;
     }
