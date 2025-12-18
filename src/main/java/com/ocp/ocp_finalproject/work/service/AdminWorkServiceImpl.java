@@ -63,10 +63,10 @@ public class AdminWorkServiceImpl implements AdminWorkService {
 
         List<Work> works = workPage.getContent();
 
-
         List<AdminWorkListResponse> responses = works.stream()
                 .map(work -> AdminWorkListResponse.builder()
                         .workId(work.getId())
+                        .workflowId(work.getWorkflow().getId())
                         .userId(work.getWorkflow().getUser().getId())
                         .status(work.getStatus())
                         .postingUrl(work.getPostingUrl())

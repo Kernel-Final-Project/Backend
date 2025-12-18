@@ -59,25 +59,20 @@ public enum WorkflowStatus {
      */
     public boolean canTransitionTo(WorkflowStatus newStatus) {
         return switch (this) {
-            case PENDING ->
-                    newStatus == INACTIVE
-                            || newStatus == DELETED;
+            case PENDING -> newStatus == ACTIVE
+                    || newStatus == DELETED;
 
-            case ACTIVE ->
-                    newStatus == INACTIVE
-                            || newStatus == COMPLETED
-                            || newStatus == DELETED;
+            case ACTIVE -> newStatus == INACTIVE
+                    || newStatus == COMPLETED
+                    || newStatus == DELETED;
 
-            case INACTIVE ->
-                    newStatus == ACTIVE
-                            || newStatus == COMPLETED
-                            || newStatus == DELETED;
+            case INACTIVE -> newStatus == ACTIVE
+                    || newStatus == COMPLETED
+                    || newStatus == DELETED;
 
-            case COMPLETED ->
-                    newStatus == DELETED;
+            case COMPLETED -> newStatus == DELETED;
 
-            case DELETED ->
-                    false;
+            case DELETED -> false;
         };
     }
 

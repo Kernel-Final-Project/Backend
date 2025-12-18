@@ -53,7 +53,7 @@ public class BlogUploadWebhookService {
     private void updateTestStatusIfNeeded(Work work, boolean isSuccess) {
         Workflow workflow = work.getWorkflow();
 
-        if (workflow == null || !workflow.getIsTest()) {
+        if (workflow == null || workflow.getTestStatus() == null) {
             return;  // 테스트 워크플로우가 아니면 무시
         }
 
