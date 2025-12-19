@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import com.ocp.ocp_finalproject.workflow.util.AesCryptoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,7 @@ public class BlogUploadService {
     private final WorkRepository workRepository;
     private final AiContentRepository aiContentRepository;
     private final ObjectMapper objectMapper;
-
+    private final AesCryptoUtil aesCryptoUtil;
     @Transactional(readOnly = true)
     public List<BlogUploadRequest> collectPendingBlogUploadsForWorkflow(Long workflowId) {
 
@@ -81,7 +83,7 @@ public class BlogUploadService {
             req.setContent(aiContent.getContent());
             req.setBlogType(resolveBlogType(blog.getBlogType()));
             req.setBlogId(blog.getAccountId());
-            req.setBlogPassword(blog.getAccountPassword());
+            req.setBlogPassword(aesCryptoUtil.decrypt(blog.getAccountPassword()));
             req.setBlogUrl(blog.getBlogUrl());
             req.setIsTest(isTestWorkflow);
 
