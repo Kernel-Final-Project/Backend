@@ -98,6 +98,7 @@ public class Workflow extends BaseEntity {
 
     public void changeStatus(WorkflowStatus newStatus) {
         if(!this.status.canTransitionTo(newStatus)) {
+            log.info(String.valueOf(this.status));
             log.info(String.valueOf(newStatus));
             throw new CustomException(INVALID_STATUS_CHANGE);
         }

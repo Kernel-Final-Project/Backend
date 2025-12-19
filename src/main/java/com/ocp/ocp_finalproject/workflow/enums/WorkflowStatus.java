@@ -66,7 +66,8 @@ public enum WorkflowStatus {
 
             case PENDING ->
                     newStatus == INACTIVE
-                            || newStatus == DELETED;
+                            || newStatus == DELETED
+                            || newStatus == ACTIVE;
 
             case ACTIVE ->
                     newStatus == INACTIVE
