@@ -134,9 +134,17 @@ public class WorkflowTestServiceImpl implements WorkflowTestService {
 
         User user = workflow.getUser();
         UserBlog userBlog = workflow.getUserBlog();
+        if (userBlog == null) {
+            throw new CustomException(INVALID_INPUT_VALUE, "워크플로우에 블로그 정보가 없습니다.");
+        }
         BlogType blogType = userBlog.getBlogType();
 
-        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflow.getTrendCategory().getId())
+        TrendCategory trendCategory = workflow.getTrendCategory();
+        if (trendCategory == null) {
+            throw new CustomException(INVALID_INPUT_VALUE, "워크플로우에 트렌드 카테고리 정보가 없습니다.");
+        }
+
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(trendCategory.getId())
                 .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
 
         WorkflowTestDetailResponse.TestWorkInfo latestWork = workRepository.findTopByWorkflowIdOrderByCreatedAtDesc(workflowId)
