@@ -54,4 +54,6 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     """)
     Page<Work> findAllForAdmin(Pageable pageable);
 
+    Optional<Work> findTopByWorkflowIdOrderByCreatedAtDesc(Long workflowId);
+
 }

@@ -1,16 +1,27 @@
 package com.ocp.ocp_finalproject.workflow.service;
 
+import com.ocp.ocp_finalproject.blog.domain.BlogType;
+import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.integration.airflow.AirflowTriggerClient;
 import com.ocp.ocp_finalproject.message.content.ContentGenerateProducer;
 import com.ocp.ocp_finalproject.message.content.dto.ContentGenerateRequest;
+import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
+import com.ocp.ocp_finalproject.trend.repository.TrendCategoryRepository;
+import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
+import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.work.service.ContentGenerateService;
+import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.dto.RecurrenceRuleDto;
+import com.ocp.ocp_finalproject.workflow.dto.SetTrendCategoryNameDto;
 import com.ocp.ocp_finalproject.workflow.dto.request.WorkflowRequest;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowTestDetailResponse;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowTestResponse;
+import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
-import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +29,9 @@ import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.ocp.ocp_finalproject.common.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static com.ocp.ocp_finalproject.common.exception.ErrorCode.NOT_WORKFLOW_OWNER;
+import static com.ocp.ocp_finalproject.common.exception.ErrorCode.TREND_NOT_FOUND;
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.UNAUTHORIZED;
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.WORKFLOW_NOT_FOUND;
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.WORKFLOW_TEST_NOT_PASSED;
@@ -32,6 +46,8 @@ public class WorkflowTestServiceImpl implements WorkflowTestService {
     private final ContentGenerateProducer contentGenerateProducer;
     private final AirflowTriggerClient airflowTriggerClient;
     private final WorkflowRepository workflowRepository;
+    private final WorkRepository workRepository;
+    private final TrendCategoryRepository trendCategoryRepository;
 
     @Override
     @Transactional
@@ -98,5 +114,54 @@ public class WorkflowTestServiceImpl implements WorkflowTestService {
     private void triggerAirflow(Long workflowId) {
         airflowTriggerClient.triggerTrendPipeline(workflowId);
         log.info("워크플로우 {} Airflow 파이프라인 트리거 완료", workflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WorkflowTestDetailResponse getTestWorkflow(Long workflowId, UserPrincipal principal) {
+        Long userId = validateAndGetUserId(principal);
+
+        Workflow workflow = workflowRepository.findById(workflowId)
+                .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+
+        if (workflow.getUser() == null || workflow.getUser().getId() == null || !workflow.getUser().getId().equals(userId)) {
+            throw new CustomException(NOT_WORKFLOW_OWNER);
+        }
+
+        if (workflow.getStatus() != WorkflowStatus.PRE_REGISTERED) {
+            throw new CustomException(INVALID_INPUT_VALUE, "테스트 워크플로우가 아닙니다.");
+        }
+
+        User user = workflow.getUser();
+        UserBlog userBlog = workflow.getUserBlog();
+        BlogType blogType = userBlog.getBlogType();
+
+        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflow.getTrendCategory().getId())
+                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
+
+        WorkflowTestDetailResponse.TestWorkInfo latestWork = workRepository.findTopByWorkflowIdOrderByCreatedAtDesc(workflowId)
+                .map(work -> WorkflowTestDetailResponse.TestWorkInfo.builder()
+                        .workId(work.getId())
+                        .status(work.getStatus())
+                        .completedAt(work.getCompletedAt())
+                        .failureReason(work.getFailureReason())
+                        .build())
+                .orElse(null);
+
+        return WorkflowTestDetailResponse.builder()
+                .workflowId(workflow.getId())
+                .userId(user.getId())
+                .userName(user.getName())
+                .siteName(SiteUrlInfo.getSiteNameFromUrl(workflow.getSiteUrl()))
+                .siteUrl(workflow.getSiteUrl())
+                .blogType(blogType.getBlogTypeName())
+                .blogUrl(userBlog.getBlogUrl())
+                .blogAccountId(userBlog.getAccountId())
+                .setTrendCategory(SetTrendCategoryNameDto.from(category))
+                .recurrenceRule(RecurrenceRuleDto.from(workflow.getRecurrenceRule()))
+                .status(workflow.getStatus())
+                .testStatus(workflow.getTestStatus())
+                .latestWork(latestWork)
+                .build();
     }
 }
