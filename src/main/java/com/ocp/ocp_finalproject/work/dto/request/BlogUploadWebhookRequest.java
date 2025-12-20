@@ -30,4 +30,7 @@ public class BlogUploadWebhookRequest {
 
     @JsonProperty("completedAt")
     private OffsetDateTime completedAt;
+
+    @JsonProperty("isTest")
+    private Boolean isTest;
 }

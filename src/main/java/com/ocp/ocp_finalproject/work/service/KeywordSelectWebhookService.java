@@ -8,6 +8,9 @@ import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.KeywordSelectWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.work.util.WebhookTimeParser;
+import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +43,36 @@ public class KeywordSelectWebhookService {
         LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
 
 
-        log.info("웹훅 결과 수신 workId={} success={} keyword={} startedAt={} completedAt={}", workId, request.isSuccess(), request.getKeyword(), startedAt, completedAt);
+        boolean isSuccess = request.isSuccess();
+        log.info("웹훅 결과 수신 workId={} success={} keyword={} startedAt={} completedAt={}", workId, isSuccess, request.getKeyword(), startedAt, completedAt);
 
-        work.updateKeywordCompletion(request.isSuccess(),startedAt,completedAt);
-        ai.updateKeywordCompletion(request.isSuccess(),request.getKeyword(),startedAt,completedAt);
+        work.updateKeywordCompletion(isSuccess, startedAt, completedAt);
+        ai.updateKeywordCompletion(isSuccess, request.getKeyword(), startedAt, completedAt);
+
+        boolean isTest = isTestRequest(request.getIsTest(), work);
+        updateTestStatusIfNeeded(work, isTest, isSuccess);
+    }
+
+    private boolean isTestRequest(Boolean isTestFlag, Work work) {
+        if (Boolean.TRUE.equals(isTestFlag)) {
+            return true;
+        }
+        Workflow workflow = work.getWorkflow();
+        return workflow != null && workflow.getStatus() == WorkflowStatus.PRE_REGISTERED;
+    }
+
+    private void updateTestStatusIfNeeded(Work work, boolean isTest, boolean isSuccess) {
+        if (!isTest || isSuccess) {
+            return;
+        }
+        Workflow workflow = work.getWorkflow();
+        if (workflow == null) {
+            return;
+        }
+        if (workflow.getTestStatus() == WorkflowTestStatus.TEST_FAILED) {
+            return;
+        }
+        workflow.updateTestStatus(WorkflowTestStatus.TEST_FAILED);
+        log.info("워크플로우 {} 테스트 실패 처리 - 키워드 선택 단계", workflow.getId());
     }
 }

@@ -19,6 +19,9 @@ public class ProductSelectWebhookRequest {
     @JsonProperty("completedAt")
     private OffsetDateTime completedAt;
 
+    @JsonProperty("isTest")
+    private Boolean isTest;
+
     private Product product;
 
     @Getter

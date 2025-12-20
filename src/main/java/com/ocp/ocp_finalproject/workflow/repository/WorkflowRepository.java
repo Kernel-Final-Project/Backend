@@ -1,6 +1,5 @@
 package com.ocp.ocp_finalproject.workflow.repository;
 
-import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.dto.response.AdminWorkflowListResponse;
 import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
@@ -11,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN wf.recurrenceRule rr
             JOIN wf.userBlog ub
             LEFT JOIN ub.blogType bt
-            WHERE u.id = :userId AND wf.status != 'DELETED'
+            WHERE u.id = :userId AND wf.status != 'DELETED' AND wf.status <> 'PRE_REGISTERED'
     """)
     Page<WorkflowListResponse> findWorkflows(@Param("userId") Long userId, Pageable pageable);
 
@@ -48,7 +48,7 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
             LEFT JOIN FETCH wf.recurrenceRule rr
             JOIN FETCH wf.userBlog ub
             LEFT JOIN FETCH ub.blogType bt
-            WHERE u.id = :userId AND wf.id = :workflowId
+            WHERE u.id = :userId AND wf.id = :workflowId AND wf.status <> 'PRE_REGISTERED'
     """)
     Optional<Workflow> findWorkflow(@Param("userId") Long userId, @Param("workflowId") Long workflowId);
 
@@ -104,5 +104,12 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
         where w.id = :id
     """)
     Optional<Workflow> findByIdWithRecurrenceRule(@Param("id") Long id);
+
+    @Query("""
+        SELECT wf
+        FROM Workflow wf
+        WHERE wf.status = 'PRE_REGISTERED' AND wf.createdAt < :threshold
+    """)
+    List<Workflow> findStaleTestWorkflows(@Param("threshold") LocalDateTime threshold);
 
 }

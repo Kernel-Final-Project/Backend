@@ -5,6 +5,7 @@ import com.ocp.ocp_finalproject.blog.domain.UserBlog;
 import com.ocp.ocp_finalproject.blog.repository.BlogTypeRepository;
 import com.ocp.ocp_finalproject.blog.repository.UserBlogRepository;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
+import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.scheduler.service.SchedulerSyncService;
 import com.ocp.ocp_finalproject.trend.domain.TrendCategory;
 import com.ocp.ocp_finalproject.trend.repository.TrendCategoryRepository;
@@ -16,6 +17,7 @@ import com.ocp.ocp_finalproject.workflow.dto.request.*;
 import com.ocp.ocp_finalproject.workflow.dto.response.*;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
 import com.ocp.ocp_finalproject.workflow.dto.response.GetWorkflowResponse;
 import com.ocp.ocp_finalproject.workflow.util.AesCryptoUtil;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ocp.ocp_finalproject.common.exception.ErrorCode.*;
@@ -140,7 +143,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional
-    public WorkflowResponse createWorkflow(Long userId, WorkflowRequest workflowRequest) throws SchedulerException {
+    public WorkflowResponse createWorkflowDraft(Long userId, WorkflowRequest workflowRequest) throws SchedulerException {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -173,75 +176,84 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflowRepository.save(workflow);
 
-
-        scheduleJobsAfterCommit(workflow.getId(), workflow.getStatus());
-
         return buildResponse(workflow, category);
     }
 
     @Override
     @Transactional
-    public WorkflowResponse updateWorkflow(Long userId,
-                                           Long workflowId,
-                                           WorkflowRequest workflowRequest) throws SchedulerException {
-
-        Workflow workflow = updateWorkflowTransaction(userId, workflowId, workflowRequest);
-
-        scheduleJobsAfterCommit(workflowId, workflow.getStatus());
-
-        return buildResponse(workflow, workflow.getTrendCategory());
-    }
-
-    @Transactional
-    protected Workflow updateWorkflowTransaction(Long userId, Long workflowId,
-                                                 WorkflowRequest workflowRequest) {
-        Workflow workflow = workflowRepository.findWorkflow(userId, workflowId)
+    public WorkflowResponse registerWorkflow(Long userId, Long workflowId, Long replaceWorkflowId) throws SchedulerException {
+        Workflow draftWorkflow = workflowRepository.findById(workflowId)
                 .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
 
-        UserBlog userBlog = upsertUserBlog(workflowRequest);
-
-        TrendCategory category = trendCategoryRepository.findCategoryWithParent(workflowRequest.getCategoryId())
-                .orElseThrow(() -> new CustomException(TREND_NOT_FOUND));
-
-        RecurrenceRule rule = workflow.getRecurrenceRule();
-
-        if (rule != null) {
-            RecurrenceRuleDto ruleDto = workflowRequest.getRecurrenceRule();
-
-            validator.validate(ruleDto);
-
-            rule.update(ruleDto);
+        if (!draftWorkflow.getUser().getId().equals(userId)) {
+            throw new CustomException(NOT_WORKFLOW_OWNER);
         }
 
-        workflow.update(userBlog, category, rule, workflowRequest.getSiteUrl());
+        if (draftWorkflow.getTestStatus() != WorkflowTestStatus.TEST_PASSED) {
+            throw new CustomException(ErrorCode.WORKFLOW_TEST_NOT_PASSED);
+        }
 
-        return workflow;
+        Workflow targetWorkflow;
+        if (replaceWorkflowId != null) {
+            targetWorkflow = workflowRepository.findWorkflow(userId, replaceWorkflowId)
+                    .orElseThrow(() -> new CustomException(WORKFLOW_NOT_FOUND));
+            UserBlog blogCopy = copyUserBlog(draftWorkflow.getUserBlog());
+            RecurrenceRule ruleCopy = copyRecurrenceRule(draftWorkflow.getRecurrenceRule());
+            targetWorkflow.update(blogCopy, draftWorkflow.getTrendCategory(), ruleCopy, draftWorkflow.getSiteUrl());
+        } else {
+            targetWorkflow = Workflow.create(
+                    draftWorkflow.getUser(),
+                    copyUserBlog(draftWorkflow.getUserBlog()),
+                    draftWorkflow.getTrendCategory(),
+                    copyRecurrenceRule(draftWorkflow.getRecurrenceRule()),
+                    draftWorkflow.getSiteUrl()
+            );
+            workflowRepository.save(targetWorkflow);
+        }
+        targetWorkflow.updateTestStatus(WorkflowTestStatus.TEST_PASSED);
+        targetWorkflow.changeStatus(WorkflowStatus.PENDING);
+
+        workflowRepository.delete(draftWorkflow);
+
+        scheduleJobsAfterCommit(targetWorkflow.getId(), targetWorkflow.getStatus());
+        return buildResponse(targetWorkflow, targetWorkflow.getTrendCategory());
     }
 
-    private UserBlog upsertUserBlog(WorkflowRequest workflowRequest) {
-        BlogType blogType = blogTypeRepository.findById(workflowRequest.getBlogTypeId())
-                .orElseThrow(() -> new CustomException(BLOG_TYPE_NOT_FOUND));
-
-        UserBlog userBlog = userBlogRepository.findByBlogTypeAndAccountId(blogType, workflowRequest.getBlogAccountId());
-
-        if (userBlog == null) {
-            userBlog = UserBlog.create(blogType,
-                    workflowRequest.getBlogAccountId(),
-                    aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()),
-                    workflowRequest.getBlogUrl());
-
-            userBlogRepository.save(userBlog);
-        } else {
-            userBlog.updateBlogUrl(workflowRequest.getBlogUrl());
-
-            if (workflowRequest.getBlogAccountPwd() != null
-                    && !workflowRequest.getBlogAccountPwd().isBlank()) {
-                userBlog.updateCredentials(workflowRequest.getBlogAccountId(),
-                        aesCryptoUtil.encrypt(workflowRequest.getBlogAccountPwd()));
-            }
+    private UserBlog copyUserBlog(UserBlog original) {
+        if (original == null) {
+            return null;
         }
+        return UserBlog.create(
+                original.getBlogType(),
+                original.getAccountId(),
+                original.getAccountPassword(),
+                original.getBlogUrl()
+        );
+    }
 
-        return userBlog;
+    private RecurrenceRule copyRecurrenceRule(RecurrenceRule original) {
+        if (original == null) {
+            return null;
+        }
+        List<Integer> daysOfWeek = original.getDaysOfWeek() != null
+                ? new ArrayList<>(original.getDaysOfWeek())
+                : null;
+        List<Integer> daysOfMonth = original.getDaysOfMonth() != null
+                ? new ArrayList<>(original.getDaysOfMonth())
+                : null;
+        List<String> timesOfDay = original.getTimesOfDay() != null
+                ? new ArrayList<>(original.getTimesOfDay())
+                : null;
+
+        return RecurrenceRule.create(
+                original.getRepeatType(),
+                original.getRepeatInterval(),
+                daysOfWeek,
+                daysOfMonth,
+                timesOfDay,
+                original.getStartAt(),
+                original.getEndAt()
+        );
     }
 
     @Override

@@ -26,4 +26,7 @@ public class KeywordSelectWebhookRequest {
 
     @JsonProperty("completedAt")
     private OffsetDateTime completedAt;
+
+    @JsonProperty("isTest")
+    private Boolean isTest;
 }

@@ -8,11 +8,10 @@ import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.request.BlogUploadWebhookRequest;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.work.util.WebhookTimeParser;
-import java.time.LocalDateTime;
-
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
+import com.ocp.ocp_finalproject.workflow.enums.WorkflowStatus;
 import com.ocp.ocp_finalproject.workflow.enums.WorkflowTestStatus;
-import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ public class BlogUploadWebhookService {
 
     private final WorkRepository workRepository;
     private final AiContentRepository aiContentRepository;
-    private final WorkflowRepository workflowRepository;
 
     @Transactional
     public void handleResult(BlogUploadWebhookRequest request) {
@@ -42,30 +40,48 @@ public class BlogUploadWebhookService {
 
         LocalDateTime completedAt = WebhookTimeParser.toUtcOrNow(request.getCompletedAt());
 
-        log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, request.isSuccess(), request.getPostingUrl(), completedAt);
-        work.updateUrlCompletion(request.getPostingUrl(), request.isSuccess(), completedAt);
-        aiContent.updateBlogUploadResult(request.isSuccess(), completedAt);
+        boolean isSuccess = request.isSuccess();
+        log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, isSuccess, request.getPostingUrl(), completedAt);
+        work.updateUrlCompletion(request.getPostingUrl(), isSuccess, completedAt);
+        aiContent.updateBlogUploadResult(isSuccess, completedAt);
 
-        // 테스트 워크플로우 상태 업데이트
-        updateTestStatusIfNeeded(work, request.isSuccess());
+        boolean isTest = isTestRequest(request.getIsTest(), work);
+        updateTestStatusIfNeeded(work, isTest, isSuccess);
     }
 
-    private void updateTestStatusIfNeeded(Work work, boolean isSuccess) {
+    private boolean isTestRequest(Boolean isTestFlag, Work work) {
+        if (Boolean.TRUE.equals(isTestFlag)) {
+            return true;
+        }
         Workflow workflow = work.getWorkflow();
+        return workflow != null && workflow.getStatus() == WorkflowStatus.PRE_REGISTERED;
+    }
 
-        if (workflow == null || workflow.getTestStatus() == null) {
-            return;  // 테스트 워크플로우가 아니면 무시
+    private void updateTestStatusIfNeeded(Work work, boolean isTest, boolean isSuccess) {
+        if (!isTest) {
+            return;
         }
 
-        WorkflowTestStatus newStatus = isSuccess
-                ? WorkflowTestStatus.TEST_PASSED
-                : WorkflowTestStatus.TEST_FAILED;
+        Workflow workflow = work.getWorkflow();
+        if (workflow == null) {
+            return;
+        }
 
-        workflow.updateTestStatus(newStatus);
+        WorkflowTestStatus currentStatus = workflow.getTestStatus();
 
-        log.info("워크플로우 {} 테스트 상태 업데이트: {} -> {}",
-                workflow.getId(),
-                workflow.getTestStatus(),
-                newStatus);
+        if (!isSuccess) {
+            if (currentStatus != WorkflowTestStatus.TEST_FAILED) {
+                workflow.updateTestStatus(WorkflowTestStatus.TEST_FAILED);
+                log.info("워크플로우 {} 테스트 실패 처리 - 블로그 업로드 단계", workflow.getId());
+            }
+            return;
+        }
+
+        if (currentStatus == WorkflowTestStatus.TEST_FAILED) {
+            return;
+        }
+
+        workflow.updateTestStatus(WorkflowTestStatus.TEST_PASSED);
+        log.info("워크플로우 {} 테스트 성공 처리 - 블로그 업로드 단계", workflow.getId());
     }
 }
