@@ -74,6 +74,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .blogAccountId(wf.getBlogAccountId())
                 .readableRule(wf.getReadableRule())
                 .status(wf.getStatus())
+                .testStatus(wf.getTestStatus())
                 .build());
     }
 

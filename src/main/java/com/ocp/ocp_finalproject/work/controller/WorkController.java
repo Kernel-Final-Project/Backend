@@ -4,6 +4,7 @@ import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
 import com.ocp.ocp_finalproject.work.dto.response.WorkPageResponse;
+import com.ocp.ocp_finalproject.work.dto.response.WorkResponse;
 import com.ocp.ocp_finalproject.work.service.WorkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,5 +40,20 @@ public class WorkController {
         WorkPageResponse workPage = workService.getWorks(userId, workflowId, page);
 
         return ResponseEntity.ok(ApiResult.success("워크 목록 조회 성공", workPage));
+    }
+
+    @GetMapping("/find/{workId}")
+    public ResponseEntity<ApiResult<WorkResponse>> getWork(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable("workId") Long workId
+    ) {
+        if (principal == null || principal.getUser() == null) {
+            throw new CustomException(UNAUTHORIZED);
+        }
+
+        Long userId = principal.getUser().getId();
+        WorkResponse work = workService.getWork(userId, workId);
+
+        return ResponseEntity.ok(ApiResult.success("워크 단일 조회 성공", work));
     }
 }

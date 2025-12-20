@@ -3,9 +3,12 @@ package com.ocp.ocp_finalproject.work.service;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.content.domain.AiContent;
 import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
+import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.response.WorkListResponse;
 import com.ocp.ocp_finalproject.work.dto.response.WorkPageResponse;
+import com.ocp.ocp_finalproject.work.dto.response.WorkResponse;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
@@ -28,6 +31,7 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final WorkflowRepository workflowRepository;
     private final AiContentRepository aiContentRepository;
+    private final UserRepository userRepository;
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -66,6 +70,29 @@ public class WorkService {
                 .totalElements(workPage.getTotalElements())
                 .totalPages(workPage.getTotalPages())
                 .last(workPage.isLast())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public WorkResponse getWork(Long userId, Long workId) {
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        workRepository.findById(workId)
+                .orElseThrow(() -> new CustomException(WORK_NOT_FOUND));
+
+        WorkResponse work = workRepository.findWork(workId);
+
+        return WorkResponse.builder()
+                .workId(work.getWorkId())
+                .postingUrl(work.getPostingUrl())
+                .completedAt(work.getCompletedAt())
+                .title(work.getTitle())
+                .content(work.getContent())
+                .choiceProduct(work.getChoiceProduct())
+                .choiceTrendKeyword(work.getChoiceTrendKeyword())
+                .status(work.getStatus())
                 .build();
     }
 

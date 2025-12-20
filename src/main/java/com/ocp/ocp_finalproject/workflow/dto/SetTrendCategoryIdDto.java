@@ -19,15 +19,34 @@ public class SetTrendCategoryIdDto {
     private Long depth3Category;
 
     public static SetTrendCategoryIdDto from(TrendCategory category) {
+        TrendCategory parent = category.getParentCategory();
+        TrendCategory grandParent = (parent != null) ? parent.getParentCategory() : null;
 
-        TrendCategory d2 = category.getParentCategory();
-        TrendCategory d1 = (d2 != null) ? d2.getParentCategory() : null;
+        Long depth1Id;
+        Long depth2Id;
+        Long depth3Id;
+
+        if (parent == null) {
+            // 부모가 없으면 category가 depth1
+            depth1Id = category.getId();
+            depth2Id = null;
+            depth3Id = null;
+        } else if (grandParent == null) {
+            // 조부모가 없으면 category가 depth2
+            depth1Id = parent.getId();
+            depth2Id = category.getId();
+            depth3Id = null;
+        } else {
+            // 조부모가 있으면 category가 depth3
+            depth1Id = grandParent.getId();
+            depth2Id = parent.getId();
+            depth3Id = category.getId();
+        }
 
         return SetTrendCategoryIdDto.builder()
-                .depth1Category(d1 != null ? d1.getId() : null)
-                .depth2Category(d2 != null ? d2.getId() : null)
-                .depth3Category(category.getId())
+                .depth1Category(depth1Id)
+                .depth2Category(depth2Id)
+                .depth3Category(depth3Id)
                 .build();
     }
-
 }
