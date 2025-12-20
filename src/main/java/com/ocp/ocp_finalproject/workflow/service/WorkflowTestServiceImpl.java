@@ -71,7 +71,7 @@ public class WorkflowTestServiceImpl implements WorkflowTestService {
                 .workflowId(workflowId)
                 .contentGenerateRequested(true)
                 .blogUploadCount(0)
-                .testStatus(WorkflowTestStatus.NOT_TESTED)
+                .testStatus(WorkflowTestStatus.TESTING)
                 .message("워크플로우 생성 및 테스트 실행 완료")
                 .build();
     }
