@@ -34,4 +34,6 @@ public class AdminWorkListResponse {
     private String choiceProduct;
 
     private WorkExecutionStatus status;
+
+    private String failureReason;
 }

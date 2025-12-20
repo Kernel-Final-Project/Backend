@@ -54,7 +54,7 @@ public class ContentGenerateWebhookService {
         log.info("콘텐츠 생성 웹훅 수신 workId={} success={} title={}", workId, isSuccess, request.getTitle());
 
         aiContent.updateContentGeneration(isSuccess, request.getTitle(), request.getSummary(), request.getContent(), completedAt);
-        work.updateContentGeneration(isSuccess, completedAt);
+        work.updateContentGeneration(isSuccess, completedAt, request.getMessage());
 
         boolean isTest = isTestRequest(request.getIsTest(), work);
 

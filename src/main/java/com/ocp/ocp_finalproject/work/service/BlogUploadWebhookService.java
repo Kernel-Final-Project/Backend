@@ -42,7 +42,7 @@ public class BlogUploadWebhookService {
 
         boolean isSuccess = request.isSuccess();
         log.info("웹훅 결과 수신 workId={} success={} postingUrl={} completedAt={}", workId, isSuccess, request.getPostingUrl(), completedAt);
-        work.updateUrlCompletion(request.getPostingUrl(), isSuccess, completedAt);
+        work.updateUrlCompletion(request.getPostingUrl(), isSuccess, completedAt, request.getMessage());
         aiContent.updateBlogUploadResult(isSuccess, completedAt);
 
         boolean isTest = isTestRequest(request.getIsTest(), work);

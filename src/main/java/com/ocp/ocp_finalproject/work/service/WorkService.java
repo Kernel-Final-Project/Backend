@@ -54,6 +54,7 @@ public class WorkService {
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())
                         .choiceProduct(choiceProductByWorkId.get(work.getId()))
+                        .failureReason(work.getFailureReason())
                         .status(work.getStatus() != null ? work.getStatus().name() : null)
                         .build())
                 .collect(Collectors.toList());

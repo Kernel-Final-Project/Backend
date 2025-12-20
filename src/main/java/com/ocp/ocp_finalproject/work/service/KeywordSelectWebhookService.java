@@ -46,7 +46,7 @@ public class KeywordSelectWebhookService {
         boolean isSuccess = request.isSuccess();
         log.info("웹훅 결과 수신 workId={} success={} keyword={} startedAt={} completedAt={}", workId, isSuccess, request.getKeyword(), startedAt, completedAt);
 
-        work.updateKeywordCompletion(isSuccess, startedAt, completedAt);
+        work.updateKeywordCompletion(isSuccess, startedAt, completedAt, request.getMessage());
         ai.updateKeywordCompletion(isSuccess, request.getKeyword(), startedAt, completedAt);
 
         boolean isTest = isTestRequest(request.getIsTest(), work);

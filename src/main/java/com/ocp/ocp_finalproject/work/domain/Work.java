@@ -46,6 +46,9 @@ public class Work extends BaseEntity {
     @OneToOne(mappedBy = "work", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private AiContent aiContent;
 
+    @Column(name = "failure_reason", columnDefinition = "TEXT")
+    private String failureReason;
+
     @Builder(builderMethodName = "createBuilder")
     public static Work create(Workflow workflow, WorkExecutionStatus status, LocalDateTime startedAt, LocalDateTime completedAt) {
         Work work = new Work();
@@ -57,21 +60,25 @@ public class Work extends BaseEntity {
         return work;
     }
 
-    public void updateUrlCompletion(String postingUrl, boolean isSuccess, LocalDateTime completedAt) {
+    public void updateUrlCompletion(String postingUrl, boolean isSuccess, LocalDateTime completedAt, String failureReason) {
         this.postingUrl = postingUrl;
         this.completedAt = completedAt;
         if (isSuccess) {
             this.status = WorkExecutionStatus.COMPLETED;
+            this.failureReason = null;
         } else {
             this.status = WorkExecutionStatus.FAILED;
+            this.failureReason = failureReason;
         }
     }
 
-    public void updateKeywordCompletion(boolean isSuccess, LocalDateTime startedAt,LocalDateTime completedAt) {
-        if(isSuccess) {
+    public void updateKeywordCompletion(boolean isSuccess, LocalDateTime startedAt, LocalDateTime completedAt, String failureReason) {
+        if (isSuccess) {
             this.status = WorkExecutionStatus.TREND_KEYWORD_DONE;
-        } else{
+            this.failureReason = null;
+        } else {
             this.status = WorkExecutionStatus.FAILED;
+            this.failureReason = failureReason;
         }
 
         this.startedAt = startedAt;
@@ -82,22 +89,25 @@ public class Work extends BaseEntity {
         this.status = WorkExecutionStatus.REQUESTED;
     }
 
-    public void updateProductSelection(boolean isSuccess, LocalDateTime completedAt) {
+    public void updateProductSelection(boolean isSuccess, LocalDateTime completedAt, String failureReason) {
         if (isSuccess) {
             this.status = WorkExecutionStatus.PRODUCT_SELECTED;
+            this.failureReason = null;
         } else {
             this.status = WorkExecutionStatus.FAILED;
+            this.failureReason = failureReason;
         }
         this.completedAt = completedAt;
     }
 
-    public void updateContentGeneration(boolean isSuccess, LocalDateTime completedAt) {
+    public void updateContentGeneration(boolean isSuccess, LocalDateTime completedAt, String failureReason) {
         if (isSuccess) {
             this.status = WorkExecutionStatus.CONTENT_GENERATED;
+            this.failureReason = null;
         } else {
             this.status = WorkExecutionStatus.FAILED;
+            this.failureReason = failureReason;
         }
         this.completedAt = completedAt;
     }
-
 }

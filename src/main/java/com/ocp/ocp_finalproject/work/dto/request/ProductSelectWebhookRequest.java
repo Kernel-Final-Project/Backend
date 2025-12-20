@@ -16,6 +16,12 @@ public class ProductSelectWebhookRequest {
 
     private Boolean success;
 
+    private String message;
+
+    private String errorType;
+
+    private String step;
+
     @JsonProperty("completedAt")
     private OffsetDateTime completedAt;
 

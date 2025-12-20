@@ -51,7 +51,7 @@ public class ProductSelectWebhookService {
 
         boolean isSuccess = successFlag;
         aiContent.updateProductSelection(isSuccess, productName, completedAt);
-        work.updateProductSelection(isSuccess, completedAt);
+        work.updateProductSelection(isSuccess, completedAt, request.getMessage());
 
         boolean isTest = isTestRequest(request.getIsTest(), work);
         updateTestStatusIfNeeded(work, isTest, isSuccess);
