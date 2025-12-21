@@ -76,22 +76,23 @@ public class WorkService {
     @Transactional(readOnly = true)
     public WorkResponse getWork(Long userId, Long workId) {
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        workRepository.findById(workId)
+        Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new CustomException(WORK_NOT_FOUND));
 
-        WorkResponse work = workRepository.findWork(workId);
+        if (!work.getWorkflow().getUser().getId().equals(userId)) {
+            throw new CustomException(NOT_WORKFLOW_OWNER);
+        }
+
+        AiContent aiContent = work.getAiContent();
 
         return WorkResponse.builder()
-                .workId(work.getWorkId())
+                .workId(work.getId())
                 .postingUrl(work.getPostingUrl())
                 .completedAt(work.getCompletedAt())
-                .title(work.getTitle())
-                .content(work.getContent())
-                .choiceProduct(work.getChoiceProduct())
-                .choiceTrendKeyword(work.getChoiceTrendKeyword())
+                .title(aiContent != null ? aiContent.getTitle() : null)
+                .content(aiContent != null ? aiContent.getContent() : null)
+                .choiceProduct(aiContent != null ? aiContent.getChoiceProduct() : null)
+                .choiceTrendKeyword(aiContent != null ? aiContent.getChoiceTrendKeyword() : null)
                 .status(work.getStatus())
                 .build();
     }
