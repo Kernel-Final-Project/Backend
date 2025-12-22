@@ -5,6 +5,7 @@ import com.ocp.ocp_finalproject.audit.enums.ActorType;
 import com.ocp.ocp_finalproject.audit.enums.AuditResult;
 import com.ocp.ocp_finalproject.audit.service.AuditLogService;
 import com.ocp.ocp_finalproject.audit.util.ActorResolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AuditAspect {
 
     private final AuditLogService auditLogService;
+    private final ObjectMapper objectMapper;
 
     private final ExpressionParser spelParser = new SpelExpressionParser();
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
@@ -208,33 +210,10 @@ public class AuditAspect {
             return null;
         }
         try {
-            StringBuilder sb = new StringBuilder();
-            sb.append('{');
-            boolean first = true;
-            for (Map.Entry<String, Object> e : extra.entrySet()) {
-                if (e.getKey() == null || e.getValue() == null) {
-                    continue;
-                }
-                if (!first) {
-                    sb.append(',');
-                }
-                first = false;
-                sb.append('"').append(escapeJson(e.getKey())).append('"')
-                        .append(':')
-                        .append('"').append(escapeJson(String.valueOf(e.getValue()))).append('"');
-            }
-            sb.append('}');
-            return sb.toString();
+            return objectMapper.writeValueAsString(extra);
         } catch (Exception e) {
             log.debug("extraJson 생성 실패 msg={}", e.getMessage());
             return null;
         }
-    }
-
-    private String escapeJson(String s) {
-        if (s == null) {
-            return "";
-        }
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
