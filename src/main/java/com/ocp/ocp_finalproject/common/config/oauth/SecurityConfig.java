@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -77,6 +79,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/workflows/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/workflows/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/workflows/**").authenticated()
+
+                        // ⭐ Site Request 권한 추가
+                        .requestMatchers(HttpMethod.POST, "/api/v1/site-requests").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/site-requests/my").authenticated()
+                        .requestMatchers("/api/v1/site-requests/**").hasRole("ADMIN")
 
                         .anyRequest().permitAll()
                 )
