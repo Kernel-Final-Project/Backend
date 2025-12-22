@@ -1,4 +1,4 @@
-package com.ocp.ocp_finalproject.workflow.service.controller;
+package com.ocp.ocp_finalproject.admin.controller;
 
 //user
 import com.ocp.ocp_finalproject.admin.dto.response.DailyUserStatisticsResponse;

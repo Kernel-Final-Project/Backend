@@ -17,4 +17,5 @@ public class WorkListResponse {
     private String postingUrl;
     private LocalDateTime completedAt;
     private String choiceProduct;
+    private String failureReason;
 }

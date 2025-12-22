@@ -1,6 +1,7 @@
 package com.ocp.ocp_finalproject.work.repository;
 
 import com.ocp.ocp_finalproject.work.domain.Work;
+import com.ocp.ocp_finalproject.work.dto.response.WorkResponse;
 import com.ocp.ocp_finalproject.work.enums.WorkExecutionStatus;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,24 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
     Page<Work> findByWorkflowIdForAdmin(Long workflowId, Pageable pageable);
 
     @Query("""
+        SELECT new com.ocp.ocp_finalproject.work.dto.response.WorkResponse(
+            w.id,
+            w.postingUrl,
+            w.completedAt,
+            ac.choiceProduct,
+            ac.title,
+            ac.content,
+            ac.choiceTrendKeyword,
+            w.status
+        )
+        FROM Work w
+        JOIN w.workflow wf
+        LEFT JOIN w.aiContent ac
+        WHERE w.id = :workId
+    """)
+    WorkResponse findWork(Long workId);
+
+    @Query("""
         SELECT w
         FROM Work w
         JOIN FETCH w.workflow wf
@@ -53,5 +72,7 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
         JOIN FETCH w.aiContent ac
     """)
     Page<Work> findAllForAdmin(Pageable pageable);
+
+    Optional<Work> findTopByWorkflowIdOrderByCreatedAtDesc(Long workflowId);
 
 }

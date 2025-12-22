@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum WorkflowStatus {
 
+    PRE_REGISTERED("등록전", "워크플로우가 아직 등록되지 않은 상태"),
     PENDING("대기", "워크플로우 생성 후 첫 실행 대기 중"),
     ACTIVE("활성", "워크플로우가 활성화되어 자동 실행 중"),
     INACTIVE("비활성", "워크플로우가 비활성화되어 실행 중지"),
@@ -59,21 +60,30 @@ public enum WorkflowStatus {
      */
     public boolean canTransitionTo(WorkflowStatus newStatus) {
         return switch (this) {
+            case PRE_REGISTERED ->
+                    newStatus == PENDING
+                            || newStatus == DELETED;
 
-            case PENDING -> newStatus == ACTIVE
-                    || newStatus == DELETED;
+            case PENDING ->
+                    newStatus == INACTIVE
+                            || newStatus == DELETED
+                            || newStatus == ACTIVE;
 
-            case ACTIVE -> newStatus == INACTIVE
-                    || newStatus == COMPLETED
-                    || newStatus == DELETED;
+            case ACTIVE ->
+                    newStatus == INACTIVE
+                            || newStatus == COMPLETED
+                            || newStatus == DELETED;
 
-            case INACTIVE -> newStatus == ACTIVE
-                    || newStatus == COMPLETED
-                    || newStatus == DELETED;
+            case INACTIVE ->
+                    newStatus == ACTIVE
+                            || newStatus == COMPLETED
+                            || newStatus == DELETED;
 
-            case COMPLETED -> newStatus == DELETED;
+            case COMPLETED ->
+                    newStatus == DELETED;
 
-            case DELETED -> false;
+            case DELETED ->
+                    false;
         };
     }
 

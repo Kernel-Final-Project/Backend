@@ -45,7 +45,7 @@ public class Workflow extends BaseEntity {
     @JoinColumn(name = "trend_category_id")
     private TrendCategory trendCategory;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "recurrence_rule_id")
     private RecurrenceRule recurrenceRule;
 
@@ -79,9 +79,9 @@ public class Workflow extends BaseEntity {
         workflow.userBlog = userBlog;
         workflow.trendCategory = trendCategory;
         workflow.recurrenceRule = recurrenceRule;
-        workflow.status = WorkflowStatus.PENDING;
+        workflow.status = WorkflowStatus.PRE_REGISTERED;
         workflow.siteUrl = siteUrl;
-        workflow.testStatus = null;
+        workflow.testStatus = WorkflowTestStatus.NOT_TESTED;
 
         return workflow;
     }
@@ -98,6 +98,7 @@ public class Workflow extends BaseEntity {
 
     public void changeStatus(WorkflowStatus newStatus) {
         if(!this.status.canTransitionTo(newStatus)) {
+            log.info(String.valueOf(this.status));
             log.info(String.valueOf(newStatus));
             throw new CustomException(INVALID_STATUS_CHANGE);
         }
@@ -111,11 +112,10 @@ public class Workflow extends BaseEntity {
     }
 
     public void markAsTest() {
-        this.testStatus = WorkflowTestStatus.NOT_TESTED;
+        this.testStatus = WorkflowTestStatus.TESTING;
     }
 
     public void updateTestStatus(WorkflowTestStatus newStatus) {
         this.testStatus = newStatus;
     }
-
 }

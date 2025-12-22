@@ -4,6 +4,9 @@ import com.ocp.ocp_finalproject.common.response.ErrorResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -123,6 +126,31 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus())
+                .body(response);
+    }
+
+    // ===== 인증/인가 예외 처리 =====
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<@NonNull ErrorResponse> handleAccessDenied(Exception e) {
+        log.error("AccessDeniedException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.error(
+                ErrorCode.ACCESS_DENIED.getCode(),
+                ErrorCode.ACCESS_DENIED.getMessage()
+        );
+        return ResponseEntity
+                .status(ErrorCode.ACCESS_DENIED.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<@NonNull ErrorResponse> handleAuthenticationException(AuthenticationException e) {
+        log.error("AuthenticationException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.error(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+        );
+        return ResponseEntity
+                .status(ErrorCode.UNAUTHORIZED.getStatus())
                 .body(response);
     }
 

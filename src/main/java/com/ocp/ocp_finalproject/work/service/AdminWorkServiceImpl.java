@@ -75,6 +75,7 @@ public class AdminWorkServiceImpl implements AdminWorkService {
                         .content(work.getAiContent().getContent())
                         .choiceProduct(work.getAiContent().getChoiceProduct())
                         .choiceTrendKeyword(work.getAiContent().getChoiceTrendKeyword())
+                        .failureReason(work.getFailureReason())
                         .build())
                 .collect(Collectors.toList());
 

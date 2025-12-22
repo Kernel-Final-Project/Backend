@@ -13,4 +13,5 @@ public class BlogUploadRequest {
     private String blogUrl;
     private String webhookUrl;
     private String webhookToken;
+    private Boolean isTest;
 }

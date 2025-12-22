@@ -1,5 +1,8 @@
 package com.ocp.ocp_finalproject.work.controller;
 
+import com.ocp.ocp_finalproject.audit.annotation.Audit;
+import com.ocp.ocp_finalproject.audit.enums.ActorType;
+import com.ocp.ocp_finalproject.audit.enums.AuditAction;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.exception.ErrorCode;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
@@ -21,6 +24,12 @@ public class KeywordSelectWebhookController {
     private final KeywordSelectProperties keywordSelectProperties;
     private final KeywordSelectWebhookService webhookService;
 
+    @Audit(
+            action = AuditAction.WEBHOOK_KEYWORD_SELECT_RESULT,
+            actorType = ActorType.SYSTEM,
+            targetType = "WORK",
+            targetIdSpel = "#request.workId"
+    )
     @PostMapping
     public ApiResult<Void> handleWebhook(
             @RequestHeader(value = WEBHOOK_HEADER, required = false) String secretHeader,

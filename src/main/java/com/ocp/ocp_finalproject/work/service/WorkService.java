@@ -3,9 +3,12 @@ package com.ocp.ocp_finalproject.work.service;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.content.domain.AiContent;
 import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
+import com.ocp.ocp_finalproject.user.domain.User;
+import com.ocp.ocp_finalproject.user.repository.UserRepository;
 import com.ocp.ocp_finalproject.work.domain.Work;
 import com.ocp.ocp_finalproject.work.dto.response.WorkListResponse;
 import com.ocp.ocp_finalproject.work.dto.response.WorkPageResponse;
+import com.ocp.ocp_finalproject.work.dto.response.WorkResponse;
 import com.ocp.ocp_finalproject.work.repository.WorkRepository;
 import com.ocp.ocp_finalproject.workflow.domain.Workflow;
 import com.ocp.ocp_finalproject.workflow.repository.WorkflowRepository;
@@ -28,6 +31,7 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final WorkflowRepository workflowRepository;
     private final AiContentRepository aiContentRepository;
+    private final UserRepository userRepository;
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -54,6 +58,7 @@ public class WorkService {
                         .postingUrl(work.getPostingUrl())
                         .completedAt(work.getCompletedAt())
                         .choiceProduct(choiceProductByWorkId.get(work.getId()))
+                        .failureReason(work.getFailureReason())
                         .status(work.getStatus() != null ? work.getStatus().name() : null)
                         .build())
                 .collect(Collectors.toList());
@@ -65,6 +70,30 @@ public class WorkService {
                 .totalElements(workPage.getTotalElements())
                 .totalPages(workPage.getTotalPages())
                 .last(workPage.isLast())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public WorkResponse getWork(Long userId, Long workId) {
+
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new CustomException(WORK_NOT_FOUND));
+
+        if (!work.getWorkflow().getUser().getId().equals(userId)) {
+            throw new CustomException(NOT_WORKFLOW_OWNER);
+        }
+
+        AiContent aiContent = work.getAiContent();
+
+        return WorkResponse.builder()
+                .workId(work.getId())
+                .postingUrl(work.getPostingUrl())
+                .completedAt(work.getCompletedAt())
+                .title(aiContent != null ? aiContent.getTitle() : null)
+                .content(aiContent != null ? aiContent.getContent() : null)
+                .choiceProduct(aiContent != null ? aiContent.getChoiceProduct() : null)
+                .choiceTrendKeyword(aiContent != null ? aiContent.getChoiceTrendKeyword() : null)
+                .status(work.getStatus())
                 .build();
     }
 

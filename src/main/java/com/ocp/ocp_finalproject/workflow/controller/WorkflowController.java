@@ -1,10 +1,21 @@
 package com.ocp.ocp_finalproject.workflow.controller;
 
+import com.ocp.ocp_finalproject.audit.annotation.Audit;
+import com.ocp.ocp_finalproject.audit.enums.ActorType;
+import com.ocp.ocp_finalproject.audit.enums.AuditAction;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
-import com.ocp.ocp_finalproject.workflow.dto.request.*;
-import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.dto.request.WorkflowRegisterRequest;
+import com.ocp.ocp_finalproject.workflow.dto.request.WorkflowStatusRequest;
+import com.ocp.ocp_finalproject.workflow.dto.response.BlogTypeResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.GetWorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.SiteUrlResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.TrendCategoryResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowEditResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowStatusResponse;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
@@ -79,40 +90,33 @@ public class WorkflowController {
     /**
      * 워크플로우 등록
      */
-    @PostMapping
-    public ResponseEntity<ApiResult<WorkflowResponse>> createWorkflow(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody WorkflowRequest workflowRequest
-    ) throws SchedulerException {
-
-        Long userId = validateAndGetUserId(principal);
-
-        WorkflowResponse workflow = workflowService.createWorkflow(userId, workflowRequest);
-
-        return ResponseEntity.ok(ApiResult.success("워크플로우 생성 성공", workflow));
-    }
-
-    /**
-     * 워크플로우 수정
-     * url, 트렌드 키워드, 블로그, 예약 시간, 블로그 계정 모두 수정 가능
-     */
-    @PutMapping("/{workflowId}")
-    public ResponseEntity<ApiResult<WorkflowResponse>> updateWorkflow(
+    @Audit(
+            action = AuditAction.WORKFLOW_CREATE,
+            actorType = ActorType.USER,
+            targetType = "WORKFLOW",
+            targetIdSpel = "#workflowId"
+    )
+    @PostMapping("/{workflowId}/register")
+    public ResponseEntity<ApiResult<WorkflowResponse>> registerWorkflow(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long workflowId,
-            @RequestBody WorkflowRequest workflowRequest
+            @RequestBody(required = false) WorkflowRegisterRequest request
     ) throws SchedulerException {
-
         Long userId = validateAndGetUserId(principal);
-
-        WorkflowResponse workflow = workflowService.updateWorkflow(userId, workflowId, workflowRequest);
-
-        return ResponseEntity.ok(ApiResult.success("워크플로우 수정 성공", workflow));
+        Long replaceWorkflowId = request != null ? request.getReplaceWorkflowId() : null;
+        WorkflowResponse workflow = workflowService.registerWorkflow(userId, workflowId, replaceWorkflowId);
+        return ResponseEntity.ok(ApiResult.success("워크플로우 등록 성공", workflow));
     }
 
     /**
      * 워크플로우 상태 변경
      */
+    @Audit(
+            action = AuditAction.WORKFLOW_STATUS_CHANGE,
+            actorType = ActorType.USER,
+            targetType = "WORKFLOW",
+            targetIdSpel = "#workflowId"
+    )
     @PatchMapping("/{workflowId}/status")
     public ResponseEntity<ApiResult<WorkflowStatusResponse>> updateStatus(
             @AuthenticationPrincipal UserPrincipal principal,
