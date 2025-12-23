@@ -341,9 +341,9 @@ public class StatisticsService {
                     Integer monthNumber = entry.getKey();
                     List<SystemDailyStatistics> monthData = entry.getValue();
 
-                    // 월의 시작일과 종료일
-                    LocalDate monthStart = monthData.get(0).getStatDate();
-                    LocalDate monthEnd = monthData.get(monthData.size() - 1).getStatDate();
+                    // 월의 시작일과 종료일 (해당 월의 실제 첫날과 마지막 날)
+                    LocalDate monthStart = LocalDate.of(year, monthNumber, 1);
+                    LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
 
                     // 월간 총 포스팅 수 (합계)
                     long totalPosts = monthData.stream()

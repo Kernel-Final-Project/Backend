@@ -2,6 +2,9 @@ package com.ocp.ocp_finalproject.admin.controller;
 
 import com.ocp.ocp_finalproject.admin.dto.request.SuspendUserRequest;
 import com.ocp.ocp_finalproject.admin.dto.response.AdminUserResponse;
+import com.ocp.ocp_finalproject.audit.annotation.Audit;
+import com.ocp.ocp_finalproject.audit.enums.ActorType;
+import com.ocp.ocp_finalproject.audit.enums.AuditAction;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.admin.service.AdminUserService;
 import com.ocp.ocp_finalproject.user.domain.User;
@@ -70,6 +73,12 @@ public class AdminUserController {
         @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음"),
         @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
+    @Audit(
+            action = AuditAction.ADMIN_USER_SUSPEND,
+            actorType = ActorType.ADMIN,
+            targetType = "USER",
+            targetIdSpel = "#userId"
+    )
     @PostMapping("/users/{userId}/suspend")
     public ResponseEntity<ApiResult<Void>> suspendUser(
             @Parameter(description = "사용자 ID", example = "5") @PathVariable Long userId,

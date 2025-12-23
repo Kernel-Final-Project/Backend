@@ -147,4 +147,25 @@ public class StatisticsAggregationService {
         Long count = userRepository.countActiveUsersBetween(startTime, endTime);
         return Math.toIntExact(count);
     }
+
+    /*
+    * 특정 날짜의 통계를 재집계합니다.
+    *
+    * 기존 통계 데이터가 있으면 삭제한 후 새로 집계합니다.
+    * 수동으로 통계를 재집계할 때 사용합니다.
+    *
+    * @param targetDate 재집계할 날짜
+    * */
+    @Transactional
+    public void reAggregateStatistics(LocalDate targetDate) {
+        log.info("통계 재집계 시작 - 날짜: {}", targetDate);
+
+        // 1. 기존 통계 데이터 삭제
+        systemDailyStatisticsRepository.deleteByStatDate(targetDate);
+        log.info("기존 통계 데이터 삭제 완료 - 날짜: {}", targetDate);
+
+        // 2. 새로 집계
+        aggregateAndSaveDailyStatistics(targetDate);
+        log.info("통계 재집계 완료 - 날짜: {}", targetDate);
+    }
 }

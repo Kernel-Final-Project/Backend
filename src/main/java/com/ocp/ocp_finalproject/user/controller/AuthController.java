@@ -1,5 +1,8 @@
 package com.ocp.ocp_finalproject.user.controller;
 
+import com.ocp.ocp_finalproject.audit.annotation.Audit;
+import com.ocp.ocp_finalproject.audit.enums.ActorType;
+import com.ocp.ocp_finalproject.audit.enums.AuditAction;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.User;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
@@ -50,6 +53,11 @@ public class AuthController {
      * 로그 아웃
      * POST /api/v1/auth/logout
      */
+    @Audit(
+            action = AuditAction.USER_LOGOUT,
+            actorType = ActorType.USER,
+            targetType = "USER"
+    )
     @PostMapping("/logout")
     public ResponseEntity <ApiResult<Void>> logout(@AuthenticationPrincipal UserPrincipal principal ,HttpServletRequest request) {
         log.info("로그아웃 요청 - userId: {}",principal.getUser().getId());

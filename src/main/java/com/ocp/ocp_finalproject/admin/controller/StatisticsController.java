@@ -10,6 +10,7 @@ import com.ocp.ocp_finalproject.admin.dto.response.WeeklyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.MonthlyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.service.StatisticsService;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
+import com.ocp.ocp_finalproject.monitoring.service.StatisticsAggregationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,13 +42,14 @@ import java.util.List;
 * 실패: ApiResult.error(errorCode, message)
 *
 * */
-@Tag(name = "관리자 - 통계", description = "관리자 통계 조회 API")
+@Tag(name = "관리자 - 통계", description = "관리자 통계 조회 및 관리 API")
 @RestController
 @RequestMapping("/api/v1/admin/statistics")
 @RequiredArgsConstructor
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
+    private final StatisticsAggregationService statisticsAggregationService;
     
     /*
     * 일별 사용자 통계를 조회합니다.
@@ -306,6 +309,100 @@ public class StatisticsController {
                 statisticsService.getMonthlyPostStatistics(year);
 
         return ResponseEntity.ok(ApiResult.success("월별 포스팅 조회 성공", statistics));
+    }
+
+    // ============================================
+    // 통계 수동 재집계 (관리자용)
+    // ============================================
+
+    /*
+     * 특정 날짜의 통계를 수동으로 재집계합니다.
+     *
+     * 기존 통계 데이터가 있으면 삭제 후 재집계합니다.
+     * 스케줄러가 실행되지 않았거나 데이터 오류 발생 시 사용합니다.
+     *
+     * @param targetDate 재집계할 날짜
+     * @return 성공 메시지
+     * */
+    @Operation(summary = "특정 날짜 통계 수동 재집계",
+            description = "지정한 날짜의 통계를 수동으로 재집계합니다. 기존 데이터가 있으면 삭제 후 재집계합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "통계 재집계 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/manual-aggregate")
+    public ResponseEntity<ApiResult<String>> manualAggregate(
+            @Parameter(
+                    description = "재집계할 날짜 (ISO-8601 형식)",
+                    example = "2025-12-15",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate targetDate) {
+
+        statisticsAggregationService.reAggregateStatistics(targetDate);
+
+        return ResponseEntity.ok(
+                ApiResult.success("통계 재집계 완료", targetDate.toString())
+        );
+    }
+
+    /*
+     * 날짜 범위의 통계를 수동으로 일괄 재집계합니다.
+     *
+     * 시작일부터 종료일까지 각 날짜의 통계를 재집계합니다.
+     * 기존 통계 데이터가 있으면 삭제 후 재집계합니다.
+     *
+     * @param startDate 재집계 시작 날짜
+     * @param endDate 재집계 종료 날짜
+     * @return 성공 메시지
+     * */
+    @Operation(summary = "날짜 범위 통계 수동 재집계",
+            description = "지정한 날짜 범위의 통계를 일괄 재집계합니다. 기존 데이터가 있으면 삭제 후 재집계합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "통계 재집계 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (시작일 > 종료일 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/manual-aggregate-range")
+    public ResponseEntity<ApiResult<String>> manualAggregateRange(
+            @Parameter(
+                    description = "재집계 시작 날짜 (ISO-8601 형식)",
+                    example = "2025-12-10",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @Parameter(
+                    description = "재집계 종료 날짜 (ISO-8601 형식)",
+                    example = "2025-12-19",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate) {
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("시작일은 종료일보다 늦을 수 없습니다.");
+        }
+
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            statisticsAggregationService.reAggregateStatistics(current);
+            current = current.plusDays(1);
+        }
+
+        return ResponseEntity.ok(
+                ApiResult.success("통계 재집계 완료", startDate + " ~ " + endDate)
+        );
     }
 }
 

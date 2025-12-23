@@ -1,10 +1,21 @@
 package com.ocp.ocp_finalproject.workflow.controller;
 
+import com.ocp.ocp_finalproject.audit.annotation.Audit;
+import com.ocp.ocp_finalproject.audit.enums.ActorType;
+import com.ocp.ocp_finalproject.audit.enums.AuditAction;
 import com.ocp.ocp_finalproject.common.exception.CustomException;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.user.domain.UserPrincipal;
-import com.ocp.ocp_finalproject.workflow.dto.request.*;
-import com.ocp.ocp_finalproject.workflow.dto.response.*;
+import com.ocp.ocp_finalproject.workflow.dto.request.WorkflowRegisterRequest;
+import com.ocp.ocp_finalproject.workflow.dto.request.WorkflowStatusRequest;
+import com.ocp.ocp_finalproject.workflow.dto.response.BlogTypeResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.GetWorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.SiteUrlResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.TrendCategoryResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowEditResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowListResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowResponse;
+import com.ocp.ocp_finalproject.workflow.dto.response.WorkflowStatusResponse;
 import com.ocp.ocp_finalproject.workflow.enums.SiteUrlInfo;
 import com.ocp.ocp_finalproject.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +90,12 @@ public class WorkflowController {
     /**
      * 워크플로우 등록
      */
+    @Audit(
+            action = AuditAction.WORKFLOW_CREATE,
+            actorType = ActorType.USER,
+            targetType = "WORKFLOW",
+            targetIdSpel = "#workflowId"
+    )
     @PostMapping("/{workflowId}/register")
     public ResponseEntity<ApiResult<WorkflowResponse>> registerWorkflow(
             @AuthenticationPrincipal UserPrincipal principal,
@@ -94,6 +111,12 @@ public class WorkflowController {
     /**
      * 워크플로우 상태 변경
      */
+    @Audit(
+            action = AuditAction.WORKFLOW_STATUS_CHANGE,
+            actorType = ActorType.USER,
+            targetType = "WORKFLOW",
+            targetIdSpel = "#workflowId"
+    )
     @PatchMapping("/{workflowId}/status")
     public ResponseEntity<ApiResult<WorkflowStatusResponse>> updateStatus(
             @AuthenticationPrincipal UserPrincipal principal,

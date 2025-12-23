@@ -38,4 +38,13 @@ public interface SystemDailyStatisticsRepository extends JpaRepository<SystemDai
     * @return 존재 여부
     * */
     boolean existsByStatDate(LocalDate date);
+
+    /*
+    * 특정 날짜의 통계 삭제
+    *
+    * 통계 재집계 시 기존 데이터를 삭제하기 위해 사용
+    *
+    * @param date 삭제할 날짜
+    * */
+    void deleteByStatDate(LocalDate date);
 }
