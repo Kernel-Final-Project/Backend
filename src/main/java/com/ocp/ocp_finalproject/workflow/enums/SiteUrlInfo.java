@@ -19,7 +19,7 @@ public enum SiteUrlInfo {
     EQL("EQL", "https://www.eql.kr"),
     KREAM("크림", "https://kream.co.kr"),
     ZIGZAG("지그재그", "https://www.zigzag.kr"),
-    SSADAGU("싸다구", "https://www.sadagu.kr");
+    SSADAGU("싸다구", "https://www.ssadagu.kr");
 
     private final String siteName;
     private final String siteUrl;

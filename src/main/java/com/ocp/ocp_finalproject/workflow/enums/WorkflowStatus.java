@@ -60,19 +60,19 @@ public enum WorkflowStatus {
      */
     public boolean canTransitionTo(WorkflowStatus newStatus) {
         return switch (this) {
-            case PRE_REGISTERED ->
-                    newStatus == PENDING
-                            || newStatus == DELETED;
+            case PRE_REGISTERED -> newStatus == PENDING
+                    || newStatus == DELETED;
 
-            case PENDING ->
-                    newStatus == INACTIVE
-                            || newStatus == DELETED
-                            || newStatus == ACTIVE;
+            case PENDING -> newStatus == INACTIVE
+                    || newStatus == DELETED
+                    || newStatus == ACTIVE
+                    || newStatus == PENDING;
 
             case ACTIVE ->
                     newStatus == INACTIVE
                             || newStatus == COMPLETED
-                            || newStatus == DELETED;
+                            || newStatus == DELETED
+                            || newStatus == PENDING;
 
             case INACTIVE ->
                     newStatus == ACTIVE
