@@ -27,6 +27,36 @@ public class DummyDataInitializer implements ApplicationRunner {
     @Value("classpath:db/seed/dummy_data.sql")
     private Resource dummyDataSql;
 
+    @Value("classpath:db/seed/system_daily_statistics.sql")
+    private Resource systemDailyStatisticsSql;
+
+    @Value("classpath:db/seed/ai_usage_log.sql")
+    private Resource aiUsageLogSql;
+
+    @Value("classpath:db/seed/system_logs.sql")
+    private Resource systemLogsSql;
+
+    @Value("classpath:db/seed/ai_content.sql")
+    private Resource aiContentSql;
+
+    @Value("classpath:db/seed/workflow.sql")
+    private Resource workflowSql;
+
+    @Value("classpath:db/seed/work.sql")
+    private Resource workSql;
+
+    @Value("classpath:db/seed/trend_category.sql")
+    private Resource trendCategorySql;
+
+    @Value("classpath:db/seed/common_code.sql")
+    private Resource commonCodeSql;
+
+    @Value("classpath:db/seed/recurrence_rule.sql")
+    private Resource recurrenceRuleSql;
+
+    @Value("classpath:db/seed/user_blog.sql")
+    private Resource userBlogSql;
+
     @Override
     public void run(ApplicationArguments args) {
         log.info("========================================");
@@ -34,12 +64,109 @@ public class DummyDataInitializer implements ApplicationRunner {
         log.info("========================================");
 
         try {
-            ResourceDatabasePopulator populator = new ResourceDatabasePopulator(dummyDataSql);
-            populator.setSeparator(";");
-            populator.setContinueOnError(true);  // 에러가 있어도 계속 진행
-            populator.execute(dataSource);
+            // ========== 1단계: 독립 테이블 (외래키 참조 없음) ==========
 
-            log.info("[Init] SQL 실행 완료");
+            // 1. trend_category 로드
+            log.info("[Init] 1. trend_category 데이터 로드 시작");
+            ResourceDatabasePopulator categoryPopulator = new ResourceDatabasePopulator(trendCategorySql);
+            categoryPopulator.setSeparator(";");
+            categoryPopulator.setContinueOnError(true);
+            categoryPopulator.execute(dataSource);
+            log.info("[Init] 1. trend_category 데이터 로드 완료");
+
+            // 2. common_code 로드
+            log.info("[Init] 2. common_code 데이터 로드 시작");
+            ResourceDatabasePopulator codePopulator = new ResourceDatabasePopulator(commonCodeSql);
+            codePopulator.setSeparator(";");
+            codePopulator.setContinueOnError(true);
+            codePopulator.execute(dataSource);
+            log.info("[Init] 2. common_code 데이터 로드 완료");
+
+            // ========== 2단계: 기본 데이터 (user, auth, blog_type 등) ==========
+
+            // 3. 기본 더미 데이터 로드 (user, auth, blog_type 포함)
+            log.info("[Init] 3. 기본 더미 데이터 로드 시작 (user, auth, blog_type)");
+            ResourceDatabasePopulator dummyPopulator = new ResourceDatabasePopulator(dummyDataSql);
+            dummyPopulator.setSeparator(";");
+            dummyPopulator.setContinueOnError(true);
+            dummyPopulator.execute(dataSource);
+            log.info("[Init] 3. 기본 더미 데이터 로드 완료");
+
+            // ========== 3단계: user, blog_type 참조 테이블 ==========
+
+            // 4. user_blog 로드 (user, blog_type 참조)
+            log.info("[Init] 4. user_blog 데이터 로드 시작");
+            ResourceDatabasePopulator userBlogPopulator = new ResourceDatabasePopulator(userBlogSql);
+            userBlogPopulator.setSeparator(";");
+            userBlogPopulator.setContinueOnError(true);
+            userBlogPopulator.execute(dataSource);
+            log.info("[Init] 4. user_blog 데이터 로드 완료");
+
+            // 5. recurrence_rule 로드 (독립 테이블)
+            log.info("[Init] 5. recurrence_rule 데이터 로드 시작");
+            ResourceDatabasePopulator recurrencePopulator = new ResourceDatabasePopulator(recurrenceRuleSql);
+            recurrencePopulator.setSeparator(";");
+            recurrencePopulator.setContinueOnError(true);
+            recurrencePopulator.execute(dataSource);
+            log.info("[Init] 5. recurrence_rule 데이터 로드 완료");
+
+            // ========== 4단계: workflow 로드 (user, user_blog, trend_category, recurrence_rule 참조) ==========
+
+            // 6. workflow 로드
+            log.info("[Init] 6. workflow 데이터 로드 시작");
+            ResourceDatabasePopulator workflowPopulator = new ResourceDatabasePopulator(workflowSql);
+            workflowPopulator.setSeparator(";");
+            workflowPopulator.setContinueOnError(true);
+            workflowPopulator.execute(dataSource);
+            log.info("[Init] 6. workflow 데이터 로드 완료");
+
+            // ========== 5단계: work 로드 (workflow 참조) ==========
+
+            // 7. work 로드
+            log.info("[Init] 7. work 데이터 로드 시작");
+            ResourceDatabasePopulator workPopulator = new ResourceDatabasePopulator(workSql);
+            workPopulator.setSeparator(";");
+            workPopulator.setContinueOnError(true);
+            workPopulator.execute(dataSource);
+            log.info("[Init] 7. work 데이터 로드 완료");
+
+            // ========== 6단계: ai_content 로드 (work 참조) ==========
+
+            // 8. ai_content 로드
+            log.info("[Init] 8. ai_content 데이터 로드 시작");
+            ResourceDatabasePopulator aiContentPopulator = new ResourceDatabasePopulator(aiContentSql);
+            aiContentPopulator.setSeparator(";");
+            aiContentPopulator.setContinueOnError(true);
+            aiContentPopulator.execute(dataSource);
+            log.info("[Init] 8. ai_content 데이터 로드 완료");
+
+            // ========== 7단계: 통계 및 로그 데이터 (독립) ==========
+
+            // 9. system_daily_statistics 로드
+            log.info("[Init] 9. system_daily_statistics 데이터 로드 시작");
+            ResourceDatabasePopulator statsPopulator = new ResourceDatabasePopulator(systemDailyStatisticsSql);
+            statsPopulator.setSeparator(";");
+            statsPopulator.setContinueOnError(true);
+            statsPopulator.execute(dataSource);
+            log.info("[Init] 9. system_daily_statistics 데이터 로드 완료");
+
+            // 10. ai_usage_log 로드
+            log.info("[Init] 10. ai_usage_log 데이터 로드 시작");
+            ResourceDatabasePopulator aiLogPopulator = new ResourceDatabasePopulator(aiUsageLogSql);
+            aiLogPopulator.setSeparator(";");
+            aiLogPopulator.setContinueOnError(true);
+            aiLogPopulator.execute(dataSource);
+            log.info("[Init] 10. ai_usage_log 데이터 로드 완료");
+
+            // 11. system_logs 로드
+            log.info("[Init] 11. system_logs 데이터 로드 시작");
+            ResourceDatabasePopulator sysLogPopulator = new ResourceDatabasePopulator(systemLogsSql);
+            sysLogPopulator.setSeparator(";");
+            sysLogPopulator.setContinueOnError(true);
+            sysLogPopulator.execute(dataSource);
+            log.info("[Init] 11. system_logs 데이터 로드 완료");
+
+            log.info("[Init] 모든 SQL 실행 완료");
 
             // 데이터 확인
             try (Connection c = dataSource.getConnection();

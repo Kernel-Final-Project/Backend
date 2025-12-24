@@ -9,14 +9,14 @@ spring:
         size: 5
 
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/ocpdb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
-    username: ${MYSQL_USER:ocpuser}
-    password: ${MYSQL_PASSWORD:ocp1234}
+    url: jdbc:mysql://localhost:3306/ocpdb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+    username: ocpuser
+    password: ocp1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -33,7 +33,7 @@ spring:
       max-age: 1800     # 30분
 
   rabbitmq:
-    host: localhost
+    host: 43.203.128.226 # localhost
     port: 5672
     username: guest
     password: guest
@@ -88,11 +88,12 @@ oauth2:
     failure-url: http://localhost:5173/oauth2/callback
 
 airflow:
+  log:
+    base-path: airflow/logs
   api:
-    base-url: ${AIRFLOW_BASE_URL:http://localhost:8081}
-    username: ${AIRFLOW_USERNAME:airflow}
-    password: ${AIRFLOW_PASSWORD:airflow}
-
+    base-url: ${AIRFLOW_BASE_URL:http://43.203.128.226:8081} #${AIRFLOW_BASE_URL:http://localhost:8081}
+    username: ${AIRFLOW_USERNAME:admin}
+    password: ${AIRFLOW_PASSWORD:admin}
 
 app:
   rabbit:
