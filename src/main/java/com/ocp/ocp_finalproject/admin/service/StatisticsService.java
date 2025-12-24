@@ -8,6 +8,8 @@ import com.ocp.ocp_finalproject.admin.dto.response.WeeklyUserStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.DailyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.WeeklyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.MonthlyPostStatisticsResponse;
+import com.ocp.ocp_finalproject.admin.dto.response.BlogPlatformStatisticsResponse;
+import com.ocp.ocp_finalproject.content.repository.AiContentRepository;
 import com.ocp.ocp_finalproject.monitoring.domain.SystemDailyStatistics;
 import com.ocp.ocp_finalproject.monitoring.repository.SystemDailyStatisticsRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 public class StatisticsService {
 
     private final SystemDailyStatisticsRepository systemDailyStatisticsRepository;
+    private final AiContentRepository aiContentRepository;
     /*
     * 일별 사용자 통계 조회
     *
@@ -361,6 +364,37 @@ public class StatisticsService {
                             .build();
                 })
                 .sorted(Comparator.comparing(MonthlyPostStatisticsResponse::getYearMonth))
+                .collect(Collectors.toList());
+    }
+
+    /*
+    * 플랫폼별 발행 통계 조회
+    *
+    * 지정된 기간의 블로그 플랫폼별 발행된 포스팅 수를 조회합니다.
+    *
+    * @param startDate 조회 시작 날짜 (포함)
+    * @param endDate 조회 종료 날짜 (포함)
+    * @return 플랫폼별 포스팅 통계 리스트
+    * */
+    public List<BlogPlatformStatisticsResponse> getBlogPlatformStatistics(LocalDate startDate, LocalDate endDate) {
+        log.info("플랫폼별 발행 통계 조회 - startDate: {}, endDate: {}", startDate, endDate);
+
+        // 날짜 유효성 검사
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("시작일은 종료일보다 늦을 수 없습니다.");
+        }
+
+        // 시작일 00:00:00, 종료일 23:59:59
+        java.time.LocalDateTime startDateTime = startDate.atStartOfDay();
+        java.time.LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+
+        // AiContentRepository에서 플랫폼별 집계 조회
+        List<Object[]> results = aiContentRepository.countByBlogPlatform(startDateTime, endDateTime);
+
+        log.info("조회된 플랫폼 수: {}", results.size());
+
+        return results.stream()
+                .map(BlogPlatformStatisticsResponse::from)
                 .collect(Collectors.toList());
     }
 }

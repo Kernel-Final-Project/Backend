@@ -8,6 +8,7 @@ import com.ocp.ocp_finalproject.admin.dto.response.WeeklyUserStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.DailyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.WeeklyPostStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.dto.response.MonthlyPostStatisticsResponse;
+import com.ocp.ocp_finalproject.admin.dto.response.BlogPlatformStatisticsResponse;
 import com.ocp.ocp_finalproject.admin.service.StatisticsService;
 import com.ocp.ocp_finalproject.common.response.ApiResult;
 import com.ocp.ocp_finalproject.monitoring.service.StatisticsAggregationService;
@@ -403,6 +404,54 @@ public class StatisticsController {
         return ResponseEntity.ok(
                 ApiResult.success("통계 재집계 완료", startDate + " ~ " + endDate)
         );
+    }
+
+    // ============================================
+    // 플랫폼별 발행 통계
+    // ============================================
+
+    /*
+     * 플랫폼별 발행 통계를 조회합니다.
+     *
+     * 지정된 기간의 블로그 플랫폼별 발행된 포스팅 수를 조회합니다.
+     *
+     * @param startDate 조회 시작 날짜
+     * @param endDate 조회 종료 날짜
+     * @return 플랫폼별 발행 통계 리스트
+     * */
+    @Operation(summary = "플랫폼별 발행 통계 조회",
+            description = "지정한 기간의 블로그 플랫폼별 발행된 포스팅 수를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "플랫폼별 통계 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (날짜 형식 오류, 시작일 > 종료일 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음 (관리자 전용)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @GetMapping("/blog-platforms")
+    public ResponseEntity<ApiResult<List<BlogPlatformStatisticsResponse>>> getBlogPlatformStatistics(
+            @Parameter(
+                    description = "조회 시작 날짜 (ISO-8601 형식)",
+                    example = "2025-12-01",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @Parameter(
+                    description = "조회 종료 날짜 (ISO-8601 형식)",
+                    example = "2025-12-31",
+                    required = true
+            )
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate) {
+
+        List<BlogPlatformStatisticsResponse> statistics =
+                statisticsService.getBlogPlatformStatistics(startDate, endDate);
+
+        return ResponseEntity.ok(ApiResult.success("플랫폼별 발행 통계 조회 성공", statistics));
     }
 }
 
